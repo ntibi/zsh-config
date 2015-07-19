@@ -1,6 +1,14 @@
 export PS1="%n@%m [%~] %#> "
 export RPS1="%t"
 
+HISTFILE=~/.zshrc_history
+SAVEHIST=512
+HISTSIZE=512
+
+setopt inc_append_history
+setopt share_history
+
+
 alias e="emacs"
 alias q="emacs -q"
 
