@@ -16,7 +16,7 @@ export editor=emacs
 
 alias ss="du -a . | sort -n -r | head -n 10"
 
-source ".mouse.zsh"
+source "~/.mouse.zsh"
 # zle-toggle-mouse_	to enable mouse
 
 autoload -U colors && colors
