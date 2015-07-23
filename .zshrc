@@ -8,6 +8,7 @@ HISTSIZE=512
 setopt inc_append_history
 setopt share_history
 
+alias emacs=~/.brew/bin/emacs-24.5
 
 alias e="emacs"
 alias q="emacs -q"
@@ -20,6 +21,12 @@ source ~/.mouse.zsh
 # zle-toggle-mouse_	to enable mouse
 
 autoload -U colors && colors
+
+export EDITOR="emacs -q"
+export VISUAL="emacs -q"
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
 
 autoload -U compinit && compinit # enable completion
 zmodload zsh/complist			# load compeltion list
@@ -50,3 +57,5 @@ alias grep="grep --color"
 alias ressource="source ~/.zshrc"
 
 setopt histignoredups			# ignore dups in history
+
+source ~/.myzshrc
