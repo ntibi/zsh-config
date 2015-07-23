@@ -8,12 +8,8 @@ HISTSIZE=512
 setopt inc_append_history
 setopt share_history
 
-alias emacs=~/.brew/bin/emacs-24.5
-
 alias e="emacs"
 alias q="emacs -q"
-
-export editor=emacs
 
 alias ss="du -a . | sort -n -r | head -n 10"
 
@@ -24,9 +20,6 @@ autoload -U colors && colors
 
 export EDITOR="emacs -q"
 export VISUAL="emacs -q"
-autoload -z edit-command-line
-zle -N edit-command-line
-bindkey "^X^E" edit-command-line
 
 autoload -U compinit && compinit # enable completion
 zmodload zsh/complist			# load compeltion list
@@ -58,4 +51,10 @@ alias ressource="source ~/.zshrc"
 
 setopt histignoredups			# ignore dups in history
 
-source ~/.myzshrc
+bindkey -e 						# emacs style
+
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
+
+[ -e ~/.myzshrc ] && source ~/.myzshrc
