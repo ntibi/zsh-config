@@ -16,6 +16,13 @@ HISTSIZE=512
 setopt inc_append_history
 setopt share_history
 setopt histignoredups			# ignore dups in history
+setopt hist_expire_dups_first	# remove all dubs in history when full
+setopt auto_remove_slash		# remove slash when pressing space in auto completion
+setopt nullglob					# remove pointless globs
+setopt auto_cd					# './dir' = 'cd dir'
+unsetopt rm_star_silent			# ask for confirmation if 'rm *'
+unsetopt beep					# no sounds
+# setopt print_exit_value			# print exit value if non 0
 
 source ~/.mouse.zsh				# zle-toggle-mouse_	to enable mouse
 
@@ -23,6 +30,11 @@ autoload -U colors && colors	# cool colors
 
 autoload -U compinit && compinit # enable completion
 zmodload zsh/complist			# load compeltion list
+
+zstyle ':completion:*:rm:*' ignore-line yes # remove suggestion if already in selection
+zstyle ':completion:*:mv:*' ignore-line yes # same
+zstyle ':completion:*:cp:*' ignore-line yes # same
+
 zstyle ":completion:*" menu select # select menu completion
 
 zstyle ':completion:*' list-colors '' # enable colors in completion
@@ -76,4 +88,9 @@ alias ressource="source ~/.zshrc"
 alias e="emacs"
 alias q="emacs -q"				# fast emacs
 
-alias ss="du -a . | sort -n -r | head -n 10" # get the 10 biggest files
+alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
+
+alias .="ls"
+
+uname -a
+uptime
