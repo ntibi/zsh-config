@@ -44,8 +44,8 @@ zstyle ":completion:*" group-name "" # group completion
 zstyle ":completion:*:warnings" format "Nope !" # custom error
 
 zstyle ":completion:::::" completer _complete _approximate # approx completion after regular one
-# zstyle ":completion:*:approximate:*" max-errors 2		   # complete 2 errors max
-zstyle ":completion:*:approximate:*" max-errors "reply=( $(( ($#PREFIX+$#SUFFIX)/3 )) numeric )" # allow one error each 3 characters
+zstyle ":completion:*:approximate:*" max-errors 2		   # complete 2 errors max
+# zstyle ":completion:*:approximate:*" max-errors "reply=( $(( ($#PREFIX+$#SUFFIX)/3 )) numeric )" # allow one error each 3 characters
 
 bindkey -e 						# emacs style
 
