@@ -77,6 +77,8 @@ alias -s py=emacs
 alias -s el=emacs
 alias -s emacs=emacs
 
+alias l="ls -G"
+
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
 alias lt="ls -ltFh"				# l with modification date sort
