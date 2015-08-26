@@ -3,16 +3,24 @@
 
 # setup zsh
 
-export PS1="%n@%m [%~] %#> "
-export RPS1="%t"
+PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{cyan}$([[ $? -ne 0 ]] && echo "×" || echo "✔")$([[ $(jobs) != "" ]] && echo "►" || echo "○")%#%F{red}> %f' # heavy
+# PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
+
+RPS1="%B%F{yellow}%T%f"
 
 export EDITOR="emacs -q"
 export VISUAL="emacs -q"
+
+bindkey "$(echotc kl)" backward-char
+bindkey "$(echotc kr)" forward-char
+bindkey "$(echotc ku)" up-line-or-history
+bindkey "$(echotc kd)" down-line-or-history
 
 HISTFILE=~/.zshrc_history
 SAVEHIST=512
 HISTSIZE=512
 
+setopt promptsubst
 setopt inc_append_history
 setopt share_history
 setopt histignoredups			# ignore dups in history
@@ -47,16 +55,45 @@ zstyle ":completion:::::" completer _complete _approximate # approx completion a
 zstyle ":completion:*:approximate:*" max-errors 2		   # complete 2 errors max
 # zstyle ":completion:*:approximate:*" max-errors "reply=( $(( ($#PREFIX+$#SUFFIX)/3 )) numeric )" # allow one error each 3 characters
 
+zle -C complete-file complete-word _generic
+zstyle ':completion:complete-file::::' completer _files
+
+
 bindkey -e 						# emacs style
+
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+  function zle-line-init() {
+    echoti smkx
+  }
+  function zle-line-finish() {
+    echoti rmkx
+  }
+  zle -N zle-line-init
+  zle -N zle-line-finish
+fi
+
+
+insert_sudo () { zle beginning-of-line; zle -U "sudo " }
+zle -N insert-sudo insert_sudo
+bindkey "^[s" insert-sudo
 
 autoload -z edit-command-line
 zle -N edit-command-line
 
+bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
+bindkey "^x^T" zle-toggle-mouse
 bindkey "^w" kill-region		 # emacs-like kill
 bindkey -s "\el" "ls\n"			 # run ls
 bindkey -s "^X^X" "emacs\n"		 # run emacs
+bindkey "^[[1;3C" emacs-forward-word # alt + keys to navigate between words
+bindkey "^[[1;3D" emacs-backward-word
+
 bindkey -s "^X^M" "make\n"		 # make
+
+if [[ "${terminfo[kcbt]}" != "" ]]; then
+  bindkey "${terminfo[kcbt]}" reverse-menu-complete # shift tab for backward completion
+fi
 
 if [[ "${terminfo[kcuu1]}" != "" ]]; then
 	bindkey "${terminfo[kcuu1]}" up-line-or-search # smart search if line is not empty when keyup
@@ -84,6 +121,7 @@ alias la="ls -lAFh"				# l with hidden files
 alias lt="ls -ltFh"				# l with modification date sort
 alias ll="ls -l"				# simple list
 alias grep="grep --color"
+alias egrep="egrep --color=auto"
 
 alias ressource="source ~/.zshrc"
 
