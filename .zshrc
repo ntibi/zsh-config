@@ -14,9 +14,6 @@ PS1='%B%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{re
 
 RPS1="%B%F{yellow}%T%f"
 
-[[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != "" ]] && export PS1=$(echo $PS1 | sed 's/%n/%F{blue}ssh%F{red}:%F{blue}%n/g');
-
-
 export EDITOR="emacs -q"
 export VISUAL="emacs -q"
 
