@@ -3,7 +3,13 @@
 
 # setup zsh
 
-PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{cyan}$([[ $? -ne 0 ]] && echo "×" || echo "✔")$([[ $(jobs) != "" ]] && echo "►" || echo "○")%#%F{red}> %f' # heavy
+get_exit() { [[ $? -ne 0 ]] && echo "×" || echo "✔" }
+
+get_jobs() { ([[ $(jobs) != "" ]] && echo "►" || echo "○") }
+
+GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo 'ssh:')"
+
+PS1='%B%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{cyan}$(get_exit)$(get_jobs)%#%F{red}> %f' # heavy
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
 RPS1="%B%F{yellow}%T%f"
@@ -23,7 +29,7 @@ HISTFILE=~/.zshrc_history
 SAVEHIST=512
 HISTSIZE=512
 
-setopt promptsubst
+setopt promptsubst				# compute PS1 at each prompt print
 setopt inc_append_history
 setopt share_history
 setopt histignoredups			# ignore dups in history
