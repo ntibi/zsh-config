@@ -3,11 +3,11 @@
 
 # setup zsh
 
-get_exit() { [[ $? -ne 0 ]] && echo "×" || echo "✔" }
+get_exit() { [[ $? -ne 0 ]] && echo "×" || echo "✔" } # functions called at each prompt print
 
 get_jobs() { ([[ $(jobs) != "" ]] && echo "►" || echo "○") }
 
-GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo 'ssh:')"
+GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{blue}ssh%F{red}:%F{blue}')" # Only called once
 
 PS1='%B%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{cyan}$(get_exit)$(get_jobs)%#%F{red}> %f' # heavy
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
