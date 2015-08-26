@@ -8,10 +8,7 @@ PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{c
 
 RPS1="%B%F{yellow}%T%f"
 
-if [[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != "" ]]
-then
-	PS1 = echo $PS1 | sed 's/%n/%F{blue}ssh%F{red}:%F{blue}%n/g';
-fi
+if [[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != "" ]] && export PS1=$(echo $PS1 | sed 's/%n/%F{blue}ssh%F{red}:%F{blue}%n/g');
 
 
 export EDITOR="emacs -q"
