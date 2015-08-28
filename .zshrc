@@ -28,7 +28,7 @@ function chpwd()				# chpwd hook to update variables
 NB_FILES=$(ls -pA1 | grep -v /$ | wc -l) # set them for the first time
 NB_DIRS=$(ls -pA1 | grep /$ | wc -l)
 
-PS1='%B%F{red}%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%F{red} [%B%F{magenta}%~%b%F{red}|%F{blue}$NB_FILES%F{red}/%F{green}$NB_DIRS%F{red}] %F{cyan}%(0?.✔.×)%(1j.►.○)$GET_SHLVL%#%F{red}> %f' # heavy
+PS1='%B%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%F{red} [%B%F{magenta}%~%b%F{red}|%F{blue}$NB_FILES%F{red}/%F{green}$NB_DIRS%F{red}] %F{cyan}%(0?.%F{green}✔.%F{red}×)%(1j.%F{yellow}►.%F{blue}○)%F{magenta}$GET_SHLVL%(0#.%F{red}#.%F{blue}\$)%F{red}> %f' # heavy
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
 RPS1="%B%F{yellow}%T%f"
