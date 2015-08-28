@@ -3,7 +3,6 @@
 
 # setup zsh
 
-<<<<<<< HEAD
 
 # Only called once
 
@@ -19,7 +18,6 @@ GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{bl
 # pre promt hook function
 # function precmd() {}
 
-
 function chpwd()				# chpwd hook to update variables
 {
 	v=$(ls -pA1)
@@ -30,15 +28,6 @@ NB_FILES=$(ls -pA1 | grep -v /$ | wc -l) # set them for the first time
 NB_DIRS=$(ls -pA1 | grep /$ | wc -l)
 
 PS1='%B%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%b%F{red} [%F{magenta}%~%b%F{red}|%F{blue}$NB_FILES%F{red}/%F{green}$NB_DIRS%F{red}] %F{cyan}%(0?.%F{green}✔.%F{red}×)%(1j.%F{yellow}%j►.%F{blue}○)%F{magenta}$GET_SHLVL%(0!.%F{red}#.%F{blue}\$)%F{red}> %f' # heavy
-=======
-get_exit() { [[ $? -ne 0 ]] && echo "×" || echo "✔" } # functions called at each prompt print
-
-get_jobs() { ([[ $(jobs) != "" ]] && echo "►" || echo "○") }
-
-GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{blue}ssh%F{red}:%F{blue}')" # Only called once
-
-PS1='%B%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{cyan}$(get_exit)$(get_jobs)%#%F{red}> %f' # heavy
->>>>>>> parent of 2d4cbd8... super update
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
 RPS1="%U%B%F{yellow}%T%f%u"
