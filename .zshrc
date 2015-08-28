@@ -3,11 +3,17 @@
 
 # setup zsh
 
+
+# Only called once
+
+GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
+
+GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{blue}ssh%F{red}:%F{blue}')"
+
+
 # functions called at each prompt print
 
-get_exit() { [[ $? -ne 0 ]] && echo "×" || echo "✔" } # get a character according to the last command return value
-
-get_jobs() { [[ $(jobs) != "" ]] && echo "►" || echo "○" } # get a character according to whether there is jobs running or not
+#
 
 # pre promt hook function
 # function precmd() {}
@@ -22,15 +28,7 @@ function chpwd()				# chpwd hook to update variables
 NB_FILES=$(ls -pA1 | grep -v /$ | wc -l) # set them for the first time
 NB_DIRS=$(ls -pA1 | grep /$ | wc -l)
 
-
-# Only called once
-
-GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
-
-GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{blue}ssh%F{red}:%F{blue}')"
-
-
-PS1='%B%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}|%F{blue}$NB_FILES%F{red}/%F{green}$NB_DIRS%F{red}] %F{cyan}$(get_exit)$(get_jobs)$GET_SHLVL%#%F{red}> %f' # heavy
+PS1='%B%F{red}%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%F{red} [%B%F{magenta}%~%b%F{red}|%F{blue}$NB_FILES%F{red}/%F{green}$NB_DIRS%F{red}] %F{cyan}%(0?.✔.×)%(1j.►.○)$GET_SHLVL%#%F{red}> %f' # heavy
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
 RPS1="%B%F{yellow}%T%f"
