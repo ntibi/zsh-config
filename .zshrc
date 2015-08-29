@@ -6,7 +6,7 @@
 
 # Only called once
 
-PWD_FILE=~/.pwd
+PWD_FILE=~/.pwd					# last pwd sav file
 
 GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
 
@@ -43,7 +43,7 @@ chpwd
 # pre promt hook function
 function precmd()
 {
-	[[ $REPO -eq 1 ]] && GET_GIT=$(git diff --quiet  && echo "%F{green}=" || echo "%F{yellow}+") || GET_GIT="%F{cyan}X"
+	[[ $REPO -eq 1 ]] && GET_GIT=$(git diff --quiet  && echo "%F{green}=" || echo "%F{yellow}+") || GET_GIT="%F{cyan}○"
 }
 autoload precmd
 precmd
@@ -113,8 +113,8 @@ zstyle ":completion:*" group-name "" # group completion
 zstyle ":completion:*:warnings" format "Nope !" # custom error
 
 zstyle ":completion:::::" completer _complete _approximate # approx completion after regular one
-zstyle ":completion:*:approximate:*" max-errors 2		   # complete 2 errors max
-# zstyle ":completion:*:approximate:*" max-errors "reply=( $(( ($#PREFIX+$#SUFFIX)/3 )) numeric )" # allow one error each 3 characters
+# zstyle ":completion:*:approximate:*" max-errors 2		   # complete 2 errors max
+zstyle ":completion:*:approximate:*" max-errors "(( ($#PREFIX+$#SUFFIX)/3 ))" # allow one error each 3 characters
 
 zle -C complete-file complete-word _generic
 zstyle ':completion:complete-file::::' completer _files
