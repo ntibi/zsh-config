@@ -13,10 +13,13 @@ GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{bl
 
 # functions called at each prompt print
 
-#
+
+# pre execution hook function
+# preexec () {}
 
 # pre promt hook function
 # function precmd() {}
+
 
 function chpwd()				# chpwd hook to update variables
 {
@@ -27,10 +30,24 @@ function chpwd()				# chpwd hook to update variables
 NB_FILES=$(ls -pA1 | grep -v /$ | wc -l) # set them for the first time
 NB_DIRS=$(ls -pA1 | grep /$ | wc -l)
 
-PS1='%B%F{blue}$GET_SSH%n%b%F{red}@%B%F{blue}%m%b%F{red} [%F{magenta}%~%b%F{red}|%F{green}$NB_FILES%F{red}/%F{blue}$NB_DIRS%F{red}] %F{cyan}%(0?.%F{green}✔.%F{red}×)%(1j.%F{yellow}%j►.%F{blue}○)%F{magenta}$GET_SHLVL%(0!.%F{red}#.%F{blue}\$)%F{red}> %f' # heavy
-# PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
-RPS1="%U%B%F{yellow}%T%f%u"
+PS1=''
+PS1+='%B%F{blue}$GET_SSH'
+PS1+='%n%b%F{red}@%B%F{blue}%m%b'
+PS1+='%F{red}[%F{magenta}%~%b%F{red}|'
+PS1+='%F{green}$NB_FILES%F{red}/%F{blue}$NB_DIRS%F{red}]'
+PS1+='%F{red}[%F{cyan}'
+PS1+='%(0?.%F{green}✔.%F{red}×)'
+PS1+='%(1j.%F{yellow}►.%F{blue}○)'
+PS1+='%F{magenta}$GET_SHLVL'
+PS1+='%(0!.%F{red}#.%F{blue}\$)'
+PS1+='%F{red}]> '
+
+PS1_RIGHT="%U%B%F{yellow}%T%u%f"
+
+RPS1=$PS1_RIGHT
+
+# PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
 export EDITOR="emacs -q"
 export VISUAL="emacs -q"
