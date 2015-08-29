@@ -17,19 +17,24 @@ GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{bl
 # pre execution hook function
 # preexec () {}
 
-# pre promt hook function
-# function precmd() {}
-
-
 function chpwd()				# chpwd hook to update variables
 {
 	v=$(ls -pA1)
 	NB_FILES=$(echo $v | grep -v /$ | wc -l)
 	NB_DIRS=$(echo $v | grep /$ | wc -l)
+	[[ ! -e ./.git ]]
+	REPO=$?
 }
-NB_FILES=$(ls -pA1 | grep -v /$ | wc -l) # set them for the first time
-NB_DIRS=$(ls -pA1 | grep /$ | wc -l)
+autoload chpwd
+chpwd
 
+# pre promt hook function
+function precmd()
+{
+	[[ $REPO -eq 1 ]] && GET_GIT=$(git diff --quiet  && echo "%F{green}=" || echo "%F{yellow}+") || GET_GIT="%F{cyan}X"
+}
+autoload precmd
+precmd
 
 PS1=''
 PS1+='%B%F{blue}$GET_SSH'
@@ -37,6 +42,7 @@ PS1+='%n%b%F{red}@%B%F{blue}%m%b'
 PS1+='%F{red}[%F{magenta}%~%b%F{red}|'
 PS1+='%F{green}$NB_FILES%F{red}/%F{blue}$NB_DIRS%F{red}]'
 PS1+='%F{red}[%F{cyan}'
+PS1+='$GET_GIT'
 PS1+='%(0?.%F{green}✔.%F{red}×)'
 PS1+='%(1j.%F{yellow}►.%F{blue}○)'
 PS1+='%F{magenta}$GET_SHLVL'
