@@ -69,13 +69,12 @@ PS1+='%B%F{blue}$GET_SSH'
 PS1+='%n%b%F{red}@%B%F{blue}%m%b'
 PS1+='%F{red}[%F{magenta}%~%b%F{red}|'
 PS1+='%F{green}$NB_FILES%F{red}/%F{blue}$NB_DIRS%F{red}]'
-PS1+='%F{red}[%F{cyan}'
-PS1+='$GET_GIT'
+PS1+=' $GET_GIT'
 PS1+='%(0?.%F{green}✔.%F{red}×)'
 PS1+='%(1j.%F{yellow}►.%F{blue}○)'
 PS1+='%F{magenta}$GET_SHLVL'
 PS1+='%(0!.%F{red}#.%F{blue}\$)'
-PS1+='%F{red}]> '
+PS1+='%F{red}> '
 
 PS1_RIGHT="%U%B%F{yellow}%T%u%f"
 
