@@ -49,7 +49,12 @@ function precmd()
 		then
 			if git diff --cached --quiet;
 			then
-				GET_GIT="%F{green}="
+				if git status | grep "up-to-date";
+				then
+					GET_GIT="%F{green}="
+				else	
+					GET_GIT="%F{green}+"
+				fi
 			else
 				GET_GIT="%F{yellow}+"
 			fi
@@ -60,6 +65,25 @@ function precmd()
 		GET_GIT="%F{cyan}o"
 	fi
 }
+# function precmd()
+# {
+# 	if [[ $REPO -eq 1 ]];
+# 	then
+# 		if git diff --quiet;
+# 		then
+# 			if git diff --cached --quiet;
+# 			then
+# 				GET_GIT="%F{green}="
+# 			else
+# 				GET_GIT="%F{yellow}+"
+# 			fi
+# 		else
+# 			GET_GIT="%F{red}+"
+# 		fi
+# 	else
+# 		GET_GIT="%F{cyan}o"
+# 	fi
+# }
 autoload precmd
 precmd
 
