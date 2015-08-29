@@ -6,6 +6,8 @@
 
 # Only called once
 
+PWD_FILE=~/.pwd
+
 GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
 
 GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{blue}ssh%F{red}:%F{blue}')"
@@ -17,6 +19,15 @@ GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{bl
 # pre execution hook function
 # preexec () {}
 
+function join_others_shells()
+{
+	if [[ -e $PWD_FILE ]]; then
+		read -q "R?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):"
+		[[ $R = "y" ]] && cd "$(cat $PWD_FILE)"
+	fi
+}
+autoload join_others_shells
+
 function chpwd()				# chpwd hook to update variables
 {
 	v=$(ls -pA1)
@@ -24,6 +35,7 @@ function chpwd()				# chpwd hook to update variables
 	NB_DIRS=$(echo $v | grep /$ | wc -l)
 	[[ ! -e ./.git ]]
 	REPO=$?
+	[[ $(pwd) != ~ ]] && pwd > $PWD_FILE
 }
 autoload chpwd
 chpwd
@@ -181,5 +193,9 @@ alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
 
 alias .="ls"
 
+
 uname -a
 uptime
+
+
+join_others_shells
