@@ -97,7 +97,7 @@ PS1+='%(0?.%F{green}✔.%F{red}×)'
 PS1+='%(1j.%F{yellow}►.%F{blue}○)'
 PS1+='%F{magenta}$GET_SHLVL'
 PS1+='%(0!.%F{red}#.%F{blue}\$)'
-PS1+='%F{red}> '
+PS1+='%F{red}>%f '
 
 PS1_RIGHT="%U%B%F{yellow}%T%u%f"
 
