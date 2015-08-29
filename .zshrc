@@ -43,7 +43,10 @@ chpwd
 # pre promt hook function
 function precmd()
 {
-	[[ $REPO -eq 1 ]] && GET_GIT=$(git diff --quiet  && echo "%F{green}=" || echo "%F{yellow}+") || GET_GIT="%F{cyan}○"
+	if [[ $REPO -eq 1 ]];
+	then
+		GET_GIT=$(git diff --quiet  && ([[ $(git rev-parse HEAD) == $(git rev-parse @{u}) ]] && echo "%F{green}=" || echo "%F{yellow}+") || echo "%F{red}+") || GET_GIT="%F{cyan}○"
+	fi
 }
 autoload precmd
 precmd
