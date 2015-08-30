@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "checking for updates..."
+git pull
+
 if [ ! -e ~/.zshrc ];
 then
 	echo "linking ~/.zshrc with ./.zshrc"
