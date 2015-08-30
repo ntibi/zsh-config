@@ -167,12 +167,8 @@ zstyle ':completion:complete-file::::' completer _files
 bindkey -e 						# emacs style
 
 if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
-  function zle-line-init() {
-    echoti smkx
-  }
-  function zle-line-finish() {
-    echoti rmkx
-  }
+  function zle-line-init() { echoti smkx }
+  function zle-line-finish() { echoti rmkx }
   zle -N zle-line-init
   zle -N zle-line-finish
 fi
@@ -184,6 +180,7 @@ bindkey "^[s" insert-sudo
 
 autoload -z edit-command-line
 zle -N edit-command-line
+
 
 bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
