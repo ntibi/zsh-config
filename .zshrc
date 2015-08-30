@@ -60,7 +60,7 @@ function precmd()
 		then
 			if git diff --cached --quiet;
 			then
-				if git status | grep "nothing" > /dev/null;
+				if git status | grep "up-to-date" > /dev/null;
 				then
 					GET_GIT="%F{green}=" # changes pushed
 				else	
