@@ -17,7 +17,10 @@ GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{bl
 
 
 # pre execution hook function
-# preexec () {}
+preexec ()
+{
+	print -Pn "\e]2;$PWD : $1\a" # print pwd + cmd in window title
+}
 
 function join_others_shells()
 {
@@ -28,22 +31,30 @@ function join_others_shells()
 }
 autoload join_others_shells
 
+periodic()						# every $PERIOD secs
+{
+	rehash						# rehash path binaries
+}
+PERIOD=30
+
 function chpwd()				# chpwd hook to update variables
 {
 	v=$(ls -pA1)
 	NB_FILES=$(echo $v | grep -v /$ | wc -l)
 	NB_DIRS=$(echo $v | grep /$ | wc -l)
 	[[ ! -e ./.git ]]
-	REPO=$?
-	[[ $(pwd) != ~ ]] && pwd > $PWD_FILE
+	REPO=$?						# check if in git repo
+	[[ $PWD != ~ ]] && echo $PWD > $PWD_FILE
 }
 autoload chpwd
 chpwd
 
-# pre promt hook function
+pre promt hook function
 function precmd()
 {
-	if [[ $REPO -eq 1 ]];
+	print -Pn "\e]2;$PWD\a"		# print pwd in window title
+	
+	if [[ $REPO -eq 1 ]];		# if in git repo
 	then
 		if git diff --quiet;
 		then
@@ -51,39 +62,20 @@ function precmd()
 			then
 				if git status | grep "nothing" > /dev/null;
 				then
-					GET_GIT="%F{green}="
+					GET_GIT="%F{green}=" # changes pushed
 				else	
-					GET_GIT="%F{green}+"
+					GET_GIT="%F{green}+" # changes commited
 				fi
 			else
-				GET_GIT="%F{yellow}+"
+				GET_GIT="%F{yellow}+" # changes added
 			fi
 		else
-			GET_GIT="%F{red}+"
+			GET_GIT="%F{red}+"	# if git diff, wip
 		fi
 	else
-		GET_GIT="%F{cyan}o"
+		GET_GIT="%F{cyan}o"		# not in git repo
 	fi
 }
-# function precmd()
-# {
-# 	if [[ $REPO -eq 1 ]];
-# 	then
-# 		if git diff --quiet;
-# 		then
-# 			if git diff --cached --quiet;
-# 			then
-# 				GET_GIT="%F{green}="
-# 			else
-# 				GET_GIT="%F{yellow}+"
-# 			fi
-# 		else
-# 			GET_GIT="%F{red}+"
-# 		fi
-# 	else
-# 		GET_GIT="%F{cyan}o"
-# 	fi
-# }
 autoload precmd
 precmd
 
@@ -229,11 +221,11 @@ alias q="emacs -q"				# fast emacs
 
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
 
-alias .="ls"
+# alias .="ls"
 
-
-uname -a
-uptime
+rehash							# hash commands in path
+uname -a						# give some infos about hardware
+uptime							# show uptime
 
 
 join_others_shells
