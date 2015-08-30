@@ -56,7 +56,7 @@ function precmd()
 	
 	if [ $REPO -eq 1 ];		# if in git repo, get git infos
 	then
-		STATUS=$(git status)	# use porcelain
+		STATUS=$(git status)
 		if [[ $STATUS =~ "Changes not staged" ]];
 		then GET_GIT="%F{red}+"	# if git diff, wip
 		else
@@ -72,27 +72,6 @@ function precmd()
 	else
 		GET_GIT="%F{cyan}o"		# not in git repo
 	fi
-	# if [[ $REPO -eq 1 ]];		# if in git repo, get git infos
-	# then
-	# 	if git diff --quiet;
-	# 	then
-	# 		if git diff --cached --quiet;
-	# 		then
-	# 			if git status | grep "ahead" > /dev/null;
-	# 			then
-	# 				GET_GIT="%F{green}+" # changes commited
-	# 			else
-	# 				GET_GIT="%F{green}=" # changes pushed
-	# 			fi
-	# 		else
-	# 			GET_GIT="%F{yellow}+" # changes added
-	# 		fi
-	# 	else
-	# 		GET_GIT="%F{red}+"	# if git diff, wip
-	# 	fi
-	# else
-	# 	GET_GIT="%F{cyan}o"		# not in git repo
-	# fi
 }
 autoload precmd
 precmd

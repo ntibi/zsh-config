@@ -9,15 +9,15 @@ else
 	then
 		if [ $(readlink -f ~/.zshrc) = $(echo "$PWD/.zshrc") ];
 		then
-			echo "new config already installed"
+			echo "new .zshrc already installed"
 		else
 			echo "removing old ~/.zshrc pointing at $(readlink ~/.zshrc)"
 			rm ~/.zshrc
-			echo "linking ~/.zshrc with ./.zshrc"
+			echo "linking ~/.zshrc with .zshrc"
 			ln -s ./.zshrc ~/.zshrc
 		fi
 		else
-			echo "linking ~/.zshrc with ./.zshrc"
+			echo "linking ~/.zshrc with .zshrc"
 			echo "old ~/.zshrc content is now in ~/.myzshrc"
 			cat ~/.zshrc >> ~/.myzshrc
 			rm ~/.zshrc
@@ -25,7 +25,15 @@ else
 	fi
 fi
 
-cp .mouse.zsh ~/.mouse.zsh
-echo ".mouse.zsh copied to home"
+if [ -e ~/.mouse.zsh ];
+then
+	if diff ~/.mouse.zsh ./.mouse.zsh > /dev/null;
+	then
+		echo "mouse.zsh up to date"
+		else
+			cp .mouse.zsh ~/.mouse.zsh
+			echo ".mouse.zsh copied to home"
+	fi
+fi
 
 echo "Done"
