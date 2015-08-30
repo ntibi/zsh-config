@@ -13,49 +13,38 @@ GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
 GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{blue}ssh%F{red}:%F{blue}')"
 
 
-# functions called at each prompt print
-
-
-# pre execution hook function
-preexec ()
-{
-	print -Pn "\e]2;$PWD : $1\a" # print pwd + cmd in window title
-}
-
-function join_others_shells()
+function join_others_shells()	# ask for joining path specified in $PWD_FILE
 {
 	if [[ -e $PWD_FILE ]]; then
 		read -q "R?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):"
 		[[ $R = "y" ]] && cd "$(cat $PWD_FILE)"
 	fi
 }
-autoload join_others_shells
 
-periodic()						# every $PERIOD secs
+function check_git_repo()		# check if pwd is a git repo
 {
-	rehash						# rehash path binaries
+	[[ ! -e ./.git ]]
+	REPO=$?
 }
-PERIOD=30
 
-function chpwd()				# chpwd hook to update variables
+function update_pwd_datas()		# update the numbers of files and dirs in .
 {
+	local v
 	v=$(ls -pA1)
 	NB_FILES=$(echo $v | grep -v /$ | wc -l)
 	NB_DIRS=$(echo $v | grep /$ | wc -l)
-	[[ ! -e ./.git ]]
-	REPO=$?						# check if in git repo
+}
+
+function update_pwd_save()		# update the $PWD_FILE
+{
 	[[ $PWD != ~ ]] && echo $PWD > $PWD_FILE
 }
-autoload chpwd
-chpwd
 
-# pre promt hook function
-function precmd()
+function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 {
-	print -Pn "\e]2;$PWD\a"		# print pwd in window title
-	
 	if [ $REPO -eq 1 ];		# if in git repo, get git infos
 	then
+		local STATUS
 		STATUS=$(git status)
 		if [[ $STATUS =~ "Changes not staged" ]];
 		then GET_GIT="%F{red}+"	# if git diff, wip
@@ -73,8 +62,36 @@ function precmd()
 		GET_GIT="%F{cyan}o"		# not in git repo
 	fi
 }
-autoload precmd
-precmd
+
+
+function chpwd()				# chpwd hook
+{
+	check_git_repo
+	update_pwd_datas
+	update_pwd_save
+}
+
+function periodic()				# every $PERIOD secs
+{
+	rehash						# rehash path binaries
+	check_git_repo
+	update_pwd_datas
+	update_pwd_save
+}
+PERIOD=5
+
+function preexec()				# pre execution hook
+{
+	print -Pn "\e]2;$PWD : $1\a" # print pwd + cmd in window title
+}
+
+function precmd()				# pre promt hook
+{
+	print -Pn "\e]2;$PWD\a"		# print pwd in window title
+	
+	set_git_char
+}
+
 
 PS1=''
 PS1+='%B%F{blue}$GET_SSH'
@@ -210,11 +227,14 @@ alias q="emacs -q"				# fast emacs
 
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
 
-# alias .="ls"
+alias .="ls"
 
+check_git_repo
+update_pwd_datas
+update_pwd_save
+set_git_char
 rehash							# hash commands in path
 uname -a						# give some infos about hardware
 uptime							# show uptime
 
-
-join_others_shells
+join_others_shells				# ask for joining others shells
