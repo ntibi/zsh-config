@@ -56,7 +56,7 @@ function precmd()
 	
 	if [[ $REPO -eq 1 ]];		# if in git repo, get git infos
 	then
-		STATUS=$(git status)	# ?
+		STATUS=$(git status)	# use porcelain
 		if [[ $STATUS =~ "Changes not staged" ]];
 		then GET_GIT="%F{red}+"	# if git diff, wip
 		else
