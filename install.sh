@@ -39,5 +39,7 @@ then
 	fi
 fi
 
+echo "applying changes..."
+source ~/.zshrc
 echo "Done"
 
