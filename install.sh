@@ -25,4 +25,7 @@ else
 	fi
 fi
 
+cp .mouse.zsh ~/.mouse.zsh
+echo ".mouse.zsh copied to home"
+
 echo "Done"

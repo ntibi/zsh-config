@@ -54,7 +54,7 @@ function precmd()
 {
 	print -Pn "\e]2;$PWD\a"		# print pwd in window title
 	
-	if [[ $REPO -eq 1 ]];		# if in git repo, get git infos
+	if [ $REPO -eq 1 ];		# if in git repo, get git infos
 	then
 		STATUS=$(git status)	# use porcelain
 		if [[ $STATUS =~ "Changes not staged" ]];
@@ -214,14 +214,6 @@ fi
 
 
 # useful aliases
-
-alias -s c=emacs				# alias {file}.c=emacs{file}.c
-alias -s h=emacs
-alias -s cpp=emacs
-alias -s hpp=emacs
-alias -s py=emacs
-alias -s el=emacs
-alias -s emacs=emacs
 
 alias l="ls -G"
 
