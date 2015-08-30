@@ -56,20 +56,17 @@ function precmd()
 	
 	if [[ $REPO -eq 1 ]];		# if in git repo, get git infos
 	then
-		if git diff --cached --quiet;
-		then
-			if git status | grep "ahead" > /dev/null;
-			then
-				GET_GIT="%F{green}+" # changes commited
-			else
-				GET_GIT="%F{green}=" # changes pushed
-			fi
+		STATUS=$(git status)
+		if echo $STATUS | /usr/bin/grep --silent "Changes not staged";
+		then GET_GIT="%F{red}+"	# if git diff, wip
 		else
-			if git diff --quiet;
-			then
-				GET_GIT="%F{red}+"	# if git diff, wip
+			if echo $STATUS | /usr/bin/grep --silent "Changes to be committed";
+			then GET_GIT="%F{yellow}+" # changes added
 			else
-				GET_GIT="%F{yellow}+" # changes added
+				if echo $STATUS | /usr/bin/grep --silent "is ahead";
+				then GET_GIT="%F{green}+" # changes commited
+				else GET_GIT="%F{green}=" # changes pushed
+				fi
 			fi
 		fi
 	else
