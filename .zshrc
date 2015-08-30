@@ -181,15 +181,19 @@ bindkey "^[s" insert-sudo
 autoload -z edit-command-line
 zle -N edit-command-line
 
-
 bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 bindkey "^x^T" zle-toggle-mouse
-bindkey "^w" kill-region		 # emacs-like kill
 bindkey -s "\el" "ls\n"			 # run ls
 bindkey -s "^X^X" "emacs\n"		 # run emacs
+
 bindkey "^[[1;3C" emacs-forward-word # alt + keys to navigate between words
 bindkey "^[[1;3D" emacs-backward-word
+bindkey "^[[1;5D" backward-word	# same with ctrl
+bindkey "^[[1;5C" forward-word
+
+bindkey "^[k" kill-word
+bindkey "^w" kill-region		 # emacs-like kill
 
 bindkey -s "^X^M" "make\n"		 # make
 
