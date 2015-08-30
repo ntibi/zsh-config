@@ -56,25 +56,46 @@ function precmd()
 	
 	if [[ $REPO -eq 1 ]];		# if in git repo, get git infos
 	then
-		if git diff --quiet;
+		if git diff --cached --quiet;
 		then
-			if git diff --cached --quiet;
+			if git status | grep "ahead" > /dev/null;
 			then
-				if git status | grep "ahead" > /dev/null;
-				then
-					GET_GIT="%F{green}+" # changes commited
-				else
-					GET_GIT="%F{green}=" # changes pushed
-				fi
+				GET_GIT="%F{green}+" # changes commited
+			else
+				GET_GIT="%F{green}=" # changes pushed
+			fi
+		else
+			if git diff --quiet;
+			then
+				GET_GIT="%F{red}+"	# if git diff, wip
 			else
 				GET_GIT="%F{yellow}+" # changes added
 			fi
-		else
-			GET_GIT="%F{red}+"	# if git diff, wip
 		fi
 	else
 		GET_GIT="%F{cyan}o"		# not in git repo
 	fi
+	# if [[ $REPO -eq 1 ]];		# if in git repo, get git infos
+	# then
+	# 	if git diff --quiet;
+	# 	then
+	# 		if git diff --cached --quiet;
+	# 		then
+	# 			if git status | grep "ahead" > /dev/null;
+	# 			then
+	# 				GET_GIT="%F{green}+" # changes commited
+	# 			else
+	# 				GET_GIT="%F{green}=" # changes pushed
+	# 			fi
+	# 		else
+	# 			GET_GIT="%F{yellow}+" # changes added
+	# 		fi
+	# 	else
+	# 		GET_GIT="%F{red}+"	# if git diff, wip
+	# 	fi
+	# else
+	# 	GET_GIT="%F{cyan}o"		# not in git repo
+	# fi
 }
 autoload precmd
 precmd
