@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "checking for updates..."
 git pull
@@ -39,7 +39,6 @@ then
 	fi
 fi
 
-echo "applying changes..."
-source ~/.zshrc
+echo "type 'source ~/.zshrc' to apply update"
 echo "Done"
 
