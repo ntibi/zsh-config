@@ -49,7 +49,7 @@ function chpwd()				# chpwd hook to update variables
 autoload chpwd
 chpwd
 
-pre promt hook function
+# pre promt hook function
 function precmd()
 {
 	print -Pn "\e]2;$PWD\a"		# print pwd in window title
@@ -97,8 +97,8 @@ RPS1=$PS1_RIGHT
 
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
-export EDITOR="emacs -q"
-export VISUAL="emacs -q"
+EDITOR="emacs -q"
+VISUAL="emacs -q"
 
 bindkey "$(echotc kl)" backward-char
 bindkey "$(echotc kr)" forward-char
