@@ -54,7 +54,7 @@ function precmd()
 {
 	print -Pn "\e]2;$PWD\a"		# print pwd in window title
 	
-	if [[ $REPO -eq 1 ]];		# if in git repo
+	if [[ $REPO -eq 1 ]];		# if in git repo, get git infos
 	then
 		if git diff --quiet;
 		then
