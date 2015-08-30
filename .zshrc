@@ -106,8 +106,8 @@ bindkey "$(echotc ku)" up-line-or-history
 bindkey "$(echotc kd)" down-line-or-history
 
 HISTFILE=~/.zshrc_history
-SAVEHIST=512
-HISTSIZE=512
+SAVEHIST=1024
+HISTSIZE=1024
 
 setopt promptsubst				# compute PS1 at each prompt print
 setopt inc_append_history
