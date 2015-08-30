@@ -1,4 +1,4 @@
-[ -e ~/.myzshrc ] && source ~/.myzshrc # load my user file
+[ -e ~/.myzshrc ] && source ~/.myzshrc # load user file
 
 
 # setup zsh
