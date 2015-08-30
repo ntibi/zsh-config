@@ -64,7 +64,7 @@ function precmd()
 				then
 					GET_GIT="%F{green}+" # changes commited
 				else
-					if $(git rev-parse HEAD) == $(git rev-parse @{u});
+					if [[ $(git rev-parse HEAD) = $(git rev-parse @{u}) ]];
 					then
 						GET_GIT="%F{green}=" # changes pushed
 					else
