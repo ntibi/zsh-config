@@ -3,6 +3,7 @@
 
 # setup zsh
 
+[ "$TERM" = "xterm" ] && export TERM="xterm-256color"
 
 # Only called once
 
