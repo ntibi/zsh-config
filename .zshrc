@@ -98,9 +98,9 @@ PS1+='%B%F{blue}$GET_SSH'
 PS1+='%n%b%F{red}@%B%F{blue}%m%b'
 PS1+='%F{red}[%F{magenta}%~%b%F{red}|'
 PS1+='%F{green}$NB_FILES%F{red}/%F{blue}$NB_DIRS%F{red}]'
-PS1+=' $GET_GIT'
-PS1+='%(0?.%F{green}✔.%F{red}×)'
-PS1+='%(1j.%F{yellow}►.%F{blue}○)'
+PS1+=' %(0?.%F{green}✔.%F{red}×)'
+PS1+='$GET_GIT'
+PS1+='%(1j.%F{yellow}►.%F{blue}o)'
 PS1+='%F{magenta}$GET_SHLVL'
 PS1+='%(0!.%F{red}#.%F{blue}\$)'
 PS1+='%F{red}>%f '
@@ -111,8 +111,10 @@ RPS1=$PS1_RIGHT
 
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
-EDITOR="emacs -q"
-VISUAL="emacs -q"
+EDITOR="emacs"
+VISUAL="emacs"
+
+LS_COLORS='fi=32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
 
 bindkey "$(echotc kl)" backward-char
 bindkey "$(echotc kr)" forward-char
@@ -150,7 +152,7 @@ zstyle ':completion:*:cp:*' ignore-line yes # same
 
 zstyle ":completion:*" menu select # select menu completion
 
-zstyle ':completion:*' list-colors '' # enable colors in completion
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
 zstyle ":completion:*" group-name "" # group completion
 
@@ -212,7 +214,7 @@ fi
 
 # useful aliases
 
-alias l="ls -G"
+alias ls="ls --color"
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
