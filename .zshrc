@@ -242,4 +242,4 @@ rehash							# hash commands in path
 uname -a						# give some infos about hardware
 uptime							# show uptime
 
-#join_others_shells				# ask for joining others shells
+join_others_shells				# ask for joining others shells
