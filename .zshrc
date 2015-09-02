@@ -32,8 +32,8 @@ function update_pwd_datas()		# update the numbers of files and dirs in .
 {
 	local v
 	v=$(ls -pA1)
-	NB_FILES=$(echo $v | grep -v /$ | wc -l)
-	NB_DIRS=$(echo $v | grep /$ | wc -l)
+	NB_FILES=$(echo $v | grep -v /$ | wc -l | tr -d ' ')
+	NB_DIRS=$(echo $v | grep /$ | wc -l | tr -d ' ')
 }
 
 function update_pwd_save()		# update the $PWD_FILE
@@ -99,9 +99,9 @@ PS1+='%B%F{blue}$GET_SSH'
 PS1+='%n%b%F{red}@%B%F{blue}%m%b'
 PS1+='%F{red}[%F{magenta}%~%b%F{red}|'
 PS1+='%F{green}$NB_FILES%F{red}/%F{blue}$NB_DIRS%F{red}]'
-PS1+=' %(0?.%F{green}✔.%F{red}×)'
+PS1+=' %(0?.%F{green}o.%F{red}x)'
 PS1+='$GET_GIT'
-PS1+='%(1j.%F{yellow}►.%F{blue}o)'
+PS1+='%(1j.%F{yellow}%j.%F{blue}o)'
 PS1+='%F{magenta}$GET_SHLVL'
 PS1+='%(0!.%F{red}#.%F{blue}\$)'
 PS1+='%F{red}>%f '
@@ -115,7 +115,8 @@ RPS1=$PS1_RIGHT
 EDITOR="emacs"
 VISUAL="emacs"
 
-export LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+CLICOLOR=1
+LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
 
 bindkey "$(echotc kl)" backward-char
 bindkey "$(echotc kr)" forward-char
@@ -215,7 +216,7 @@ fi
 
 # useful aliases
 
-alias ls="ls --color"
+alias ls="ls -G"
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
@@ -241,4 +242,4 @@ rehash							# hash commands in path
 uname -a						# give some infos about hardware
 uptime							# show uptime
 
-join_others_shells				# ask for joining others shells
+#join_others_shells				# ask for joining others shells
