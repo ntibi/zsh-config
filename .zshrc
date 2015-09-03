@@ -46,7 +46,7 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 	if [ $REPO -eq 1 ];		# if in git repo, get git infos
 	then
 		local STATUS
-		STATUS=$(git status)
+		STATUS=$(git status 2> /dev/null)
 		if [[ $STATUS =~ "Changes not staged" ]];
 		then GET_GIT="%F{red}+"	# if git diff, wip
 		else
