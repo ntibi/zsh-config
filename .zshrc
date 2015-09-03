@@ -17,8 +17,7 @@ GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{bl
 function join_others_shells()	# ask for joining path specified in $PWD_FILE
 {
 	if [[ -e $PWD_FILE ]]; then
-		read -q "R?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):"
-		[[ $R = "y" ]] && cd "$(cat $PWD_FILE)"
+		read -q "?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):"  && cd "$(cat $PWD_FILE)"
 	fi
 }
 
@@ -234,7 +233,7 @@ alias e="emacs"
 alias q="emacs -q"				# fast emacs
 
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
-alias clip="$(pwd)/clip"
+alias clip="$(pwd)/zsh-config/clip"
 
 alias .="ls"
 
