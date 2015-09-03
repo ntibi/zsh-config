@@ -138,8 +138,6 @@ unsetopt rm_star_silent			# ask for confirmation if 'rm *'
 unsetopt beep					# no sounds
 # setopt print_exit_value			# print exit value if non 0
 
-source ~/.mouse.zsh				# zle-toggle-mouse_	to enable mouse
-
 autoload -U colors && colors	# cool colors
 
 autoload -U compinit && compinit # enable completion
@@ -214,7 +212,7 @@ fi
 # useful aliases
 
 case "$(uname)" in
-	*darwin*)
+	*Darwin*)
 		CLICOLOR=1
 		LS_COLORS='exfxcxdxbxexexabagacad'
 		alias ls="ls -G";;
