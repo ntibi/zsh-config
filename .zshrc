@@ -115,9 +115,6 @@ RPS1=$PS1_RIGHT
 EDITOR="emacs"
 VISUAL="emacs"
 
-CLICOLOR=1
-LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
-
 bindkey "$(echotc kl)" backward-char
 bindkey "$(echotc kr)" forward-char
 bindkey "$(echotc ku)" up-line-or-history
@@ -216,7 +213,15 @@ fi
 
 # useful aliases
 
-alias ls="ls -G"
+case "$(uname)" in
+	*darwin*)
+		CLICOLOR=1
+		LS_COLORS='exfxcxdxbxexexabagacad'
+		alias ls="ls -G";;
+	*linux*|*cygwin*|*)
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+		alias ls="ls --color=auto" ;;
+esac
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
