@@ -236,6 +236,7 @@ alias e="emacs"
 alias q="emacs -q"				# fast emacs
 
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
+alias clip="$(pwd)/clip"
 
 alias .="ls"
 
