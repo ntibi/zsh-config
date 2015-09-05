@@ -25,6 +25,20 @@ function insert_sudo()
 zle -N insert-sudo insert_sudo	# load as widget
 
 
+function showcolors()			# display the 256 colors by shades
+{
+	for c in {0..15}; do tput setaf $c ; echo -ne " $c "; done
+	echo
+	for s in {16..51}; do
+		for ((i = $s; i < 232; i+=36)); do
+			tput setaf $i ; echo -ne " $i ";
+		done;
+		echo
+	done
+	for c in {232..255}; do tput setaf $c ; echo -ne " $c "; done
+	echo
+}
+
 function error() { python -c "import os; print os.strerror($?)"; } # give error nb to get error string
 
 function join_others_shells()	# ask for joining path specified in $PWD_FILE if not already in it
@@ -249,8 +263,6 @@ alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
 alias clip="$(pwd)/zsh-config/clip"
 
 alias .="ls"
-
-alias show256='for c in {0..255}; do echo -en "\e[38;05;${c}m $c "; (( (${c} + 1) % 8 == 0 )) && echo; done'
 
 check_git_repo
 update_pwd_datas
