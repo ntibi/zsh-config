@@ -269,7 +269,5 @@ update_pwd_datas
 update_pwd_save
 set_git_char
 rehash							# hash commands in path
-uname							# give some infos about hardware
-uptime							# show uptime
 
 join_others_shells				# ask for joining others shells
