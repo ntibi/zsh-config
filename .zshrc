@@ -3,7 +3,7 @@
 
 # setup zsh
 
-[ "$TERM" = "xterm" ] && export TERM="xterm-256color"
+TERM="xterm-256color" && [[ $(tput colors) == 256 ]] && echo "xterm-256color ok"
 
 # Only called once
 
@@ -14,9 +14,22 @@ GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
 GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{blue}ssh%F{red}:%F{blue}')"
 
 
-function join_others_shells()	# ask for joining path specified in $PWD_FILE
+
+function insert_sudo()
 {
-	if [[ -e $PWD_FILE ]]; then
+	zle beginning-of-line;
+	zle -U "sudo ";
+	zle line
+	# zle end-of-line;
+}
+zle -N insert-sudo insert_sudo	# load as widget
+
+
+function error() { python -c "import os; print os.strerror($?)"; } # give error nb to get error string
+
+function join_others_shells()	# ask for joining path specified in $PWD_FILE if not already in it
+{
+	if [[ -e $PWD_FILE ]] && [[ $(pwd) != $(cat $PWD_FILE) ]]; then
 		read -q "?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):"  && cd "$(cat $PWD_FILE)"
 	fi
 }
@@ -50,7 +63,7 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 		then GET_GIT="%F{196}+"	# if git diff, wip
 		else
 			if [[ $STATUS =~ "Changes to be committed" ]];
-			then GET_GIT="%F{166}+" # changes added
+			then GET_GIT="%F{214}+" # changes added
 			else
 				if [[ $STATUS =~ "is ahead" ]];
 				then GET_GIT="%F{118}+" # changes commited
@@ -135,6 +148,9 @@ unsetopt rm_star_silent			# ask for confirmation if 'rm *'
 unsetopt beep					# no sounds
 # setopt print_exit_value			# print exit value if non 0
 
+autoload -z edit-command-line	# edit command line with $EDITOR
+zle -N edit-command-line
+
 autoload -U colors && colors	# cool colors
 
 autoload -U compinit && compinit # enable completion
@@ -160,7 +176,7 @@ zle -C complete-file complete-word _generic
 zstyle ':completion:complete-file::::' completer _files
 
 
-bindkey -e 						# emacs style
+bindkey -e 						# emacs style key binding
 
 if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
   function zle-line-init() { echoti smkx }
@@ -169,19 +185,20 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
   zle -N zle-line-finish
 fi
 
+# shell commands binds
+bindkey -s "^[j" "join_others_shells\n"
+bindkey -s "^[r" "ressource\n"
+bindkey -s "^[e" "error\n"
+bindkey -s "\el" "ls\n"			 # run ls
+bindkey -s "^X^X" "emacs\n"		 # run emacs
+bindkey -s "^X^M" "make\n"		 # make
 
-insert_sudo () { zle beginning-of-line; zle -U "sudo " }
-zle -N insert-sudo insert_sudo
+
+# zsh functions binds
 bindkey "^[s" insert-sudo
-
-autoload -z edit-command-line
-zle -N edit-command-line
-
 bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 bindkey "^x^T" zle-toggle-mouse
-bindkey -s "\el" "ls\n"			 # run ls
-bindkey -s "^X^X" "emacs\n"		 # run emacs
 
 bindkey "^[[1;3C" emacs-forward-word # alt + keys to navigate between words
 bindkey "^[[1;3D" emacs-backward-word
@@ -190,8 +207,6 @@ bindkey "^[[1;5C" forward-word
 
 bindkey "^[k" kill-word
 bindkey "^w" kill-region		 # emacs-like kill
-
-bindkey -s "^X^M" "make\n"		 # make
 
 if [[ "${terminfo[kcbt]}" != "" ]]; then
   bindkey "${terminfo[kcbt]}" reverse-menu-complete # shift tab for backward completion
@@ -235,14 +250,14 @@ alias clip="$(pwd)/zsh-config/clip"
 
 alias .="ls"
 
-alias show256='for code in {0..255}; do echo -e "\e[38;05;${code}m $code: Test"; done'
+alias show256='for c in {0..255}; do echo -en "\e[38;05;${c}m $c "; (( (${c} + 1) % 8 == 0 )) && echo; done'
 
 check_git_repo
 update_pwd_datas
 update_pwd_save
 set_git_char
 rehash							# hash commands in path
-uname -a						# give some infos about hardware
+uname							# give some infos about hardware
 uptime							# show uptime
 
 join_others_shells				# ask for joining others shells
