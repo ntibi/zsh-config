@@ -21,8 +21,8 @@ else
 		fi
 	else
 		echo "linking ~/.zshrc with .zshrc"
-		echo "old ~/.zshrc content is now in ~/.myzshrc"
-		cat ~/.zshrc >> ~/.myzshrc
+		echo "old ~/.zshrc content is now in ~/.oldzshrc"
+		cat ~/.zshrc >> ~/.oldzshrc
 		rm ~/.zshrc
 		ln -s ./.zshrc ~/.zshrc
 	fi
