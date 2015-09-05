@@ -123,7 +123,7 @@ function precmd()				# pre promt hook
 PS1=''
 PS1+='%F{25}$GET_SSH'
 PS1+='%n%F{240}@%F{25}%m'
-PS1+='%F{240}[%F{198}%~%F{240}|'
+PS1+='%F{240}[%F{200}%~%F{240}|'
 PS1+='%F{46}$NB_FILES%F{240}/%F{45}$NB_DIRS%F{240}]'
 PS1+=' %(0?.%F{82}o.%F{196}x)'
 PS1+='$GET_GIT'
@@ -132,7 +132,7 @@ PS1+='%F{207}$GET_SHLVL'
 PS1+='%(0!.%F{196}#.%F{21}\$)'
 PS1+='%F{240}>%f%k '
 
-# RPS1="%U%B%F{yellow}%T%u%f"
+RPS1="%U%B%F{220}%T%u%f%b"
 
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
