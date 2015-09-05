@@ -3,7 +3,7 @@
 
 # setup zsh
 
-TERM="xterm-256color" && [[ $(tput colors) == 256 ]] && echo "xterm-256color ok"
+TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/"
 
 # Only called once
 
