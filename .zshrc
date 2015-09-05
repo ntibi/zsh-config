@@ -11,7 +11,7 @@ PWD_FILE=~/.pwd					# last pwd sav file
 
 GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
 
-GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{blue}ssh%F{red}:%F{blue}')"
+GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{25}ssh%F{240}:%F{25}')"
 
 
 
