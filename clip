@@ -3,6 +3,8 @@
 import sys
 import signal
 
+signal.signal(signal.SIGINT, signal.SIG_IGN)
+
 clip_file = "/tmp/clip.tmp"
 if (sys.stdin.isatty()):
 	try:

@@ -47,14 +47,14 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 		local STATUS
 		STATUS=$(git status 2> /dev/null)
 		if [[ $STATUS =~ "Changes not staged" ]];
-		then GET_GIT="%F{red}+"	# if git diff, wip
+		then GET_GIT="%F{196}+"	# if git diff, wip
 		else
 			if [[ $STATUS =~ "Changes to be committed" ]];
-			then GET_GIT="%F{yellow}+" # changes added
+			then GET_GIT="%F{166}+" # changes added
 			else
 				if [[ $STATUS =~ "is ahead" ]];
-				then GET_GIT="%F{green}+" # changes commited
-				else GET_GIT="%F{green}=" # changes pushed
+				then GET_GIT="%F{118}+" # changes commited
+				else GET_GIT="%F{118}=" # changes pushed
 				fi
 			fi
 		fi
@@ -94,20 +94,18 @@ function precmd()				# pre promt hook
 
 
 PS1=''
-PS1+='%B%F{blue}$GET_SSH'
-PS1+='%n%b%F{red}@%B%F{blue}%m%b'
-PS1+='%F{red}[%F{magenta}%~%b%F{red}|'
-PS1+='%F{green}$NB_FILES%F{red}/%F{blue}$NB_DIRS%F{red}]'
-PS1+=' %(0?.%F{green}o.%F{red}x)'
+PS1+='%F{25}$GET_SSH'
+PS1+='%n%F{240}@%F{25}%m'
+PS1+='%F{240}[%F{198}%~%F{240}|'
+PS1+='%F{46}$NB_FILES%F{240}/%F{45}$NB_DIRS%F{240}]'
+PS1+=' %(0?.%F{82}o.%F{196}x)'
 PS1+='$GET_GIT'
-PS1+='%(1j.%F{yellow}%j.%F{blue}o)'
-PS1+='%F{magenta}$GET_SHLVL'
-PS1+='%(0!.%F{red}#.%F{blue}\$)'
-PS1+='%F{red}>%f '
+PS1+='%(1j.%F{226}%j.%F{180}o)'
+PS1+='%F{207}$GET_SHLVL'
+PS1+='%(0!.%F{196}#.%F{21}\$)'
+PS1+='%F{240}>%f%k '
 
-PS1_RIGHT="%U%B%F{yellow}%T%u%f"
-
-RPS1=$PS1_RIGHT
+# RPS1="%U%B%F{yellow}%T%u%f"
 
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
 
@@ -236,6 +234,8 @@ alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
 alias clip="$(pwd)/zsh-config/clip"
 
 alias .="ls"
+
+alias show256='for code in {0..255}; do echo -e "\e[38;05;${code}m $code: Test"; done'
 
 check_git_repo
 update_pwd_datas
