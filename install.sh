@@ -19,23 +19,12 @@ else
 			echo "linking ~/.zshrc with .zshrc"
 			ln -s ./.zshrc ~/.zshrc
 		fi
-		else
-			echo "linking ~/.zshrc with .zshrc"
-			echo "old ~/.zshrc content is now in ~/.myzshrc"
-			cat ~/.zshrc >> ~/.myzshrc
-			rm ~/.zshrc
-			ln -s ./.zshrc ~/.zshrc
-	fi
-fi
-
-if [ -e ~/.mouse.zsh ];
-then
-	if diff ~/.mouse.zsh ./.mouse.zsh > /dev/null;
-	then
-		echo "mouse.zsh up to date"
-		else
-			cp .mouse.zsh ~/.mouse.zsh
-			echo ".mouse.zsh copied to home"
+	else
+		echo "linking ~/.zshrc with .zshrc"
+		echo "old ~/.zshrc content is now in ~/.myzshrc"
+		cat ~/.zshrc >> ~/.myzshrc
+		rm ~/.zshrc
+		ln -s ./.zshrc ~/.zshrc
 	fi
 fi
 
