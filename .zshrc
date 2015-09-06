@@ -5,25 +5,7 @@
 
 TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/"
 
-# Only called once
-
 PWD_FILE=~/.pwd					# last pwd sav file
-
-GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
-
-GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo '%F{25}ssh%F{240}:%F{25}')"
-
-
-
-function insert_sudo()
-{
-	zle beginning-of-line;
-	zle -U "sudo ";
-	zle line
-	# zle end-of-line;
-}
-zle -N insert-sudo insert_sudo	# load as widget
-
 
 function showcolors()			# display the 256 colors by shades
 {
@@ -118,13 +100,18 @@ function precmd()				# pre promt hook
 	set_git_char
 }
 
-SEP="%F{240}"					# separator color
+SEP="%F{66}"					# separator color
+
+GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
+
+GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo 'ssh${SEP}:')"
+
 
 PS1=''
-PS1+='%F{25}$GET_SSH'
-PS1+='%n${SEP}@%F{25}%m'
+PS1+='%F{33}$GET_SSH'
+PS1+='%F{33}%n${SEP}@%F{33}%m'
 PS1+='${SEP}[%F{200}%~${SEP}|'
-PS1+='%F{46}$NB_FILES${SEP}/%F{25}$NB_DIRS${SEP}]'
+PS1+='%F{46}$NB_FILES${SEP}/%F{21}$NB_DIRS${SEP}]'
 PS1+=' %(0?.%F{82}o.%F{196}x)'
 PS1+='$GET_GIT'
 PS1+='%(1j.%F{226}%j.%F{180}o)'
@@ -158,6 +145,7 @@ setopt nullglob					# remove pointless globs
 setopt auto_cd					# './dir' = 'cd dir'
 setopt cbases					# c-like bases conversions
 setopt emacs
+setopt flow_control
 unsetopt rm_star_silent			# ask for confirmation if 'rm *'
 unsetopt beep					# no sounds
 # setopt print_exit_value			# print exit value if non 0
@@ -200,16 +188,16 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
 fi
 
 # shell commands binds
-bindkey -s "^[j" "join_others_shells\n"
-bindkey -s "^[r" "ressource\n"
-bindkey -s "^[e" "error\n"
-bindkey -s "\el" "ls\n"			 # run ls
-bindkey -s "^X^X" "emacs\n"		 # run emacs
-bindkey -s "^X^M" "make\n"		 # make
+bindkey -s "^[j" "^Ujoin_others_shells\n"
+bindkey -s "^[r" "^Uressource\n"
+bindkey -s "^[e" "^Uerror\n"
+bindkey -s "^[s" "^Asudo ^E"	# insert sudo
+bindkey -s "\el" "^Uls\n"		# run ls
+bindkey -s "^X^X" "^Uemacs\n"	# run emacs
+bindkey -s "^X^M" "^Umake\n"	# make
 
 
 # zsh functions binds
-bindkey "^[s" insert-sudo
 bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 bindkey "^x^T" zle-toggle-mouse
