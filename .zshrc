@@ -50,8 +50,7 @@ function join_others_shells()	# ask for joining path specified in $PWD_FILE if n
 
 function check_git_repo()		# check if pwd is a git repo
 {
-	[[ ! -e ./.git ]]
-	REPO=$?
+	git rev-parse > /dev/null 2>&1 && REPO=1 || REPO=0
 }
 
 function update_pwd_datas()		# update the numbers of files and dirs in .
@@ -119,18 +118,19 @@ function precmd()				# pre promt hook
 	set_git_char
 }
 
+SEP="%F{240}"					# separator color
 
 PS1=''
 PS1+='%F{25}$GET_SSH'
-PS1+='%n%F{240}@%F{25}%m'
-PS1+='%F{240}[%F{200}%~%F{240}|'
-PS1+='%F{46}$NB_FILES%F{240}/%F{25}$NB_DIRS%F{240}]'
+PS1+='%n${SEP}@%F{25}%m'
+PS1+='${SEP}[%F{200}%~${SEP}|'
+PS1+='%F{46}$NB_FILES${SEP}/%F{25}$NB_DIRS${SEP}]'
 PS1+=' %(0?.%F{82}o.%F{196}x)'
 PS1+='$GET_GIT'
 PS1+='%(1j.%F{226}%j.%F{180}o)'
 PS1+='%F{207}$GET_SHLVL'
 PS1+='%(0!.%F{196}#.%F{21}\$)'
-PS1+='%F{240}>%f%k '
+PS1+='${SEP}>%f%k '
 
 RPS1="%U%B%F{220}%T%u%f%b"
 
