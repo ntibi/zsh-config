@@ -67,7 +67,7 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 			fi
 		fi
 	else
-		GET_GIT="%F{cyan}o"		# not in git repo
+		GET_GIT="%F{240}o"		# not in git repo
 	fi
 }
 
@@ -100,7 +100,7 @@ function precmd()				# pre promt hook
 	set_git_char
 }
 
-SEP="%F{66}"					# separator color
+SEP="%F{240}"					# separator color
 
 GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
 
@@ -108,14 +108,14 @@ GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SE
 
 
 PS1=''
-PS1+='%F{33}$GET_SSH'
-PS1+='%F{33}%n${SEP}@%F{33}%m'
+PS1+='%F{26}$GET_SSH'
+PS1+='%F{26}%n${SEP}@%F{26}%m'
 PS1+='${SEP}[%F{200}%~${SEP}|'
 PS1+='%F{46}$NB_FILES${SEP}/%F{21}$NB_DIRS${SEP}]'
 PS1+=' %(0?.%F{82}o.%F{196}x)'
 PS1+='$GET_GIT'
 PS1+='%(1j.%F{226}%j.%F{180}o)'
-PS1+='%F{207}$GET_SHLVL'
+PS1+='%F{205}$GET_SHLVL'
 PS1+='%(0!.%F{196}#.%F{21}\$)'
 PS1+='${SEP}>%f%k '
 
