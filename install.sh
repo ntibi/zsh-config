@@ -10,7 +10,7 @@ then
 else
 	if [ -L ~/.zshrc ];
 	then
-		if [ $(readlink -f ~/.zshrc) = $(echo "$PWD/.zshrc") ];
+		if [ $(readlink ~/.zshrc) = $(echo "$PWD/.zshrc") ];
 		then
 			echo "new .zshrc already installed"
 		else
