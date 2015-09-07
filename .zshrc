@@ -248,6 +248,7 @@ alias e="emacs"
 alias q="emacs -q"				# fast emacs
 
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
+alias pc='echo "$(($(du -sx . | cut -f1) * 100 / $(du -sx ~ | cut -f1)))" "%"' # percent of the home taken by this dir
 
 alias .="ls"
 
