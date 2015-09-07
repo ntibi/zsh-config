@@ -232,7 +232,7 @@ case "$(uname)" in
 		alias ls="ls -G";;
 	*linux*|*cygwin*|*)
 		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
-		alias ls="ls --color=auto" ;;
+		alias ls="ls --color=auto";;
 esac
 
 alias l="ls -lFh"				# list + classify + human readable
@@ -248,7 +248,8 @@ alias e="emacs"
 alias q="emacs -q"				# fast emacs
 
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
-alias pc='echo "$(($(du -sx . | cut -f1) * 100 / $(du -sx ~ | cut -f1)))" "%"' # percent of the home taken by this dir
+# percent of the home taken by this dir
+function pc() { echo "$(($(du -sx $1 | cut -f1) * 100 / $(du -sx ~ | cut -f1)))" "%" }
 
 alias .="ls"
 
