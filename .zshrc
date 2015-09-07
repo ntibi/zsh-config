@@ -135,6 +135,16 @@ HISTFILE=~/.zshrc_history
 SAVEHIST=1024
 HISTSIZE=1024
 
+CLICOLOR=1
+case "$(uname)" in
+	*Darwin*)
+		LS_COLORS='exfxcxdxbxexexabagacad'
+		alias ls="ls -G";;
+	*linux*|*cygwin*|*)
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+		alias ls="ls --color=auto";;
+esac
+
 setopt promptsubst				# compute PS1 at each prompt print
 setopt inc_append_history
 setopt share_history
@@ -225,16 +235,6 @@ fi
 
 # useful aliases
 
-case "$(uname)" in
-	*Darwin*)
-		CLICOLOR=1
-		LS_COLORS='exfxcxdxbxexexabagacad'
-		alias ls="ls -G";;
-	*linux*|*cygwin*|*)
-		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
-		alias ls="ls --color=auto";;
-esac
-
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
 alias lt="ls -ltFh"				# l with modification date sort
@@ -259,4 +259,4 @@ update_pwd_save
 set_git_char
 rehash							# hash commands in path
 
-join_others_shells				# ask for joining others shells
+# join_others_shells				# ask for joining others shells
