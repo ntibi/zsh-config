@@ -219,8 +219,8 @@ unsetopt beep					# no sounds
 
 autoload zed					# zsh editor
 
-autoload predict-on				# fish like suggestion
-predict-on
+# autoload predict-on				# fish like suggestion (with bundled lags !)
+# predict-on
 
 autoload -z edit-command-line	# edit command line with $EDITOR
 zle -N edit-command-line
@@ -233,6 +233,10 @@ zmodload zsh/complist			# load compeltion list
 zstyle ':completion:*:rm:*' ignore-line yes # remove suggestion if already in selection
 zstyle ':completion:*:mv:*' ignore-line yes # same
 zstyle ':completion:*:cp:*' ignore-line yes # same
+
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path .zcache
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
 
 zstyle ":completion:*" menu select # select menu completion
 
