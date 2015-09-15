@@ -125,7 +125,20 @@ function cd()
 	fi;
 	builtin cd "$@" 2> /dev/null || echo "Nope" 1>&2;
 }
-export cd  
+export cd
+
+function loop()					# loop parameter command every $LOOP_INT seconds (default 1)
+{
+	local d
+	[ -z "$LOOP_INT" ] && LOOP_INT=1
+	while true
+	do
+		clear
+		d=$(date +%s)
+		$@
+		while [ "$(( $(date +%s) - d ))" -lt "$LOOP_INT" ]; do; sleep 0.1; done
+	done
+}
 
 
 function chpwd()				# chpwd hook
