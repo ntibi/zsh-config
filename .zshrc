@@ -188,8 +188,8 @@ bindkey "$(echotc ku)" up-line-or-history
 bindkey "$(echotc kd)" down-line-or-history
 
 HISTFILE=~/.zshrc_history
-SAVEHIST=1024
-HISTSIZE=1024
+SAVEHIST=4096
+HISTSIZE=4096
 
 CLICOLOR=1
 case "$(uname)" in
@@ -215,6 +215,9 @@ setopt flow_control
 unsetopt rm_star_silent			# ask for confirmation if 'rm *'
 unsetopt beep					# no sounds
 # setopt print_exit_value			# print exit value if non 0
+
+autoload predict-on				# fish like suggestion
+predict-on
 
 autoload -z edit-command-line	# edit command line with $EDITOR
 zle -N edit-command-line
