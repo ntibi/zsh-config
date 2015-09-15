@@ -6,6 +6,7 @@
 TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/"
 
 PWD_FILE=~/.pwd					# last pwd sav file
+CA_FILE=~/.ca					# cd aliases sav file
 
 function showcolors()			# display the 256 colors by shades
 {
@@ -70,6 +71,61 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 		GET_GIT="%F{240}o"		# not in git repo
 	fi
 }
+
+function ca()					# cd aliases
+{
+	local a
+	local p
+	p=$(pwd)
+	if [ "$#" -ne 1 ] && [ "$#" -ne 2 ]; then
+		echo "Usage: ca alias (path)";
+		return;
+	fi;
+	if [ "$#" -eq 2 ]; then
+		[ ${2:0:1} = '/' ] && p="$2" || p+="/$2"
+	fi;
+	a=$1
+	touch $CA_FILE;
+	if [ "$(grep "^$a=" $CA_FILE)" != "" ]; then
+		echo "replacing old '$a' alias"
+		sed -i "s/^$a=.*$//g" $CA_FILE;
+		sed -i "/^$/d" $CA_FILE;
+	fi;
+	echo "$a=$p" >> $CA_FILE;
+}
+
+function dca()					# delete cd alias
+{
+	local a
+	if [ -e $CA_FILE ] && [ "$#" -gt 0 ]; then
+		for a in "$@"
+		do
+			sed -i "s/^$a=.*$//g" $CA_FILE;
+		done
+		sed -i "/^$/d" $CA_FILE;
+	fi
+}
+
+function sca()					# show cd aliases
+{
+	[ -e $CA_FILE ] && cat $CA_FILE || echo "No cd aliases yet";
+}
+
+function cd()
+{
+	local a
+	if [ -e $CA_FILE ] && [ "$#" -eq 1 ]; then
+		a="$(grep -o "^$1=.*$" $CA_FILE)";
+		if [ "$a" != "" ]; then
+			a="$(echo $a | cut -d'=' -f2)"
+			builtin cd $a 2> /dev/null || echo "Nope" 1>&2;
+			echo "$a";
+			return 0;
+		fi;
+	fi;
+	builtin cd "$@" 2> /dev/null || echo "Nope" 1>&2;
+}
+export cd  
 
 
 function chpwd()				# chpwd hook
@@ -191,10 +247,10 @@ zstyle ':completion:complete-file::::' completer _files
 bindkey -e 						# emacs style key binding
 
 if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
-  function zle-line-init() { echoti smkx }
-  function zle-line-finish() { echoti rmkx }
-  zle -N zle-line-init
-  zle -N zle-line-finish
+	function zle-line-init() { echoti smkx }
+	function zle-line-finish() { echoti rmkx }
+	zle -N zle-line-init
+	zle -N zle-line-finish
 fi
 
 # shell commands binds
@@ -221,7 +277,7 @@ bindkey "^[k" kill-word
 bindkey "^w" kill-region		 # emacs-like kill
 
 if [[ "${terminfo[kcbt]}" != "" ]]; then
-  bindkey "${terminfo[kcbt]}" reverse-menu-complete # shift tab for backward completion
+	bindkey "${terminfo[kcbt]}" reverse-menu-complete # shift tab for backward completion
 fi
 
 if [[ "${terminfo[kcuu1]}" != "" ]]; then
@@ -243,6 +299,7 @@ alias grep="grep --color"
 alias egrep="egrep --color=auto"
 
 alias ressource="source ~/.zshrc"
+alias res="source ~/.zshrc"
 
 alias e="emacs"
 alias q="emacs -q"				# fast emacs
