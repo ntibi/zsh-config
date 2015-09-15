@@ -216,6 +216,9 @@ unsetopt rm_star_silent			# ask for confirmation if 'rm *'
 unsetopt beep					# no sounds
 # setopt print_exit_value			# print exit value if non 0
 
+
+autoload zed					# zsh editor
+
 autoload predict-on				# fish like suggestion
 predict-on
 
