@@ -1,35 +1,17 @@
-[ -e ~/.myzshrc ] && source ~/.myzshrc # load user file
+[ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
 
 
-# setup zsh
+# setup zsh #
 
-TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/"
+TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/" # check if xterm-256 color is available, or if we are in a retarded shell
+
+# useful vars #
 
 PWD_FILE=~/.pwd					# last pwd sav file
 CA_FILE=~/.ca					# cd aliases sav file
+OS="$(uname)"					# get the os name
 
-function showcolors()			# display the 256 colors by shades
-{
-	for c in {0..15}; do tput setaf $c ; echo -ne " $c "; done
-	echo
-	for s in {16..51}; do
-		for ((i = $s; i < 232; i+=36)); do
-			tput setaf $i ; echo -ne " $i ";
-		done;
-		echo
-	done
-	for c in {232..255}; do tput setaf $c ; echo -ne " $c "; done
-	echo
-}
-
-function error() { python -c "import os; print os.strerror($?)"; } # give error nb to get error string
-
-function join_others_shells()	# ask for joining path specified in $PWD_FILE if not already in it
-{
-	if [[ -e $PWD_FILE ]] && [[ $(pwd) != $(cat $PWD_FILE) ]]; then
-		read -q "?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):"  && cd "$(cat $PWD_FILE)"
-	fi
-}
+# PS1 FUNCTIONS #
 
 function check_git_repo()		# check if pwd is a git repo
 {
@@ -72,7 +54,41 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 	fi
 }
 
-function ca()					# cd aliases
+
+# CALLBACK FUNCTIONS #
+
+function chpwd()				# chpwd hook
+{
+	check_git_repo
+	update_pwd_datas
+	update_pwd_save
+}
+
+function periodic()				# every $PERIOD secs - triggered by promt print
+{
+	rehash						# rehash path binaries
+	check_git_repo
+	update_pwd_datas
+	update_pwd_save
+}
+PERIOD=5
+
+function preexec()				# pre execution hook
+{
+	print -Pn "\e]2;$PWD : $1\a" # set 'pwd + cmd' set window title
+}
+
+function precmd()				# pre promt hook
+{
+	print -Pn "\e]2;$PWD\a"		# set pwd as window title
+	
+	set_git_char
+}
+
+
+# USER FUNCTIONS #
+
+function ca()					# add cd alias (ca <alias_name> || ca <alias_name> <aliased path>)
 {
 	local a
 	local p
@@ -94,7 +110,7 @@ function ca()					# cd aliases
 	echo "$a=$p" >> $CA_FILE;
 }
 
-function dca()					# delete cd alias
+function dca()					# delete cd alias (dca <alias 1> <alias 2> ... <alias n>)
 {
 	local a
 	if [ -e $CA_FILE ] && [ "$#" -gt 0 ]; then
@@ -111,7 +127,7 @@ function sca()					# show cd aliases
 	[ -e $CA_FILE ] && cat $CA_FILE || echo "No cd aliases yet";
 }
 
-function cd()
+function cd()					# cd wrap to use aliases - priority over real path instead of alias
 {
 	local a
 	if [ -e $CA_FILE ] && [ "$#" -eq 1 ] && [ ! -d $1 ]; then
@@ -125,7 +141,33 @@ function cd()
 	fi;
 	builtin cd "$@" 2> /dev/null || echo "Nope" 1>&2;
 }
-export cd
+export cd						# replace the old boring cd by my wrap
+
+function showcolors()			# display the 256 colors by shades - useful to get pimpy colors
+{
+	for c in {0..15}; do tput setaf $c ; echo -ne " $c "; done
+	echo
+	for s in {16..51}; do
+		for ((i = $s; i < 232; i+=36)); do
+			tput setaf $i ; echo -ne " $i ";
+		done;
+		echo
+	done
+	for c in {232..255}; do tput setaf $c ; echo -ne " $c "; done
+	echo
+}
+
+function error()				# give error nb to get error string
+{
+	python -c "import os; print os.strerror($?)";
+}
+
+function join_others_shells()	# ask for joining path specified in $PWD_FILE if not already in it
+{
+	if [[ -e $PWD_FILE ]] && [[ $(pwd) != $(cat $PWD_FILE) ]]; then
+		read -q "?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):"  && cd "$(cat $PWD_FILE)"
+	fi
+}
 
 function loop()					# loop parameter command every $LOOP_INT seconds (default 1)
 {
@@ -140,43 +182,72 @@ function loop()					# loop parameter command every $LOOP_INT seconds (default 1)
 	done
 }
 
-
-function chpwd()				# chpwd hook
+function extract				# extract muy types of archives
 {
-	check_git_repo
-	update_pwd_datas
-	update_pwd_save
+	if [ -z "$1" ]; then
+		# display usage if no parameters given
+		echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz>"
+	else
+		if [ -f $1 ] ; then
+			# NAME=${1%.*}
+			# mkdir $NAME && cd $NAME
+			case $1 in
+				*.tar.bz2)   tar xvjf ../$1    ;;
+				*.tar.gz)    tar xvzf ../$1    ;;
+				*.tar.xz)    tar xvJf ../$1    ;;
+				*.lzma)      unlzma ../$1      ;;
+				*.bz2)       bunzip2 ../$1     ;;
+				*.rar)       unrar x -ad ../$1 ;;
+				*.gz)        gunzip ../$1      ;;
+				*.tar)       tar xvf ../$1     ;;
+				*.tbz2)      tar xvjf ../$1    ;;
+				*.tgz)       tar xvzf ../$1    ;;
+				*.zip)       unzip ../$1       ;;
+				*.Z)         uncompress ../$1  ;;
+				*.7z)        7z x ../$1        ;;
+				*.xz)        unxz ../$1        ;;
+				*.exe)       cabextract ../$1  ;;
+				*)           echo "extract: '$1' - unknown archive method" ;;
+			esac
+		else
+			echo "$1 - file does not exist"
+		fi
+	fi
 }
 
-function periodic()				# every $PERIOD secs
+function pc()				   # percent of the home taken by this dir/file
 {
-	rehash						# rehash path binaries
-	check_git_repo
-	update_pwd_datas
-	update_pwd_save
-}
-PERIOD=5
+	local subdir
+	local dir
 
-function preexec()				# pre execution hook
-{
-	print -Pn "\e]2;$PWD : $1\a" # print pwd + cmd in window title
+	if [ "$#" -eq 0 ]; then
+		subdir=.
+		dir=$HOME
+	else if [ "$#" -eq 1 ]; then
+			 subdir=$1
+			 dir=$HOME
+		 else if [ "$#" -eq 2 ]; then
+				  subdir=$1
+				  dir=$2
+			  else
+				  echo "Usage: pc <dir/file a>? <dir b>? to get the % of the usage of b by a"
+				  return 1
+			  fi
+		 fi
+	fi
+	echo "$(($(du -sx $subdir | cut -f1) * 100 / $(du -sx $dir | cut -f1)))" "%"
 }
 
-function precmd()				# pre promt hook
-{
-	print -Pn "\e]2;$PWD\a"		# print pwd in window title
-	
-	set_git_char
-}
+
+# PS1 VARIABLES #
 
 SEP="%F{240}"					# separator color
 
-GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)"
+GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)" # get the shell level (0-9 or + if > 9)
 
-GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SEP:)"
+GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SEP:)" # 'ssh:' before username if logged in ssh
 
-
-PS1=''
+PS1=''							# simple quotes for post evaluation
 PS1+='%F{26}$GET_SSH'
 PS1+='%F{26}%n${SEP}@%F{26}%m'
 PS1+='${SEP}[%F{200}%~${SEP}|'
@@ -188,24 +259,27 @@ PS1+='%F{205}$GET_SHLVL'
 PS1+='%(0!.%F{196}#.%F{21}\$)'
 PS1+='${SEP}>%f%k '
 
-RPS1="%U%B%F{220}%T%u%f%b"
+RPS1="%U%B%F{220}%T%u%f%b"		# right part of the PS1
 
-# PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # light
+# PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # simple PS1 slow shells
 
-EDITOR="emacs"
-VISUAL="emacs"
 
-bindkey "$(echotc kl)" backward-char
-bindkey "$(echotc kr)" forward-char
-bindkey "$(echotc ku)" up-line-or-history
+bindkey "$(echotc kl)" backward-char # dunno why but everybody is doing it
+bindkey "$(echotc kr)" forward-char	 # looks like termcaps stuff
+bindkey "$(echotc ku)" up-line-or-history # arrows keys compatibility on dumb terms maybe ?
 bindkey "$(echotc kd)" down-line-or-history
+
+# SETTING STUFF #
+
+EDITOR="emacs"					# variables set for git editor and edit-command-line
+VISUAL="emacs"
 
 HISTFILE=~/.zshrc_history
 SAVEHIST=4096
 HISTSIZE=4096
 
 CLICOLOR=1
-case "$(uname)" in
+case "$UNAME" in				# there is different LS_COLORS syntaxes according to OS :/
 	*Darwin*)
 		LS_COLORS='exfxcxdxbxexexabagacad'
 		alias ls="ls -G";;
@@ -213,6 +287,9 @@ case "$(uname)" in
 		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
 		alias ls="ls --color=auto";;
 esac
+
+
+# (UN)SETTING ZSH (COOL) OPTIONS #
 
 setopt promptsubst				# compute PS1 at each prompt print
 setopt inc_append_history
@@ -224,11 +301,14 @@ setopt nullglob					# remove pointless globs
 setopt auto_cd					# './dir' = 'cd dir'
 setopt cbases					# c-like bases conversions
 setopt emacs
-setopt flow_control
-unsetopt rm_star_silent			# ask for confirmation if 'rm *'
-unsetopt beep					# no sounds
+setopt flow_control				# enable C-q and C-s to control the flooow
+setopt rm_star_silent			# ask for confirmation if 'rm *'... why not ?
 # setopt print_exit_value			# print exit value if non 0
 
+unsetopt beep					# no disturbing sounds
+
+
+# ZSH FUNCTIONS LOAD #
 
 autoload zed					# zsh editor
 
@@ -241,7 +321,10 @@ zle -N edit-command-line
 autoload -U colors && colors	# cool colors
 
 autoload -U compinit && compinit # enable completion
-zmodload zsh/complist			# load compeltion list
+zmodload zsh/complist			 # load compeltion list
+
+
+# SETTING UP ZSH COMPLETION STUFF #
 
 zstyle ':completion:*:rm:*' ignore-line yes # remove suggestion if already in selection
 zstyle ':completion:*:mv:*' ignore-line yes # same
@@ -266,6 +349,8 @@ zle -C complete-file complete-word _generic
 zstyle ':completion:complete-file::::' completer _files
 
 
+# ZSH KEY BINDINGS #
+
 bindkey -e 						# emacs style key binding
 
 if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
@@ -275,17 +360,19 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
 	zle -N zle-line-finish
 fi
 
-# shell commands binds
-bindkey -s "^[j" "^Ujoin_others_shells\n"
-bindkey -s "^[r" "^Uressource\n"
-bindkey -s "^[e" "^Uerror\n"
+# SHELL COMMANDS BINDS #
+# 'cat -v' to get the keycode
+bindkey -s "^[j" "^Ujoin_others_shells\n" # join_others_shells user function
+bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
+bindkey -s "^[e" "^Uerror\n"			  # run error user function
 bindkey -s "^[s" "^Asudo ^E"	# insert sudo
 bindkey -s "\el" "^Uls\n"		# run ls
 bindkey -s "^X^X" "^Uemacs\n"	# run emacs
 bindkey -s "^X^M" "^Umake\n"	# make
 
 
-# zsh functions binds
+# ZSH FUNCTIONS BINDS #
+
 bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 bindkey "^x^T" zle-toggle-mouse
@@ -311,12 +398,16 @@ if [[ "${terminfo[kcud1]}" != "" ]]; then
 fi
 
 
-# useful aliases
+# USEFUL ALIASES #
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
 alias lt="ls -ltFh"				# l with modification date sort
 alias ll="ls -l"				# simple list
+alias .="ls"
+
+alias mkdir="mkdir -pv"			# create all the needed parent directories + inform user about creations
+
 alias grep="grep --color"
 alias egrep="egrep --color=auto"
 
@@ -326,11 +417,19 @@ alias res="source ~/.zshrc"
 alias e="emacs"
 alias q="emacs -q"				# fast emacs
 
+alias ff="find . -name "		# find file faster
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
-# percent of the home taken by this dir
-function pc() { echo "$(($(du -sx $1 | cut -f1) * 100 / $(du -sx ~ | cut -f1)))" "%" }
+alias df="df -Tha --total"		# disk usage infos
+alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e VSZ -e " # fps <processname> to get ps infos only for the matching processes
 
-alias .="ls"
+alias roadtrip='while true; do cd $(ls -pa1 | grep "/$" | grep -v "^\./$" | sort --random-sort | head -n1); echo -ne "\033[2K\r>$(pwd)"; done' # visit your computer
+
+case "$UNAME" in
+	*Darwin*)
+		alias update="brew update && brew upgrade";;
+	*linux*|*)
+		alias update="sudo apt-get update && sudo apt-get upgrade";;
+esac
 
 check_git_repo
 update_pwd_datas
