@@ -114,7 +114,7 @@ function sca()					# show cd aliases
 function cd()
 {
 	local a
-	if [ -e $CA_FILE ] && [ "$#" -eq 1 ] && [ ${1:0:1} != '/' ] && [ ${1:0:1} != '.' ]; then
+	if [ -e $CA_FILE ] && [ "$#" -eq 1 ] && [ ! -d $1 ]; then
 		a="$(grep -o "^$1=.*$" $CA_FILE)";
 		if [ "$a" != "" ]; then
 			a="$(echo $a | cut -d'=' -f2)"
