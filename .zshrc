@@ -410,6 +410,7 @@ alias mkdir="mkdir -pv"			# create all the needed parent directories + inform us
 
 alias grep="grep --color"
 alias egrep="egrep --color=auto"
+alias tree="tree -C"
 
 alias ressource="source ~/.zshrc"
 alias res="source ~/.zshrc"
