@@ -238,6 +238,9 @@ function pc()				   # percent of the home taken by this dir/file
 	echo "$(($(du -sx $subdir | cut -f1) * 100 / $(du -sx $dir | cut -f1)))" "%"
 }
 
+function tmp()					# TODO: invoque new subshell in /tmp
+
+function checkgit()				# TODO: find all git repos and check if pull/push is needed
 
 # PS1 VARIABLES #
 
