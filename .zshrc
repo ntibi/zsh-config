@@ -124,7 +124,7 @@ function dca()					# delete cd alias (dca <alias 1> <alias 2> ... <alias n>)
 
 function sca()					# show cd aliases
 {
-	[ -e $CA_FILE ] && cat $CA_FILE || echo "No cd aliases yet";
+	[ -e $CA_FILE ] && cat $CA_FILE | egrep --color=auto "^[^=]+" || echo "No cd aliases yet";
 }
 
 function cd()					# cd wrap to use aliases - priority over real path instead of alias
