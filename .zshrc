@@ -243,6 +243,11 @@ function tmp()					# TODO: invoque new subshell in /tmp
 	env STARTUP_CMD="cd /tmp" zsh;
 }
 
+function -()
+{
+	[[ $# -eq 0 ]] && cd - || builtin - "$@"
+}
+
 # PS1 VARIABLES #
 
 SEP="%F{240}"					# separator color
@@ -307,6 +312,7 @@ setopt cbases					# c-like bases conversions
 setopt emacs
 setopt flow_control				# enable C-q and C-s to control the flooow
 setopt rm_star_silent			# ask for confirmation if 'rm *'... why not ?
+setopt completeinword			# complete from anywhere
 # setopt print_exit_value			# print exit value if non 0
 
 unsetopt beep					# no disturbing sounds
