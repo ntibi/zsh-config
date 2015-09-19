@@ -239,8 +239,9 @@ function pc()				   # percent of the home taken by this dir/file
 }
 
 function tmp()					# TODO: invoque new subshell in /tmp
-
-function checkgit()				# TODO: find all git repos and check if pull/push is needed
+{
+	env STARTUP_CMD="cd /tmp" zsh;
+}
 
 # PS1 VARIABLES #
 
@@ -442,3 +443,5 @@ set_git_char
 rehash							# hash commands in path
 
 # join_others_shells				# ask for joining others shells
+
+[ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD
