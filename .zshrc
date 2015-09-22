@@ -257,15 +257,15 @@ GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)" # get the shell lev
 GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SEP:)" # 'ssh:' before username if logged in ssh
 
 PS1=''							# simple quotes for post evaluation
-PS1+='%F{26}$GET_SSH'
+PS1+='%F{26}$GET_SSH'			# 'ssh:' if in ssh
 PS1+='%F{26}%n${SEP}@%F{26}%m'
-PS1+='${SEP}[%F{200}%~${SEP}|'
-PS1+='%F{46}$NB_FILES${SEP}/%F{21}$NB_DIRS${SEP}]'
-PS1+=' %(0?.%F{82}o.%F{196}x)'
-PS1+='$GET_GIT'
-PS1+='%(1j.%F{226}%j.%F{180}o)'
-PS1+='%F{205}$GET_SHLVL'
-PS1+='%(0!.%F{196}#.%F{21}\$)'
+PS1+='${SEP}[%F{200}%~${SEP}|'	# current short path
+PS1+='%F{46}$NB_FILES${SEP}/%F{21}$NB_DIRS${SEP}]' # nb of files and dirs in .
+PS1+=' %(0?.%F{82}o.%F{196}x)'					   # return status of last command (green O or red X)
+PS1+='$GET_GIT'									 # git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
+PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' # number of running/sleeping bg jobs
+PS1+='%F{205}$GET_SHLVL'						 # static shlvl
+PS1+='%(0!.%F{196}#.%F{21}\$)'					 # static user level
 PS1+='${SEP}>%f%k '
 
 RPS1="%U%B%F{220}%T%u%f%b"		# right part of the PS1
