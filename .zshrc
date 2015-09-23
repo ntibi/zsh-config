@@ -134,8 +134,7 @@ function cd()					# cd wrap to use aliases - priority over real path instead of 
 		a="$(grep -o "^$1=.*$" $CA_FILE)";
 		if [ "$a" != "" ]; then
 			a="$(echo $a | cut -d'=' -f2)"
-			builtin cd $a 2> /dev/null || echo "Nope" 1>&2;
-			echo "$a";
+			builtin cd $a 2> /dev/null && echo $a|| echo "Nope" 1>&2;
 			return 0;
 		fi;
 	fi;
