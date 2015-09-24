@@ -248,6 +248,27 @@ function -()
 	[[ $# -eq 0 ]] && cd - || builtin - "$@"
 }
 
+function ff()					# faster find allowing parameters in disorder (ff [type|name|root]+)
+{
+	local p
+	local name=""
+	local type=""
+	local root="."
+	for p in "$@"; do
+		if $(echo $p | grep -q "^[bcdflps]$"); # is it a type ?
+		then
+			type+=$([ -z $type ] && echo " -type $p" || echo " -or -type $p")
+		else if [ -d $p ];		# is it a path ?
+			 then
+				 root=$p
+			 else				# then its a name !
+				 name+=$([ -z $name ] && echo " -name $p" || echo " -or -name $p");
+			 fi
+		fi
+	done
+	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null # re split all to spearate parameters
+}
+
 # PS1 VARIABLES #
 
 SEP="%F{240}"					# separator color
@@ -428,7 +449,6 @@ alias res="source ~/.zshrc"
 alias e="emacs"
 alias q="emacs -q"				# fast emacs
 
-alias ff="find . -name "		# find file faster
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
 alias df="df -Tha --total"		# disk usage infos
 alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e VSZ -e " # fps <processname> to get ps infos only for the matching processes
