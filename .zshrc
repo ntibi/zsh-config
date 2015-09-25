@@ -243,9 +243,14 @@ function tmp()					# TODO: invoque new subshell in /tmp
 	env STARTUP_CMD="cd /tmp" zsh;
 }
 
-function -()
+function -()					# if 0 params, acts like 'cd -', else, act like the regular '-'
 {
 	[[ $# -eq 0 ]] && cd - || builtin - "$@"
+}
+
+function race()					# race between logins given in parameters
+{
+    cat /dev/urandom | egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
 }
 
 function ff()					# faster find allowing parameters in disorder (ff [type|name|root]+)
@@ -267,6 +272,17 @@ function ff()					# faster find allowing parameters in disorder (ff [type|name|r
 		fi
 	done
 	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null # re split all to spearate parameters
+}
+
+function hacker()				# prints a file in hollywood hacker style
+{
+	clear;
+	echo "$(cat $@)" | pv -qL 15
+}
+
+function +()					# send params to bc -l (-l to alloe floating point operations)
+{
+	echo "$@" | bc -l
 }
 
 # PS1 VARIABLES #
