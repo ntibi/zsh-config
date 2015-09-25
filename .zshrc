@@ -274,10 +274,21 @@ function ff()					# faster find allowing parameters in disorder (ff [type|name|r
 	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null # re split all to spearate parameters
 }
 
-function hacker()				# prints a file in hollywood hacker style
+function work()				 # work simulation
 {
 	clear;
-	tput setaf 40; echo "$(cat $@)" | pv -qL 25
+	cat /dev/zero | head -c $COLUMNS | tr '\0' '='
+	# echo "$(cat $(find -type f -name "*.cpp" 2>/dev/null | head -n1))" | sed ':a;$!N;$!ba;s/\/\*[^​*]*\*\([^/*​][^*]*\*\|\*\)*\///g' | pv -qL 25
+	text="$(cat $(find -type f -name "*.cpp" 2>/dev/null | head -n1) | sed ':a;$!N;$!ba;s/\/\*[^​*]*\*\([^/*​][^*]*\*\|\*\)*\///g')"
+	arr=($(echo $text))
+	i=0
+	while true
+	do
+		read -qs;
+		echo -n ${text[$i]};
+		i=$(( i + 1 ))
+	done
+	echo
 }
 
 function +()					# send params to bc -l (-l to alloe floating point operations)
