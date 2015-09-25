@@ -277,7 +277,7 @@ function ff()					# faster find allowing parameters in disorder (ff [type|name|r
 function hacker()				# prints a file in hollywood hacker style
 {
 	clear;
-	echo "$(cat $@)" | pv -qL 15
+	tput setaf 40; echo "$(cat $@)" | pv -qL 25
 }
 
 function +()					# send params to bc -l (-l to alloe floating point operations)
