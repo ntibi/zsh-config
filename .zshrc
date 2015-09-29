@@ -10,6 +10,7 @@ TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-25
 PWD_FILE=~/.pwd					# last pwd sav file
 CA_FILE=~/.ca					# cd aliases sav file
 OS="$(uname)"					# get the os name
+UPDATE_TERM_TITLE=""			# set to update the term title according to the path and the currently executed line
 
 # PS1 FUNCTIONS #
 
@@ -75,12 +76,12 @@ PERIOD=5
 
 function preexec()				# pre execution hook
 {
-	print -Pn "\e]2;$PWD : $1\a" # set 'pwd + cmd' set window title
+	[ -z $UPDATE_TERM_TITLE ] || print -Pn "\e]2;$PWD : $1\a" # set 'pwd + cmd' set term title
 }
 
 function precmd()				# pre promt hook
 {
-	print -Pn "\e]2;$PWD\a"		# set pwd as window title
+	[ -z $UPDATE_TERM_TITLE ] || print -Pn "\e]2;$PWD\a"		# set pwd as term title
 	
 	set_git_char
 }
