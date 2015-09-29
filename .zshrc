@@ -88,7 +88,7 @@ function precmd()				# pre promt hook
 }
 
 
-# USER FUNCTIONS #
+# USEFUL USER FUNCTIONS #
 
 function ca()					# add cd alias (ca <alias_name> || ca <alias_name> <aliased path>)
 {
@@ -217,7 +217,7 @@ function extract				# extract muy types of archives
 	fi
 }
 
-function pc()				   # percent of the home taken by this dir/file
+function pc()			  # percent of the home taken by this dir/file
 {
 	local subdir
 	local dir
@@ -250,11 +250,6 @@ function -()					# if 0 params, acts like 'cd -', else, act like the regular '-'
 	[[ $# -eq 0 ]] && cd - || builtin - "$@"
 }
 
-function race()					# race between logins given in parameters
-{
-    cat /dev/urandom | egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
-}
-
 function ff()					# faster find allowing parameters in disorder (ff [type|name|root]+)
 {
 	local p
@@ -276,23 +271,6 @@ function ff()					# faster find allowing parameters in disorder (ff [type|name|r
 	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null # re split all to spearate parameters
 }
 
-function work()				 # work simulation
-{
-	clear;
-	cat /dev/zero | head -c $COLUMNS | tr '\0' '='
-	# echo "$(cat $(find -type f -name "*.cpp" 2>/dev/null | head -n1))" | sed ':a;$!N;$!ba;s/\/\*[^​*]*\*\([^/*​][^*]*\*\|\*\)*\///g' | pv -qL 25
-	text="$(cat $(find -type f -name "*.cpp" 2>/dev/null | head -n1) | sed ':a;$!N;$!ba;s/\/\*[^​*]*\*\([^/*​][^*]*\*\|\*\)*\///g')"
-	arr=($(echo $text))
-	i=0
-	while true
-	do
-		read -qs;
-		echo -n ${text[$i]};
-		i=$(( i + 1 ))
-	done
-	echo
-}
-
 function +()					# send params to bc -l (-l to alloe floating point operations)
 {
 	echo "$@" | bc -l
@@ -306,6 +284,34 @@ function gitcheck()				# check all the git repos set in
 		git pull&
 	done
 	cd $SAVPWD
+}
+
+# LESS USEFUL USER FUNCTIONS #
+
+function race()					# race between logins given in parameters
+{
+    cat /dev/urandom | egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
+}
+
+function work()					# work simulation
+{
+	clear;
+	cat /dev/zero | head -c $COLUMNS | tr '\0' '='
+	text="$(cat $(find -type f -name "*.cpp" 2>/dev/null | head -n1) | sed ':a;$!N;$!ba;s/\/\*[^​*]*\*\([^/*​][^*]*\*\|\*\)*\///g')"
+	arr=($(echo $text))
+	i=0
+	while true
+	do
+		read -qs;
+		echo -n ${text[$i]};
+		i=$(( i + 1 ))
+	done
+	echo
+}
+
+function hack()					# hollywood hacker cat
+{
+	cat $@ | pv -qL 25
 }
 
 function window()				# prints weather info
