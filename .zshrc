@@ -473,8 +473,13 @@ alias tree="tree -C"
 alias ressource="source ~/.zshrc"
 alias res="source ~/.zshrc"
 
+alias xemacs="emacs"
+alias emax="emacs"
+alias x="emacs"
+alias emacs="emacs -nw"
 alias e="emacs"
-alias q="emacs -q"				# fast emacs
+alias qmacs="emacs -q"
+alias q="emacs -q"
 
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
 alias df="df -Tha --total"		# disk usage infos
