@@ -7,11 +7,12 @@ TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-25
 
 # useful vars #
 
+PERIOD=5						# period used to hook periodic function (in sec)
 PWD_FILE=~/.pwd					# last pwd sav file
 CA_FILE=~/.ca					# cd aliases sav file
 OS="$(uname)"					# get the os name
 UPDATE_TERM_TITLE=""			# set to update the term title according to the path and the currently executed line
-GIT_CHECK="~/zsh-config:~/emacs-config"
+TO_PULL="~/zsh-config:~/emacs-config" # git repo paths to pull
 
 # PS1 FUNCTIONS #
 
@@ -73,7 +74,6 @@ function periodic()				# every $PERIOD secs - triggered by promt print
 	update_pwd_datas
 	update_pwd_save
 }
-PERIOD=5
 
 function preexec()				# pre execution hook
 {
@@ -298,15 +298,21 @@ function +()					# send params to bc -l (-l to alloe floating point operations)
 	echo "$@" | bc -l
 }
 
-function gitcheck()
+function gitcheck()				# check all the git repos set in 
 {
 	SAVPWD=$(pwd)
-	for repo in $(echo $GIT_CHECK | tr : \\n); do
+	for repo in $(echo $TO_PULL | tr : \\n); do
 		cd $repo
 		git pull&
 	done
 	cd $SAVPWD
 }
+
+function window()				# prints weather info
+{
+	curl -s "http://www.wunderground.com/q/zmw:00000.37.07156" | grep "og:title" | cut -d\" -f4 | sed 's/&deg;/ degrees/';
+}
+
 
 # PS1 VARIABLES #
 
