@@ -11,6 +11,7 @@ PWD_FILE=~/.pwd					# last pwd sav file
 CA_FILE=~/.ca					# cd aliases sav file
 OS="$(uname)"					# get the os name
 UPDATE_TERM_TITLE=""			# set to update the term title according to the path and the currently executed line
+GIT_CHECK="~/zsh-config:~/emacs-config"
 
 # PS1 FUNCTIONS #
 
@@ -295,6 +296,16 @@ function work()				 # work simulation
 function +()					# send params to bc -l (-l to alloe floating point operations)
 {
 	echo "$@" | bc -l
+}
+
+function gitcheck()
+{
+	SAVPWD=$(pwd)
+	for repo in $(echo $GIT_CHECK | tr : \\n); do
+		cd $repo
+		git pull&
+	done
+	cd $SAVPWD
 }
 
 # PS1 VARIABLES #
