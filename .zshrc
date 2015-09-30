@@ -7,12 +7,16 @@ TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-25
 
 # useful vars #
 
-PERIOD=5						# period used to hook periodic function (in sec)
+PERIOD=5			  # period used to hook periodic function (in sec)
 PWD_FILE=~/.pwd					# last pwd sav file
 CA_FILE=~/.ca					# cd aliases sav file
 OS="$(uname)"					# get the os name
 UPDATE_TERM_TITLE=""			# set to update the term title according to the path and the currently executed line
 TO_PULL="~/zsh-config:~/emacs-config" # git repo paths to pull
+SC=$(tput sc);
+RC=$(tput rc);
+YELLOW_C=$(tput setaf 226);
+DEF_C=$(tput sgr0);
 
 # PS1 FUNCTIONS #
 
@@ -57,6 +61,13 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 	fi
 }
 
+function clock()
+{
+	echo -ne $SC
+	tput cup 0 $(( $(tput cols) - 10));
+	echo "$YELLOW_C$(date +"%T")$DEF_C";
+	echo -ne $RC
+}
 
 # CALLBACK FUNCTIONS #
 
@@ -68,8 +79,7 @@ function chpwd()				# chpwd hook
 }
 
 function periodic()				# every $PERIOD secs - triggered by promt print
-{
-	rehash						# rehash path binaries
+{	
 	check_git_repo
 	update_pwd_datas
 	update_pwd_save
@@ -82,6 +92,7 @@ function preexec()				# pre execution hook
 
 function precmd()				# pre promt hook
 {
+	clock
 	[ -z $UPDATE_TERM_TITLE ] || print -Pn "\e]2;$PWD\a"		# set pwd as term title
 	
 	set_git_char
@@ -388,9 +399,8 @@ PS1+='%F{205}$GET_SHLVL'						 # static shlvl
 PS1+='%(0!.%F{196}#.%F{26}\$)'					 # static user level
 PS1+='${SEP_C}>%f%k '
 
-RPS1="$TIM_C%T%u%f%b"		# right part of the PS1
+# RPS1="$TIM_C%T%u%f%b"		# right part of the PS1
 
-# PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # simple PS1 slow shells
 
 
 bindkey "$(echotc kl)" backward-char # dunno why but everybody is doing it
@@ -575,3 +585,4 @@ rehash							# hash commands in path
 # join_others_shells				# ask for joining others shells
 
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD
+
