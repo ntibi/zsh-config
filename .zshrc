@@ -47,8 +47,8 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 			then GET_GIT="%F{214}+" # changes added
 			else
 				if [[ $STATUS =~ "is ahead" ]];
-				then GET_GIT="%F{118}+" # changes commited
-				else GET_GIT="%F{118}=" # changes pushed
+				then GET_GIT="%F{46}+" # changes commited
+				else GET_GIT="%F{46}=" # changes pushed
 				fi
 			fi
 		fi
@@ -322,22 +322,22 @@ function window()				# prints weather info
 
 # PS1 VARIABLES #
 
-SEP="%F{240}"					# separator color
+SEP="%F{242}"					# separator color
 
 GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)" # get the shell level (0-9 or + if > 9)
 
 GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SEP:)" # 'ssh:' before username if logged in ssh
 
 PS1=''							# simple quotes for post evaluation
-PS1+='%F{26}$GET_SSH'			# 'ssh:' if in ssh
-PS1+='%F{26}%n${SEP}@%F{26}%m'
-PS1+='${SEP}[%F{200}%~${SEP}|'	# current short path
-PS1+='%F{46}$NB_FILES${SEP}/%F{21}$NB_DIRS${SEP}]' # nb of files and dirs in .
+PS1+='%F{33}$GET_SSH'			# 'ssh:' if in ssh
+PS1+='%F{33}%n${SEP}@%F{33}%m'
+PS1+='${SEP}[%F{165}%~${SEP}|'	# current short path
+PS1+='%F{46}$NB_FILES${SEP}/%F{26}$NB_DIRS${SEP}]' # nb of files and dirs in .
 PS1+=' %(0?.%F{82}o.%F{196}x)'					   # return status of last command (green O or red X)
 PS1+='$GET_GIT'									 # git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
 PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' # number of running/sleeping bg jobs
 PS1+='%F{205}$GET_SHLVL'						 # static shlvl
-PS1+='%(0!.%F{196}#.%F{21}\$)'					 # static user level
+PS1+='%(0!.%F{196}#.%F{26}\$)'					 # static user level
 PS1+='${SEP}>%f%k '
 
 RPS1="%U%B%F{220}%T%u%f%b"		# right part of the PS1
