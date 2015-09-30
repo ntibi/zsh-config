@@ -286,6 +286,49 @@ function gitcheck()				# check all the git repos set in
 	cd $SAVPWD
 }
 
+function colorcode()			# get the code to set the corresponding fg color
+{
+	for c in "$@"; do
+		tput setaf $c;
+		echo -e "\"$(tput setaf $c | cat -v)\""
+	done
+}
+
+function colorize() # cmd | colorize <exp1> <color1> <exp2> <color2> ... to colorize expr with color
+{
+	local i
+	local last
+	local params
+	local col
+	i=0
+	params=""
+	col=""
+	for c in "$@"; do
+		case $c in
+			"black") 	col=0;;
+			"red") 		col=1;;
+			"green") 	col=2;;
+			"yellow") 	col=3;;
+			"blue") 	col=4;;
+			"purple") 	col=5;;
+			"cyan") 	col=6;;
+			"white") 	col=7;;
+			*) 			col=$c;;
+		esac
+		if [ "$((i % 2))" = "1" ]; then
+			params+=" -e s/($last)/$(tput setaf $col)\1$(tput sgr0)/g"
+		else
+			last=$c
+		fi
+		i=$(( i + 1))
+	done
+	if [ "$c" = "$last" ]; then
+		echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
+		return
+	fi
+	sed -r $(echo $params) 2>/dev/null || echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
+}
+
 # LESS USEFUL USER FUNCTIONS #
 
 function race()					# race between logins given in parameters
@@ -322,25 +365,30 @@ function window()				# prints weather info
 
 # PS1 VARIABLES #
 
-SEP="%F{242}"					# separator color
+SEP_C="%F{242}"					# separator color
+ID_C="%F{33}"					# id color
+PWD_C="%F{165}"					# pwd color
+NBF_C="%F{46}"					# files number color
+NBD_C="%F{26}"					# dir number color
+TIM_C="%U%B%F{220}"				# time color
 
 GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)" # get the shell level (0-9 or + if > 9)
 
-GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SEP:)" # 'ssh:' before username if logged in ssh
+GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SEP_C:)" # 'ssh:' before username if logged in ssh
 
 PS1=''							# simple quotes for post evaluation
-PS1+='%F{33}$GET_SSH'			# 'ssh:' if in ssh
-PS1+='%F{33}%n${SEP}@%F{33}%m'
-PS1+='${SEP}[%F{165}%~${SEP}|'	# current short path
-PS1+='%F{46}$NB_FILES${SEP}/%F{26}$NB_DIRS${SEP}]' # nb of files and dirs in .
-PS1+=' %(0?.%F{82}o.%F{196}x)'					   # return status of last command (green O or red X)
-PS1+='$GET_GIT'									 # git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
+PS1+='$ID_C$GET_SSH'			# 'ssh:' if in ssh
+PS1+='$ID_C%n${SEP_C}@$ID_C%m'	# user@machine
+PS1+='${SEP_C}[$PWD_C%~${SEP_C}|' # current short path
+PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS${SEP_C}]' # nb of files and dirs in .
+PS1+=' %(0?.%F{82}o.%F{196}x)' # return status of last command (green O or red X)
+PS1+='$GET_GIT'	# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
 PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' # number of running/sleeping bg jobs
 PS1+='%F{205}$GET_SHLVL'						 # static shlvl
 PS1+='%(0!.%F{196}#.%F{26}\$)'					 # static user level
-PS1+='${SEP}>%f%k '
+PS1+='${SEP_C}>%f%k '
 
-RPS1="%U%B%F{220}%T%u%f%b"		# right part of the PS1
+RPS1="$TIM_C%T%u%f%b"		# right part of the PS1
 
 # PS1='%B%F{blue}%n%b%F{red}@%B%F{blue}%m%b %F{red}[%B%F{magenta}%~%b%F{red}] %F{red}%#> %f' # simple PS1 slow shells
 
