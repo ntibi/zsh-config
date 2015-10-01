@@ -13,10 +13,10 @@ CA_FILE=~/.ca					# cd aliases sav file
 OS="$(uname)"					# get the os name
 UPDATE_TERM_TITLE=""			# set to update the term title according to the path and the currently executed line
 TO_PULL="~/zsh-config:~/emacs-config" # git repo paths to pull
-SC=$(tput sc);
-RC=$(tput rc);
-YELLOWU_C=$(tput setaf 226; tput smul);
-DEF_C=$(tput sgr0);
+SC=$(tput sc);						  # save cursor pos
+RC=$(tput rc);						  # load cursor pos
+YELLOWUB_C=$(tput setaf 226; tput smul; tput bold); # yellow underlined bold
+DEF_C=$(tput sgr0);									# reset colors
 
 # PS1 FUNCTIONS #
 
@@ -65,7 +65,7 @@ function clock()
 {
 	echo -ne $SC
 	tput cup 0 $(( $(tput cols) - 10));
-	echo "$YELLOWU_C$(date +"%T")$DEF_C";
+	echo "$YELLOWUB_C$(date +"%T")$DEF_C";
 	echo -ne $RC
 }
 
