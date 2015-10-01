@@ -79,7 +79,7 @@ function chpwd()				# chpwd hook
 }
 
 function periodic()				# every $PERIOD secs - triggered by promt print
-{	
+{
 	check_git_repo
 	update_pwd_datas
 	update_pwd_save
