@@ -15,7 +15,7 @@ UPDATE_TERM_TITLE=""			# set to update the term title according to the path and 
 TO_PULL="~/zsh-config:~/emacs-config" # git repo paths to pull
 SC=$(tput sc);
 RC=$(tput rc);
-YELLOW_C=$(tput setaf 226);
+YELLOWU_C=$(tput setaf 226; tput smul);
 DEF_C=$(tput sgr0);
 
 # PS1 FUNCTIONS #
@@ -65,7 +65,7 @@ function clock()
 {
 	echo -ne $SC
 	tput cup 0 $(( $(tput cols) - 10));
-	echo "$YELLOW_C$(date +"%T")$DEF_C";
+	echo "$YELLOWU_C$(date +"%T")$DEF_C";
 	echo -ne $RC
 }
 
@@ -306,7 +306,7 @@ function colorcode()			# get the code to set the corresponding fg color
 }
 
 function colorize() # cmd | colorize <exp1> <color1> <exp2> <color2> ... to colorize expr with color
-{
+{					# maybe change the syntax to <regex>:fg:bg?:mod? ...
 	local i
 	local last
 	local params
