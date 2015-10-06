@@ -18,6 +18,27 @@ RC=$(tput rc);						  # load cursor pos
 YELLOWUB_C=$(tput setaf 226; tput smul; tput bold); # yellow underlined bold
 DEF_C=$(tput sgr0);									# reset colors
 
+
+# (UN)SETTING ZSH (COOL) OPTIONS #
+
+setopt promptsubst				# compute PS1 at each prompt print
+setopt inc_append_history
+setopt share_history
+setopt histignoredups			# ignore dups in history
+setopt hist_expire_dups_first	# remove all dubs in history when full
+setopt auto_remove_slash		# remove slash when pressing space in auto completion
+setopt nullglob					# remove pointless globs
+setopt auto_cd					# './dir' = 'cd dir'
+setopt cbases					# c-like bases conversions
+setopt emacs
+setopt flow_control				# enable C-q and C-s to control the flooow
+setopt rm_star_silent			# ask for confirmation if 'rm *'... why not ?
+setopt completeinword			# complete from anywhere
+setopt shwordsplit				# sh like word split
+# setopt print_exit_value			# print exit value if non 0
+
+unsetopt beep					# no disturbing sounds
+
 # PS1 FUNCTIONS #
 
 function check_git_repo()		# check if pwd is a git repo
@@ -256,10 +277,10 @@ function tmp()					# TODO: invoque new subshell in /tmp
 	env STARTUP_CMD="cd /tmp" zsh;
 }
 
-function -()					# if 0 params, acts like 'cd -', else, act like the regular '-'
-{
-	[[ $# -eq 0 ]] && cd - || builtin - "$@"
-}
+# function -()					# if 0 params, acts like 'cd -', else, act like the regular '-'
+# {
+	# [[ $# -eq 0 ]] && cd - || builtin - "$@"
+# }
 
 function ff()					# faster find allowing parameters in disorder (ff [type|name|root]+)
 {
@@ -275,7 +296,7 @@ function ff()					# faster find allowing parameters in disorder (ff [type|name|r
 			 then
 				 root=$p
 			 else				# then its a name !
-				 name+=$([ -z $name ] && echo " -name $p" || echo " -or -name $p");
+				 name+="$([ -z "$name" ] && echo " -name $p" || echo " -or -name $p")";
 			 fi
 		fi
 	done
@@ -327,7 +348,7 @@ function colorize() # cmd | colorize <exp1> <color1> <exp2> <color2> ... to colo
 			*) 			col=$c;;
 		esac
 		if [ "$((i % 2))" = "1" ]; then
-			params+=" -e s/($last)/$(tput setaf $col)\1$(tput sgr0)/g"
+			params+=" -e s/($last)/$(tput setaf $col)\1$(tput sgr0)/g" # investigate about ```MDR=""; MDR="-e"; echo $MDR```
 		else
 			last=$c
 		fi
@@ -337,7 +358,7 @@ function colorize() # cmd | colorize <exp1> <color1> <exp2> <color2> ... to colo
 		echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
 		return
 	fi
-	sed -r $(echo $params) 2>/dev/null || echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
+	sed -re $(echo $params) 2>/dev/null || echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
 }
 
 # LESS USEFUL USER FUNCTIONS #
@@ -426,26 +447,6 @@ case "$UNAME" in				# there is different LS_COLORS syntaxes according to OS :/
 		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
 		alias ls="ls --color=auto";;
 esac
-
-
-# (UN)SETTING ZSH (COOL) OPTIONS #
-
-setopt promptsubst				# compute PS1 at each prompt print
-setopt inc_append_history
-setopt share_history
-setopt histignoredups			# ignore dups in history
-setopt hist_expire_dups_first	# remove all dubs in history when full
-setopt auto_remove_slash		# remove slash when pressing space in auto completion
-setopt nullglob					# remove pointless globs
-setopt auto_cd					# './dir' = 'cd dir'
-setopt cbases					# c-like bases conversions
-setopt emacs
-setopt flow_control				# enable C-q and C-s to control the flooow
-setopt rm_star_silent			# ask for confirmation if 'rm *'... why not ?
-setopt completeinword			# complete from anywhere
-# setopt print_exit_value			# print exit value if non 0
-
-unsetopt beep					# no disturbing sounds
 
 
 # ZSH FUNCTIONS LOAD #
