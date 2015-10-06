@@ -378,7 +378,7 @@ function window()				# prints weather info
 
 SEP_C="%F{242}"					# separator color
 ID_C="%F{33}"					# id color
-PWD_C="%F{165}"					# pwd color
+PWD_C="%F{201}"					# pwd color
 NBF_C="%F{46}"					# files number color
 NBD_C="%F{26}"					# dir number color
 TIM_C="%U%B%F{220}"				# time color
