@@ -249,7 +249,7 @@ function extract				# extract muy types of archives
 	fi
 }
 
-function pc()			  # percent of the home taken by this dir/file
+function pc()			  		# percent of the home taken by this dir/file
 {
 	local subdir
 	local dir
@@ -277,12 +277,12 @@ function tmp()					# TODO: invoque new subshell in /tmp
 	env STARTUP_CMD="cd /tmp" zsh;
 }
 
-function -()					# if 0 params, acts like 'cd -', else, act like the regular '-'
+function -() 					# if 0 params, acts like 'cd -', else, act like the regular '-'
 {
 	[[ $# -eq 0 ]] && cd - || builtin - "$@"
 }
 
-function ff()					# faster find allowing parameters in disorder (ff [type|name|root]+)
+function ff() 					# faster find allowing parameters in disorder (ff [type|name|root]+)
 {
 	local p
 	local name=""
@@ -303,7 +303,7 @@ function ff()					# faster find allowing parameters in disorder (ff [type|name|r
 	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null # re split all to spearate parameters
 }
 
-function +()					# send params to bc -l (-l to alloe floating point operations)
+function +() 					# send params to bc -l (-l to alloe floating point operations)
 {
 	echo "$@" | bc -l
 }
@@ -318,7 +318,7 @@ function gitcheck()				# check all the git repos set in
 	cd $SAVPWD
 }
 
-function colorcode()			# get the code to set the corresponding fg color
+function colorcode()  			# get the code to set the corresponding fg color
 {
 	for c in "$@"; do
 		tput setaf $c;
@@ -326,8 +326,8 @@ function colorcode()			# get the code to set the corresponding fg color
 	done
 }
 
-function colorize() # cmd | colorize <exp1> <color1> <exp2> <color2> ... to colorize expr with color
-{					# maybe change the syntax to <regex>:fg:bg?:mod? ...
+function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to colorize expr with color # maybe change the syntax to <regex>:fg:bg?:mod? ...
+{
 	local i
 	local last
 	local params
@@ -359,6 +359,40 @@ function colorize() # cmd | colorize <exp1> <color1> <exp2> <color2> ... to colo
 		return
 	fi
 	sed -re $(echo $params) 2>/dev/null || echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
+}
+
+function rrm()					# real rm
+{
+	command rm $@
+}
+
+function rm()					# safe rm with timestamped backup
+{
+	local backup
+	backup="/tmp/backup-$(date +%s)"
+	command mkdir $backup
+	mv "$@" "$backup"
+}
+
+function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
+{
+	local delta
+	if [ $# = 0 ]; then
+		date +%s
+	elif [ $# = 1 ]; then
+		delta=$(( $(date +%s) - $1 ))
+		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )) fi
+		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )) fi
+		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )) fi
+		echo "$delta s ago";
+	elif [ $# = 2 ]; then
+			delta=$(( $2 - $1 ))
+			[ $delta -lt 0 ] && delta=$(( -delta ))
+		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )) fi
+		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )) fi
+		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )) fi
+		echo "$delta s";
+	fi
 }
 
 # LESS USEFUL USER FUNCTIONS #
