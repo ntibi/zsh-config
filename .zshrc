@@ -50,8 +50,8 @@ function update_pwd_datas()		# update the numbers of files and dirs in .
 {
 	local v
 	v=$(ls -pA1)
-	NB_FILES=$(echo $v | grep -v /$ | wc -l | tr -d ' ')
-	NB_DIRS=$(echo $v | grep /$ | wc -l | tr -d ' ')
+	NB_FILES=$(echo "$v" | grep -v /$ | wc -l | tr -d ' ')
+	NB_DIRS=$(echo "$v" | grep /$ | wc -l | tr -d ' ')
 }
 
 function update_pwd_save()		# update the $PWD_FILE
@@ -277,10 +277,10 @@ function tmp()					# TODO: invoque new subshell in /tmp
 	env STARTUP_CMD="cd /tmp" zsh;
 }
 
-# function -()					# if 0 params, acts like 'cd -', else, act like the regular '-'
-# {
-	# [[ $# -eq 0 ]] && cd - || builtin - "$@"
-# }
+function -()					# if 0 params, acts like 'cd -', else, act like the regular '-'
+{
+	[[ $# -eq 0 ]] && cd - || builtin - "$@"
+}
 
 function ff()					# faster find allowing parameters in disorder (ff [type|name|root]+)
 {
