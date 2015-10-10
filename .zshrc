@@ -158,7 +158,7 @@ function dca()					# delete cd alias (dca <alias 1> <alias 2> ... <alias n>)
 
 function sca()					# show cd aliases
 {
-	[ -e $CA_FILE ] && cat $CA_FILE | egrep --color=auto "^[^=]+" || echo "No cd aliases yet";
+	[ -e $CA_FILE ] && cat $CA_FILE | egrep --color=always "^[^=]+" || echo "No cd aliases yet";
 }
 
 function cd()					# cd wrap to use aliases - priority over real path instead of alias
@@ -495,7 +495,7 @@ case "$UNAME" in				# there is different LS_COLORS syntaxes according to OS :/
 		alias ls="ls -G";;
 	*linux*|*cygwin*|*)
 		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
-		alias ls="ls --color=auto";;
+		alias ls="ls --color=always";;
 esac
 
 
@@ -599,9 +599,10 @@ alias .="ls"
 
 alias mkdir="mkdir -pv"			# create all the needed parent directories + inform user about creations
 
-alias grep="grep --color"
-alias egrep="egrep --color=auto"
-alias tree="tree -C"
+alias grep="grep --color=always"
+alias egrep="egrep --color=always"
+alias tree="tree -C"			# -C colorzzz
+alias less="less -R"			# -R Raw control chars
 
 alias ressource="source ~/.zshrc"
 alias res="source ~/.zshrc"
