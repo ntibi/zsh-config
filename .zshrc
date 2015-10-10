@@ -395,7 +395,23 @@ function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>`
 	fi
 }
 
+
 # LESS USEFUL USER FUNCTIONS #
+
+function loading()				# useless loading bar
+{
+	LOADING="▁▂▃▄▅▆▇▆▅▄▃▂▁"
+	trap "tput cnorm; return" SIGHUP SIGINT SIGTERM
+	tput civis;
+	tput sc;
+	while true; do
+		for i in {0..12}; do
+			echo -n "${LOADING:$i:1} "
+			sleep 0.1;
+			tput rc;
+		done
+	done
+}
 
 function race()					# race between logins given in parameters
 {
