@@ -398,22 +398,6 @@ function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>`
 
 # LESS USEFUL USER FUNCTIONS #
 
-function cf()					# free cursor !!!
-{
-	local t
-	while true
-	do
-		read -r -sk1 t
-		case $t in
-			A) tput cuu1 ;;
-			B) tput cud1 ;;
-			C) tput cuf1 ;;
-			D) tput cub1 ;;
-			*) echo -n "$t" ;;
-		esac
-	done
-}
-
 function loading()				# useless loading bar
 {
 	LOADING="▁▂▃▄▅▆▇▆▅▄▃▂▁"
