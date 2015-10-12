@@ -383,9 +383,29 @@ function rm()					# safe rm with timestamped backup
 {
 	if [ $# -gt 0 ]; then
 		local backup
-		backup="/tmp/backup-$(date +%s)"
-		command mkdir $backup
-		mv "$@" "$backup"
+		local idir
+		local rm_params
+		idir=""
+		rm_params=""
+		backup="/tmp/backup/$(date +%s)"
+		command mkdir -p "$backup"
+		for i in "$@"; do
+			if [ ${i:0:1} = "-" ]; then # if $i is an args list, save them
+				rm_params+="$i";
+			elif [ -e $i ] || [ -d $i ]; then # $i exist ?
+				if [ ${i:0:4} = "/tmp" ]; then # really remove files if they are in /tmp
+					command rm "$rm_params" "$i";
+				else
+					[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
+					i="$(realpath $i)";						# simplify the path
+					idir="$(dirname $i)";
+					command mkdir -p "$backup/$idir";
+					mv "$i" "$backup/$i";
+				fi
+			else				# $i is not a param list nor a file/dir
+				echo "'$i' not found" 1>&2
+			fi
+		done
 	fi
 }
 
