@@ -1,11 +1,22 @@
+# # # # # # # #
+# TODO:
+#
+# Add a nicer backup manager
+# Handle doubles (like `rm lol lol`)
+# Add the path of all removed files each backup dir to allow rollback
+#
+# A function that displays backups like
+# 	1: X h Y m Z s ago: file_1 file_2...
+# 	2: ...
+# 	Which backup to rollback ? :
+#	(and handle files/dirs overwriting, removed pathes, ...)
+# # # # # # # #
+
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
 
+TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/" # check if xterm-256 color is available, or if we are in a dumb shell
 
-# setup zsh #
-
-TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/" # check if xterm-256 color is available, or if we are in a retarded shell
-
-# useful vars #
+# USEFUL VARS #
 
 PERIOD=5			  # period used to hook periodic function (in sec)
 PWD_FILE=~/.pwd					# last pwd sav file
@@ -13,8 +24,10 @@ CA_FILE=~/.ca					# cd aliases sav file
 OS="$(uname)"					# get the os name
 UPDATE_TERM_TITLE=""			# set to update the term title according to the path and the currently executed line
 TO_PULL="~/zsh-config:~/emacs-config" # git repo paths to pull
-SC=$(tput sc);						  # save cursor pos
-RC=$(tput rc);						  # load cursor pos
+
+# fast termcaps
+SC=$(tput sc);						  # save cursor pos termcap
+RC=$(tput rc);						  # load cursor pos termcap
 YELLOWUB_C=$(tput setaf 226; tput smul; tput bold); # yellow underlined bold
 DEF_C=$(tput sgr0);									# reset colors
 
@@ -32,7 +45,6 @@ setopt auto_cd					# './dir' = 'cd dir'
 setopt cbases					# c-like bases conversions
 setopt emacs
 setopt flow_control				# enable C-q and C-s to control the flooow
-setopt rm_star_silent			# ask for confirmation if 'rm *'... why not ?
 setopt completeinword			# complete from anywhere
 setopt shwordsplit				# sh like word split
 # setopt print_exit_value			# print exit value if non 0
@@ -82,7 +94,7 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 	fi
 }
 
-function clock()
+function clock()				# displays the time in the top right conrer
 {
 	echo -ne $SC
 	tput cup 0 $(( $(tput cols) - 10));
@@ -180,15 +192,15 @@ export cd						# replace the old boring cd by my wrap
 
 function showcolors()			# display the 256 colors by shades - useful to get pimpy colors
 {
-	for c in {0..15}; do tput setaf $c ; echo -ne " $c "; done
+	for c in {0..15}; do tput setaf $c ; echo -ne " $c "; done # 16 colors
 	echo
-	for s in {16..51}; do
+	for s in {16..51}; do		# all the color tints
 		for ((i = $s; i < 232; i+=36)); do
 			tput setaf $i ; echo -ne " $i ";
 		done;
 		echo
 	done
-	for c in {232..255}; do tput setaf $c ; echo -ne " $c "; done
+	for c in {232..255}; do tput setaf $c ; echo -ne " $c "; done # grey tints
 	echo
 }
 
@@ -273,7 +285,7 @@ function pc()			  		# percent of the home taken by this dir/file
 	echo "$(($(du -sx $subdir | cut -f1) * 100 / $(du -sx $dir | cut -f1)))" "%"
 }
 
-function tmp()					# TODO: invoque new subshell in /tmp
+function tmp()					# starts a new shubshell in /tmp
 {
 	env STARTUP_CMD="cd /tmp" zsh;
 }
@@ -639,5 +651,5 @@ rehash							# hash commands in path
 
 # join_others_shells				# ask for joining others shells
 
-[ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD
+[ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD # execute user defined commands after init
 
