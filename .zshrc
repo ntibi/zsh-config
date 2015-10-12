@@ -9,7 +9,7 @@
 # 	1: X h Y m Z s ago: file_1 file_2...
 # 	2: ...
 # 	Which backup to rollback ? :
-#	(and handle files/dirs overwriting, removed pathes, ...)
+#	(and handle files/dirs overwriting, removed pathes, handle `rm ./mdr ./lol/mdr`, ...)
 # # # # # # # #
 
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
