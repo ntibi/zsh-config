@@ -167,10 +167,10 @@ function cd()					# cd wrap to use aliases - priority over real path instead of 
 	local a
 	local p
 	if [ -e $CA_FILE ] && [ "$#" -eq 1 ] && [ ! -d $1 ]; then
-		a="$(grep -o "^$1=.*$" $CA_FILE)";
+		a="$(command grep -o "^$1=.*$" $CA_FILE)";
 		if [ "$a" != "" ]; then
 			p="$(echo $a | cut -d'=' -f2)"
-			builtin cd $p 2> /dev/null && echo $p || echo "Invalid alias '$a'" 1>&2;
+			builtin cd "$p" 2> /dev/null && echo $p || echo "Invalid alias '$a'" 1>&2;
 			return 0;
 		fi;
 	fi;
