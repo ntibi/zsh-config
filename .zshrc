@@ -90,6 +90,7 @@ function clock()
 	echo -ne $RC
 }
 
+
 # CALLBACK FUNCTIONS #
 
 function chpwd()				# chpwd hook
@@ -191,7 +192,7 @@ function showcolors()			# display the 256 colors by shades - useful to get pimpy
 	echo
 }
 
-function error()				# give error nb to get error string
+function error()				# give error nb to get the corresponding error string
 {
 	python -c "import os; print os.strerror($?)";
 }
@@ -368,10 +369,12 @@ function rrm()					# real rm
 
 function rm()					# safe rm with timestamped backup
 {
-	local backup
-	backup="/tmp/backup-$(date +%s)"
-	command mkdir $backup
-	mv "$@" "$backup"
+	if [ $# -gt 0 ]; then
+		local backup
+		backup="/tmp/backup-$(date +%s)"
+		command mkdir $backup
+		mv "$@" "$backup"
+	fi
 }
 
 function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
@@ -394,6 +397,7 @@ function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>`
 		echo "$delta s";
 	fi
 }
+
 
 # LESS USEFUL USER FUNCTIONS #
 
