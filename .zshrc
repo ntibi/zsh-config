@@ -23,7 +23,6 @@ PWD_FILE=~/.pwd					# last pwd sav file
 CA_FILE=~/.ca					# cd aliases sav file
 OS="$(uname)"					# get the os name
 UPDATE_TERM_TITLE=""			# set to update the term title according to the path and the currently executed line
-TO_PULL="~/zsh-config:~/emacs-config" # git repo paths to pull
 
 # fast termcaps
 SC=$(tput sc);						  # save cursor pos termcap
@@ -316,21 +315,6 @@ function ff() 					# faster find allowing parameters in disorder (ff [type|name|
 	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null # re split all to spearate parameters
 }
 
-function +() 					# send params to bc -l (-l to alloe floating point operations)
-{
-	echo "$@" | bc -l
-}
-
-function gitcheck()				# check all the git repos set in 
-{
-	SAVPWD=$(pwd)
-	for repo in $(echo $TO_PULL | tr : \\n); do
-		cd $repo
-		git pull&
-	done
-	cd $SAVPWD
-}
-
 function colorcode()  			# get the code to set the corresponding fg color
 {
 	for c in "$@"; do
@@ -374,6 +358,27 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 	sed -re $(echo $params) 2>/dev/null || echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
 }
 
+function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
+{
+	local delta
+	if [ $# = 0 ]; then
+		date +%s
+	elif [ $# = 1 ]; then
+		delta=$(( $(date +%s) - $1 ))
+		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )) fi
+		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )) fi
+		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )) fi
+		echo "$delta s ago";
+	elif [ $# = 2 ]; then
+			delta=$(( $2 - $1 ))
+			[ $delta -lt 0 ] && delta=$(( -delta ))
+		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )) fi
+		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )) fi
+		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )) fi
+		echo "$delta s";
+	fi
+}
+
 function rrm()					# real rm
 {
 	command rm $@
@@ -409,25 +414,24 @@ function rm()					# safe rm with timestamped backup
 	fi
 }
 
-function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
+function back()
 {
-	local delta
-	if [ $# = 0 ]; then
-		date +%s
-	elif [ $# = 1 ]; then
-		delta=$(( $(date +%s) - $1 ))
-		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )) fi
-		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )) fi
-		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )) fi
-		echo "$delta s ago";
-	elif [ $# = 2 ]; then
-			delta=$(( $2 - $1 ))
-			[ $delta -lt 0 ] && delta=$(( -delta ))
-		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )) fi
-		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )) fi
-		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )) fi
-		echo "$delta s";
-	fi
+	local t;
+	local files;
+	local peek;
+	for b in $(command ls -t1 /tmp/backup/); do
+		t=$(basename $b);
+		files=$(find /tmp/backup/$b -type f)
+		if [ ! $#files -eq 0 ]; then
+			peek=""
+			for f in $files; do peek+="$(basename $f), "; done
+			peek=${peek:0:(-2)}; # remove the last ', '
+			[ $#peek -gt 80 ] && peek="$(echo $peek | head -c 77)..." # truncate and add '...' at the end if the peek is too large
+			echo "\033[4;32m$(ts $t)$DEF_C: \033[34m$(echo $files | wc -w)$DEF_C file(s)"
+			echo "$peek";
+			echo;
+		fi
+	done
 }
 
 
