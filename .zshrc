@@ -419,6 +419,7 @@ function back()
 	local t;
 	local files;
 	local peek;
+	[ -d /tmp/backup ] || return;
 	for b in $(command ls -t1 /tmp/backup/); do
 		t=$(basename $b);
 		files=$(find /tmp/backup/$b -type f)
