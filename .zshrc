@@ -42,7 +42,7 @@ setopt auto_remove_slash		# remove slash when pressing space in auto completion
 setopt nullglob					# remove pointless globs
 setopt auto_cd					# './dir' = 'cd dir'
 setopt cbases					# c-like bases conversions
-setopt emacs
+setopt emacs					# enable emacs like keybindigs
 setopt flow_control				# enable C-q and C-s to control the flooow
 setopt completeinword			# complete from anywhere
 setopt shwordsplit				# sh like word split
@@ -187,7 +187,6 @@ function cd()					# cd wrap to use aliases - priority over real path instead of 
 	fi;
 	builtin cd "$@" 2> /dev/null || echo "Nope" 1>&2;
 }
-export cd						# replace the old boring cd by my wrap
 
 function showcolors()			# display the 256 colors by shades - useful to get pimpy colors
 {
@@ -419,6 +418,7 @@ function back()
 	local t;
 	local files;
 	local peek;
+	local nb=1;
 	for b in $(command ls -t1 /tmp/backup/); do
 		t=$(basename $b);
 		files=$(find /tmp/backup/$b -type f)
@@ -426,10 +426,11 @@ function back()
 			peek=""
 			for f in $files; do peek+="$(basename $f), "; done
 			peek=${peek:0:(-2)}; # remove the last ', '
-			[ $#peek -gt 80 ] && peek="$(echo $peek | head -c 77)..." # truncate and add '...' at the end if the peek is too large
-			echo "\033[4;32m$(ts $t)$DEF_C: \033[34m$(echo $files | wc -w)$DEF_C file(s)"
+			[ $#peek -gt $COLUMNS ] && peek="$(echo $peek | head -c $(( COLUMNS - 3 )) )..." # truncate and add '...' at the end if the peek is too large
+			echo "\033[31m#$nb$DEF_C: \033[4;32m$(ts $t)$DEF_C: \033[34m$(echo $files | wc -w)$DEF_C file(s)"
 			echo "$peek";
 			echo;
+			nb=$(( nb + 1 ));
 		fi
 	done
 }
@@ -437,22 +438,8 @@ function back()
 
 # LESS USEFUL USER FUNCTIONS #
 
-function loading()				# useless loading bar
-{
-	LOADING="▁▂▃▄▅▆▇▆▅▄▃▂▁"
-	trap "tput cnorm; return" SIGHUP SIGINT SIGTERM
-	tput civis;
-	tput sc;
-	while true; do
-		for i in {0..12}; do
-			echo -n "${LOADING:$i:1} "
-			sleep 0.1;
-			tput rc;
-		done
-	done
-}
 
-function race()					# race between logins given in parameters
+function race()					# race between tokens given in parameters
 {
     cat /dev/urandom | egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
 }
@@ -475,7 +462,7 @@ function work()					# work simulation
 
 function hack()					# hollywood hacker cat
 {
-	cat $@ | pv -qL 25
+	tput setaf 2; cat $@ | pv -qL 25
 }
 
 function window()				# prints weather info
