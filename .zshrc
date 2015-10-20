@@ -419,6 +419,8 @@ function back()
 	local files;
 	local peek;
 	local nb=1;
+
+	[ -d /tmp/backup ] || return;
 	for b in $(command ls -t1 /tmp/backup/); do
 		t=$(basename $b);
 		files=$(find /tmp/backup/$b -type f)
