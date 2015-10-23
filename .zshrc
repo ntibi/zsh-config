@@ -418,6 +418,8 @@ function back()
 	local t;
 	local files;
 	local peek;
+	local backs;
+	local to_restore=""
 	local nb=1;
 
 	[ -d /tmp/backup ] || return;
@@ -425,6 +427,7 @@ function back()
 		t=$(basename $b);
 		files=$(find /tmp/backup/$b -type f)
 		if [ ! $#files -eq 0 ]; then
+			backs[i]
 			peek=""
 			for f in $files; do peek+="$(basename $f), "; done
 			peek=${peek:0:(-2)}; # remove the last ', '
@@ -435,6 +438,10 @@ function back()
 			nb=$(( nb + 1 ));
 		fi
 	done
+	echo -n "> "; tput setaf 1;
+	read to_restore;
+	tput sgr0;
+	echo $to_restore;
 }
 
 
@@ -646,6 +653,7 @@ alias q="emacs -q"
 alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
 alias df="df -Tha --total"		# disk usage infos
 alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e VSZ -e " # fps <processname> to get ps infos only for the matching processes
+alias tt="tail --retry -fn0"	# real time tail a log
 
 alias roadtrip='while true; do cd $(ls -pa1 | grep "/$" | grep -v "^\./$" | sort --random-sort | head -n1); echo -ne "\033[2K\r>$(pwd)"; done' # visit your computer
 
