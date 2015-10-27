@@ -447,15 +447,16 @@ function back()
 
 function ft()					# find text in .
 {
-	find . -type f -exec grep --color=auto -nH -e "$@" {} +
+	command find . -type f -exec grep --color=auto -nH -e "$@" {} +
 }
+
 
 # LESS USEFUL USER FUNCTIONS #
 
 
 function race()					# race between tokens given in parameters
 {
-    cat /dev/urandom | egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
+	cat /dev/urandom | tr -dc "0-9A-Za-z" | egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
 }
 
 function work()					# work simulation
