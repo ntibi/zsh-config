@@ -70,6 +70,15 @@ function update_pwd_save()		# update the $PWD_FILE
 	[[ $PWD != ~ ]] && echo $PWD > $PWD_FILE
 }
 
+function set_git_branch()
+{
+	if [ $REPO -eq 1 ]; then		# if in git repo, get git infos
+		GIT_BRANCH="$(git branch | grep \* | cut -d\  -f2)";
+	else
+		GIT_BRANCH="";
+	fi
+}
+
 function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 {
 	if [ $REPO -eq 1 ];		# if in git repo, get git infos
@@ -107,6 +116,7 @@ function clock()				# displays the time in the top right conrer
 function chpwd()				# chpwd hook
 {
 	check_git_repo
+	set_git_branch
 	update_pwd_datas
 	update_pwd_save
 }
@@ -114,6 +124,7 @@ function chpwd()				# chpwd hook
 function periodic()				# every $PERIOD secs - triggered by promt print
 {
 	check_git_repo
+	set_git_branch
 	update_pwd_datas
 	update_pwd_save
 }
@@ -491,6 +502,7 @@ function window()				# prints weather info
 SEP_C="%F{242}"					# separator color
 ID_C="%F{33}"					# id color
 PWD_C="%F{201}"					# pwd color
+GB_C="%F{208}"					# git branch color
 NBF_C="%F{46}"					# files number color
 NBD_C="%F{26}"					# dir number color
 TIM_C="%U%B%F{220}"				# time color
@@ -499,17 +511,42 @@ GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)" # get the shell lev
 
 GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SEP_C:)" # 'ssh:' before username if logged in ssh
 
-PS1=''							# simple quotes for post evaluation
-PS1+='$ID_C$GET_SSH'			# 'ssh:' if in ssh
-PS1+='$ID_C%n${SEP_C}@$ID_C%m'	# user@machine
-PS1+='${SEP_C}[$PWD_C%~${SEP_C}|' # current short path
-PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS${SEP_C}]' # nb of files and dirs in .
-PS1+=' %(0?.%F{82}o.%F{196}x)' # return status of last command (green O or red X)
-PS1+='$GET_GIT'	# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
-PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' # number of running/sleeping bg jobs
-PS1+='%F{205}$GET_SHLVL'						 # static shlvl
-PS1+='%(0!.%F{196}#.%F{26}\$)'					 # static user level
-PS1+='${SEP_C}>%f%k '
+
+# PS1_INFO="X" to activate INFO, PS1_INFO="" to desactivate
+PS1_SSH="X"
+PS1_USER="X"
+PS1_MACHINE="X"
+PS1_WD="X"
+PS1_GIT_BRANCH="X"
+PS1_DIR_INFOS="X"
+PS1_RETURN_STATUS="X"
+PS1_GIT_STATUS="X"
+PS1_JOBS="X"
+PS1_SHLVL="X"
+PS1_USER_LEVEL="X"
+function setps1()
+{
+	PS1=''																									# simple quotes for post evaluation
+	[ -z $PS1_SSH ] 			|| 	PS1+='$ID_C$GET_SSH'													# 'ssh:' if in ssh
+	[ -z $PS1_USER ] 			||	PS1+='$ID_C%n'															# username
+	[ -z $PS1_MACHINE ]			|| 	PS1+='${SEP_C}@$ID_C%m'													# @machine
+	if [ ! -z $PS1_WD ] || [ ! -z $PS1_GIT_BRANCH ] || [ ! -z $PS1_DIR_INFOS ]; then 						# print separators if there is infos inside
+		PS1+='${SEP_C}['
+	fi
+	[ -z $PS1_WD ] 				|| 	PS1+='$PWD_C%~${SEP_C}' 												# current short path
+	[ -z $PS1_GIT_BRANCH ] 		|| 	PS1+='$([ ! -z $GIT_BRANCH ] && echo "${SEP_C}:")${GB_C}$GIT_BRANCH'	# get current branch
+	[ -z $PS1_DIR_INFOS ] 		|| 	PS1+='${SEP_C}|$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS${SEP_C}' 			# nb of files and dirs in .
+	if [ ! -z $PS1_WD ] || [ ! -z $PS1_GIT_BRANCH ] || [ ! -z $PS1_DIR_INFOS ]; then 						# print separators if there is infos inside
+		PS1+="]%f%k "
+	fi
+	[ -z $PS1_RETURN_STATUS ] 	|| 	PS1+='%(0?.%F{82}o.%F{196}x)' 											# return status of last command (green O or red X)
+	[ -z $PS1_GIT_STATUS ] 		|| 	PS1+='$GET_GIT'															# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
+	[ -z $PS1_JOBS ] 			|| 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 						# number of running/sleeping bg jobs
+	[ -z $PS1_SHLVL ] 			|| 	PS1+='%F{205}$GET_SHLVL'						 						# static shlvl
+	[ -z $PS1_USER_LEVEL ] 		|| 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 						# static user level
+	PS1+='${SEP_C}>%f%k '
+}
+setps1
 
 # RPS1="$TIM_C%T%u%f%b"		# right part of the PS1
 
