@@ -445,6 +445,11 @@ function back()
 }
 
 
+function ft()					# find text in .
+{
+	find . -type f -exec grep --color=auto -nH -e "$@" {} +
+}
+
 # LESS USEFUL USER FUNCTIONS #
 
 
