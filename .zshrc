@@ -457,8 +457,8 @@ function back()
 
 
 function ft()					# find text in .
-{
-	command find . -type f -exec grep --color=auto -nH -e "$@" {} +
+{								# I (ignore binary) n (line number) H (print fn each line)
+	command find . -type f -exec grep --color=auto -InH -e "$@" {} +
 }
 
 
