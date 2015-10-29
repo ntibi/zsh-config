@@ -415,7 +415,7 @@ function rm()					# safe rm with timestamped backup
 					i="$(realpath $i)";						# simplify the path
 					idir="$(dirname $i)";
 					command mkdir -p "$backup/$idir";
-					mv "$i" "$backup/$i";
+					mv "$i" "$backup$i";
 				fi
 			else				# $i is not a param list nor a file/dir
 				echo "'$i' not found" 1>&2
@@ -433,17 +433,16 @@ function back()
 	local to_restore=""
 	local nb=1;
 
+	back=($(command ls -t1 /tmp/backup/))
 	[ -d /tmp/backup ] || return;
-	for b in $(command ls -t1 /tmp/backup/); do
-		t=$(basename $b);
+	for b in $back; do
 		files=$(find /tmp/backup/$b -type f)
 		if [ ! $#files -eq 0 ]; then
-			backs[i]
 			peek=""
 			for f in $files; do peek+="$(basename $f), "; done
 			peek=${peek:0:(-2)}; # remove the last ', '
 			[ $#peek -gt $COLUMNS ] && peek="$(echo $peek | head -c $(( COLUMNS - 3 )) )..." # truncate and add '...' at the end if the peek is too large
-			echo "\033[31m#$nb$DEF_C: \033[4;32m$(ts $t)$DEF_C: \033[34m$(echo $files | wc -w)$DEF_C file(s)"
+			echo "\033[31m#$nb$DEF_C: \033[4;32m$(ts $b)$DEF_C: \033[34m$(echo $files | wc -w)$DEF_C file(s)"
 			echo "$peek";
 			echo;
 			nb=$(( nb + 1 ));
@@ -452,7 +451,9 @@ function back()
 	echo -n "> "; tput setaf 1;
 	read to_restore;
 	tput sgr0;
-	echo $to_restore;
+	if [ ! -z $back[to_restore] ]; then
+		cp -R $(realpath /tmp/backup/$back[to_restore]/*) /
+	fi
 }
 
 
