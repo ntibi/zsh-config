@@ -10,6 +10,8 @@
 # 	2: ...
 # 	Which backup to rollback ? :
 #	(and handle files/dirs overwriting, removed pathes, handle `rm ./mdr ./lol/mdr`, ...)
+#
+# Add pagination in the back function
 # # # # # # # #
 
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
