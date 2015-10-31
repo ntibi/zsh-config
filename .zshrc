@@ -395,7 +395,6 @@ function rm()					# safe rm with timestamped backup
 
 function back()
 {
-	local t;
 	local files;
 	local peek;
 	local backs;
@@ -421,7 +420,15 @@ function back()
 	read to_restore;
 	tput sgr0;
 	if [ ! -z $back[to_restore] ]; then
-		cp -R $(realpath /tmp/backup/$back[to_restore]/*) /
+		files=$(find /tmp/backup/$back[to_restore] -type f)
+		if [ ! -z $files ]; then
+			for f in $files; do echo $f; done | command sed -r -e "s|/tmp/backup/$back[to_restore]||g" -e "s|/home/$USER|~|g"
+			read -q "?Restore ? (Y/n): " && cp -R $(realpath /tmp/backup/$back[to_restore]/*) /
+		else
+			echo "No such back"
+		fi
+	else
+		echo "No such back"
 	fi
 }
 
