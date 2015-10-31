@@ -32,7 +32,6 @@ RC=$(tput rc);						  # load cursor pos termcap
 YELLOWUB_C=$(tput setaf 226; tput smul; tput bold); # yellow underlined bold
 DEF_C=$(tput sgr0);									# reset colors
 
-
 # (UN)SETTING ZSH (COOL) OPTIONS #
 
 setopt promptsubst				# compute PS1 at each prompt print
@@ -51,6 +50,26 @@ setopt shwordsplit				# sh like word split
 # setopt print_exit_value			# print exit value if non 0
 
 unsetopt beep					# no disturbing sounds
+
+
+case "$(uname)" in
+	*Darwin*)					# Mac os
+		PM="brew install"
+		alias update="brew update && brew upgrade"
+		LS_COLORS='exfxcxdxbxexexabagacad'
+		alias ls="ls -G";;
+	*cygwin*)
+		PM="pact install"
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+		alias ls="ls --color=always";;
+	*Linux*|*)
+		PM="sudo apt-get install"
+		alias update="sudo apt-get update && sudo apt-get upgrade"
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+		alias ls="ls --color=always";;
+esac
+
+
 
 # PS1 FUNCTIONS #
 
@@ -438,6 +457,12 @@ function ft()					# find text in .
 	command find . -type f -exec grep --color=auto -InH -e "$@" {} +
 }
 
+function installed()
+{
+	if [ $# -eq 1 ]; then
+		[ "$(type $1)" = "$1 not found" ] || return 0 &&  return 1
+	fi
+}
 
 # LESS USEFUL USER FUNCTIONS #
 
@@ -540,19 +565,10 @@ EDITOR="emacs"					# variables set for git editor and edit-command-line
 VISUAL="emacs"
 
 HISTFILE=~/.zshrc_history
-SAVEHIST=4096
-HISTSIZE=4096
+SAVEHIST=65536
+HISTSIZE=65536
 
 CLICOLOR=1
-case "$UNAME" in				# there is different LS_COLORS syntaxes according to OS :/
-	*Darwin*)
-		LS_COLORS='exfxcxdxbxexexabagacad'
-		alias ls="ls -G";;
-	*linux*|*cygwin*|*)
-		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
-		alias ls="ls --color=always";;
-esac
-
 
 # ZSH FUNCTIONS LOAD #
 
@@ -676,13 +692,6 @@ alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e VSZ -e " # fps <
 alias tt="tail --retry -fn0"	# real time tail a log
 
 alias roadtrip='while true; do cd $(ls -pa1 | grep "/$" | grep -v "^\./$" | sort --random-sort | head -n1); echo -ne "\033[2K\r>$(pwd)"; done' # visit your computer
-
-case "$UNAME" in
-	*Darwin*)
-		alias update="brew update && brew upgrade";;
-	*linux*|*)
-		alias update="sudo apt-get update && sudo apt-get upgrade";;
-esac
 
 check_git_repo
 update_pwd_datas
