@@ -644,12 +644,28 @@ if [[ "${terminfo[kcbt]}" != "" ]]; then
 	bindkey "${terminfo[kcbt]}" reverse-menu-complete # shift tab for backward completion
 fi
 
+function up-line-or-search-prefix ()
+{
+	local CURSOR_before_search=$CURSOR
+	zle up-line-or-search "$LBUFFER"
+	CURSOR=$CURSOR_before_search
+}
+zle -N up-line-or-search-prefix
+
+function down-line-or-search-prefix ()
+{
+	local CURSOR_before_search=$CURSOR
+	zle down-line-or-search "$LBUFFER"
+	CURSOR=$CURSOR_before_search
+}
+zle -N down-line-or-search-prefix
+
 if [[ "${terminfo[kcuu1]}" != "" ]]; then
-	bindkey "${terminfo[kcuu1]}" up-line-or-search # smart search if line is not empty when keyup
+	bindkey "${terminfo[kcuu1]}" up-line-or-search-prefix # smart search if line is not empty when keyup
 fi
 
 if [[ "${terminfo[kcud1]}" != "" ]]; then
-	bindkey "${terminfo[kcud1]}" down-line-or-search # same for keydown
+	bindkey "${terminfo[kcud1]}" down-line-or-search-prefix # same for keydown
 fi
 
 
