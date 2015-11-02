@@ -672,7 +672,8 @@ alias mkdir="mkdir -pv"			# create all the needed parent directories + inform us
 
 alias grep="grep --color=always"
 alias egrep="egrep --color=always"
-alias tree="tree -C"			# -C colorzzz
+installed tree && alias tree="tree -C"		   # -C colorzzz
+installed colordiff && alias diff="colordiff" # diff with nicer colors
 alias less="less -R"			# -R Raw control chars
 
 alias ressource="source ~/.zshrc"
