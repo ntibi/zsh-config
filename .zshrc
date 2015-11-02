@@ -1,17 +1,10 @@
 # # # # # # # #
 # TODO:
 #
-# Add a nicer backup manager
-# Handle doubles (like `rm lol lol`)
-# Add the path of all removed files each backup dir to allow rollback
-#
-# A function that displays backups like
-# 	1: X h Y m Z s ago: file_1 file_2...
-# 	2: ...
-# 	Which backup to rollback ? :
-#	(and handle files/dirs overwriting, removed pathes, handle `rm ./mdr ./lol/mdr`, ...)
-#
+# Don't list all the files in back if there is too many of them
+# Set the backup path dynamically instead of "/tmp/backup"
 # Add pagination in the back function
+#
 # # # # # # # #
 
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
