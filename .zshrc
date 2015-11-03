@@ -630,11 +630,71 @@ bindkey -s "^[c" "^A^Kgit checkout 		"
 
 # ZSH FUNCTIONS BINDS #
 
+function goto-right-matching-delimiter ()
+{
+       L_DELIMS="[({";
+       R_DELIMS="])}";
+       local i=0;
+       local start;
+       local end;
+       local sav=$CURSOR;
+       local old;
+       local balance=0;
+	   CURSOR=$(( CURSOR + 1 ));
+       start=$BUFFER[$CURSOR];
+       for i in $(seq $#L_DELIMS); do
+           [ "$L_DELIMS[$i]" = "$start" ] && end="$R_DELIMS[$i]";
+       done
+       if [ $#end -eq 1 ]; then
+               balance=1;
+               CURSOR=$(( CURSOR + 1 ));
+               while [ $balance -ne 0 ] && [ "$CURSOR" -le $#BUFFER ]; do
+                       if [ "$BUFFER[$CURSOR]" = "$start" ]; then balance=$(( balance + 1 ));
+					   elif [ "$BUFFER[$CURSOR]" = "$end" ]; then balance=$(( balance - 1 ));
+					   fi
+                       old=$CURSOR;
+                       [ $balance -ne 0 ] && CURSOR=$(( CURSOR + 1 ));
+               done
+               [ $CURSOR = $#BUFFER ] && CURSOR=$sav;
+       fi
+}
+zle -N goto-right-matching-delimiter
+bindkey "^[[1;3C" goto-right-matching-delimiter
+
+function goto-left-matching-delimiter ()
+{
+       L_DELIMS="[({";
+       R_DELIMS="])}";
+       local i=0;
+       local start;
+       local end;
+       local sav=$CURSOR;
+       local old;
+       local balance=0;
+	   CURSOR=$(( CURSOR ));
+       start=$BUFFER[$CURSOR];
+       for i in $(seq $#R_DELIMS); do
+           [ "$R_DELIMS[$i]" = "$start" ] && end="$L_DELIMS[$i]";
+       done
+       if [ $#end -eq 1 ]; then
+               balance="-1";
+               CURSOR=$(( CURSOR - 1 ));
+               while [ $balance -ne 0 ] && [ "$CURSOR" -ge 0 ]; do
+                       if [ "$BUFFER[$CURSOR]" = "$start" ]; then balance=$(( balance - 1 ));
+					   elif [ "$BUFFER[$CURSOR]" = "$end" ]; then balance=$(( balance + 1 ));
+					   fi
+                       old=$CURSOR;
+                       [ $balance -ne 0 ] && CURSOR=$(( CURSOR - 1 ));
+               done
+               [ $CURSOR = $#BUFFER ] && CURSOR=$sav;
+       fi
+}
+zle -N goto-left-matching-delimiter
+bindkey "^[[1;3D" goto-left-matching-delimiter
+
 bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 
-bindkey "^[[1;3C" emacs-forward-word # alt + keys to navigate between words
-bindkey "^[[1;3D" emacs-backward-word
 bindkey "^[[1;5D" backward-word	# same with ctrl
 bindkey "^[[1;5C" forward-word
 
