@@ -624,13 +624,14 @@ bindkey -s "^[s" "^Asudo ^E"	# insert sudo
 bindkey -s "\el" "^Uls\n"		# run ls
 bindkey -s "^X^X" "^Uemacs\n"	# run emacs
 bindkey -s "^X^M" "^Umake\n"	# make
+bindkey -s "^[g" "^A^Kgit commit -m\"\"^[OD"
+bindkey -s "^[c" "^A^Kgit checkout 		"
 
 
 # ZSH FUNCTIONS BINDS #
 
 bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
-bindkey "^x^T" zle-toggle-mouse
 
 bindkey "^[[1;3C" emacs-forward-word # alt + keys to navigate between words
 bindkey "^[[1;3D" emacs-backward-word
@@ -641,6 +642,13 @@ bindkey "^[k" kill-word
 bindkey "^w" kill-region		 # emacs-like kill
 
 bindkey "^[[Z" reverse-menu-complete # shift tab for backward completion
+
+function save-line()
+{
+	echo $BUFFER >> ~/.saved_commands
+}
+zle -N save-line
+bindkey "^@" save-line
 
 function up-line-or-search-prefix ()
 {
