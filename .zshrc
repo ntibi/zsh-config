@@ -630,6 +630,35 @@ bindkey -s "^[c" "^A^Kgit checkout 		"
 
 # ZSH FUNCTIONS BINDS #
 
+function get_terminfo_name()
+{
+	for k in "${(@k)terminfo}"; do
+		[ "$terminfo[$k]" = "$@" ] && echo $k
+	done
+}
+
+typeset -A binds
+
+binds[up]=$terminfo[kcuu1]
+binds[down]=$terminfo[kcud1]
+binds[left]=$terminfo[kcub1]
+binds[right]=$terminfo[kcuf1]
+
+binds[ctrl_up]="^[[1;5A"
+binds[ctrl_down]="^[[1;5B"
+binds[ctrl_left]="^[[1;5D"
+binds[ctrl_right]="^[[1;5C"
+
+binds[meta_up]="^[[1;3A"
+binds[meta_down]="^[[1;3B"
+binds[meta_left]="^[[1;3D"
+binds[meta_right]="^[[1;3C"
+
+binds[shift_up]=$terminfo[kri]
+binds[shift_down]=$terminfo[kind]
+binds[shift_left]=$terminfo[kLFT]
+binds[shift_right]=$terminfo[kRIT]
+
 function goto-right-matching-delimiter ()
 {
        L_DELIMS="[({";
