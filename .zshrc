@@ -654,17 +654,13 @@ bindkey "^[[1;5C" forward-word
 bindkey "^[k" kill-word
 bindkey "^w" kill-region		 # emacs-like kill
 
-if [[ "${terminfo[kcbt]}" != "" ]]; then
-	bindkey "${terminfo[kcbt]}" reverse-menu-complete # shift tab for backward completion
-fi
+bindkey "^[[Z" reverse-menu-complete # shift tab for backward completion
 
-if [[ "${terminfo[kcuu1]}" != "" ]]; then
-	bindkey "${terminfo[kcuu1]}" up-line-or-search # smart search if line is not empty when keyup
-fi
+bindkey "^[[1;5A" up-line-or-history
+bindkey "^[[1;5B" down-line-or-history
 
-if [[ "${terminfo[kcud1]}" != "" ]]; then
-	bindkey "${terminfo[kcud1]}" down-line-or-search # same for keydown
-fi
+bindkey "^[[OA" up-line-or-history
+bindkey "^[[OB" down-line-or-history
 
 
 # USEFUL ALIASES #
