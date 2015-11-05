@@ -5,6 +5,8 @@
 # Set the backup path dynamically instead of "/tmp/backup"
 # Add pagination in the back function
 #
+# Set a nice PS4
+#
 # # # # # # # #
 
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
@@ -459,6 +461,12 @@ function installed()
 	fi
 }
 
+function xtrace()				# debug cmd line with xtrace
+{
+	set -x;
+	$@
+}
+
 # LESS USEFUL USER FUNCTIONS #
 
 
@@ -813,6 +821,7 @@ alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
 alias df="df -Tha --total"		# disk usage infos
 alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e VSZ -e " # fps <processname> to get ps infos only for the matching processes
 alias tt="tail --retry -fn0"	# real time tail a log
+alias dzsh="zsh --norcs --xtrace" # debugzsh
 
 alias roadtrip='while true; do cd $(ls -pa1 | grep "/$" | grep -v "^\./$" | sort --random-sort | head -n1); echo -ne "\033[2K\r>$(pwd)"; done' # visit your computer
 
