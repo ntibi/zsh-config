@@ -413,8 +413,8 @@ function back()
 	local to_restore=""
 	local nb=1;
 
+	[ -d /tmp/backup ] || return
 	back=($(command ls -t1 /tmp/backup/))
-	[ -d /tmp/backup ] || return;
 	for b in $back; do
 		files=$(find /tmp/backup/$b -type f)
 		if [ ! $#files -eq 0 ]; then
