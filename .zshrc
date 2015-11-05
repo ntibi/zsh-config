@@ -606,17 +606,10 @@ zstyle ':completion:complete-file::::' completer _files
 
 # ZSH KEY BINDINGS #
 
-bindkey -e 						# emacs style key binding
-
-if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
-	function zle-line-init() { echoti smkx }
-	function zle-line-finish() { echoti rmkx }
-	zle -N zle-line-init
-	zle -N zle-line-finish
-fi
 
 # SHELL COMMANDS BINDS #
-# 'cat -v' to get the keycode
+
+# C-v or 'cat -v' to get the keycode
 bindkey -s "^[j" "^Ujoin_others_shells\n" # join_others_shells user function
 bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
 bindkey -s "^[e" "^Uerror\n"			  # run error user function
@@ -628,38 +621,43 @@ bindkey -s "^[g" "^A^Kgit commit -m\"\"^[OD"
 bindkey -s "^[c" "^A^Kgit checkout 		"
 
 
-# ZSH FUNCTIONS BINDS #
+# ZLE FUNCTIONS #
 
-function get_terminfo_name()
+bindkey -e 						# emacs style key binding
+
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+	function zle-line-init() { echoti smkx }
+	function zle-line-finish() { echoti rmkx }
+	zle -N zle-line-init
+	zle -N zle-line-finish
+fi
+
+
+function get_terminfo_name()	# get the terminfo name according to the keycode
 {
 	for k in "${(@k)terminfo}"; do
 		[ "$terminfo[$k]" = "$@" ] && echo $k
 	done
 }
 
-typeset -A binds
+function up-line-or-search-prefix () # smart up search (search in history anything matching before the cursor)
+{
+	local CURSOR_before_search=$CURSOR
+	zle up-line-or-search "$LBUFFER"
+	CURSOR=$CURSOR_before_search
+}
+zle -N up-line-or-search-prefix
 
-binds[up]=$terminfo[kcuu1]
-binds[down]=$terminfo[kcud1]
-binds[left]=$terminfo[kcub1]
-binds[right]=$terminfo[kcuf1]
+function down-line-or-search-prefix () # same with down
+{
+	local CURSOR_before_search=$CURSOR
+	zle down-line-or-search "$LBUFFER"
+	CURSOR=$CURSOR_before_search
+}
+zle -N down-line-or-search-prefix
 
-binds[ctrl_up]="^[[1;5A"
-binds[ctrl_down]="^[[1;5B"
-binds[ctrl_left]="^[[1;5D"
-binds[ctrl_right]="^[[1;5C"
 
-binds[meta_up]="^[[1;3A"
-binds[meta_down]="^[[1;3B"
-binds[meta_left]="^[[1;3D"
-binds[meta_right]="^[[1;3C"
-
-binds[shift_up]=$terminfo[kri]
-binds[shift_down]=$terminfo[kind]
-binds[shift_left]=$terminfo[kLFT]
-binds[shift_right]=$terminfo[kRIT]
-
-function goto-right-matching-delimiter ()
+function goto-right-matching-delimiter () # explicit name
 {
        L_DELIMS="[({";
        R_DELIMS="])}";
@@ -688,9 +686,8 @@ function goto-right-matching-delimiter ()
        fi
 }
 zle -N goto-right-matching-delimiter
-bindkey "^[[1;3C" goto-right-matching-delimiter
 
-function goto-left-matching-delimiter ()
+function goto-left-matching-delimiter () # yea
 {
        L_DELIMS="[({";
        R_DELIMS="])}";
@@ -719,47 +716,66 @@ function goto-left-matching-delimiter ()
        fi
 }
 zle -N goto-left-matching-delimiter
-bindkey "^[[1;3D" goto-left-matching-delimiter
 
-bindkey "[/" complete-file		# complete files only
-bindkey "^X^E" edit-command-line # edit line with $EDITOR
 
-bindkey "^[[1;5D" backward-word	# same with ctrl
-bindkey "^[[1;5C" forward-word
-
-bindkey "^[k" kill-word
-bindkey "^w" kill-region		 # emacs-like kill
-
-bindkey "^[[Z" reverse-menu-complete # shift tab for backward completion
-
-function save-line()
+function save-line()			# save the current line at its state in ~/.saved_commands
 {
 	echo $BUFFER >> ~/.saved_commands
 }
 zle -N save-line
-bindkey "^@" save-line
 
-function up-line-or-search-prefix ()
-{
-	local CURSOR_before_search=$CURSOR
-	zle up-line-or-search "$LBUFFER"
-	CURSOR=$CURSOR_before_search
-}
-zle -N up-line-or-search-prefix
 
-function down-line-or-search-prefix ()
-{
-	local CURSOR_before_search=$CURSOR
-	zle down-line-or-search "$LBUFFER"
-	CURSOR=$CURSOR_before_search
-}
-zle -N down-line-or-search-prefix
+# ZSH FUNCTIONS BINDS #
 
-bindkey "^[[1;5A" up-line-or-search-prefix # ctrl + arrow = smart completion
-bindkey "^[[1;5B" down-line-or-search-prefix
+typeset -A key				# associative array with more explicit names
 
-bindkey "^[[OA" up-line-or-history # up/down scroll through history
-bindkey "^[[OB" down-line-or-history
+key[up]=$terminfo[kcuu1]
+key[down]=$terminfo[kcud1]
+key[left]=$terminfo[kcub1]
+key[right]=$terminfo[kcuf1]
+
+key[C-up]="^[[1;5A"
+key[C-down]="^[[1;5B"
+key[C-left]="^[[1;5D"
+key[C-right]="^[[1;5C"
+
+key[M-up]="^[[1;3A"
+key[M-down]="^[[1;3B"
+key[M-left]="^[[1;3D"
+key[M-right]="^[[1;3C"
+
+key[S-up]=$terminfo[kri]
+key[S-down]=$terminfo[kind]
+key[S-left]=$terminfo[kLFT]
+key[S-right]=$terminfo[kRIT]
+
+key[tab]=$terminfo[kRIT]
+key[S-tab]=$terminfo[cbt]
+
+key[C-space]="^@"
+
+
+bindkey $key[M-right] goto-right-matching-delimiter
+bindkey $key[M-left] goto-left-matching-delimiter
+
+bindkey "[/" complete-file		# complete files only
+bindkey "^X^E" edit-command-line # edit line with $EDITOR
+
+bindkey $key[C-left] backward-word
+bindkey $key[C-right] forward-word
+
+bindkey "^[k" kill-word
+bindkey "^w" kill-region		 # emacs-like kill
+
+bindkey $key[S-tab] reverse-menu-complete # shift tab for backward completion
+
+bindkey $key[C-space] save-line
+
+bindkey $key[C-up] up-line-or-search-prefix # ctrl + arrow = smart completion
+bindkey $key[C-down] down-line-or-search-prefix
+
+bindkey $key[up] up-line-or-history # up/down scroll through history
+bindkey $key[down] down-line-or-history
 
 
 # USEFUL ALIASES #
@@ -781,10 +797,10 @@ alias less="less -R"			# -R Raw control chars
 alias ressource="source ~/.zshrc"
 alias res="source ~/.zshrc"
 
-alias xemacs="emacs"
-alias emax="emacs"
-alias x="emacs"
 alias emacs="emacs -nw"
+alias xemacs="command emacs"
+alias emax="command emacs"
+alias x="command emacs"
 alias e="emacs"
 alias qmacs="emacs -q"
 alias q="emacs -q"
