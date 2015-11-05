@@ -464,7 +464,7 @@ function installed()
 
 function race()					# race between tokens given in parameters
 {
-	cat /dev/urandom | tr -dc "0-9A-Za-z" | egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
+	cat /dev/urandom | tr -dc "0-9A-Za-z" | command egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
 }
 
 function work()					# work simulation
