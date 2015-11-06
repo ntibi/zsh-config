@@ -301,7 +301,7 @@ function ff() 					# faster find allowing parameters in disorder (ff [type|name|
 		if $(echo $p | grep -q "^[bcdflps]$"); # is it a type ?
 		then
 			type+=$([ -z $type ] && echo " -type $p" || echo " -or -type $p")
-		else if [ -d $p ];		# is it a path ?
+		else if [ -d $p ];		# is it a path ?<
 			 then
 				 root=$p
 			 else				# then its a name !
@@ -309,7 +309,7 @@ function ff() 					# faster find allowing parameters in disorder (ff [type|name|
 			 fi
 		fi
 	done
-	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null # re split all to spearate parameters
+	find $(echo $root $name $type | sed 's/ +/ /g\') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters
 }
 
 function colorcode()  			# get the code to set the corresponding fg color
