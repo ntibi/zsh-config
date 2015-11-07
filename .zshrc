@@ -124,6 +124,7 @@ function clock()				# displays the time in the top right conrer
 	tput cup 0 $(( $(tput cols) - 10));
 	echo "$YELLOWUB_C$(date +"%T")$DEF_C";
 	echo -ne $RC
+	# sched +1 clock
 }
 zle -N clock
 
