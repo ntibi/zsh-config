@@ -25,12 +25,6 @@ OS="$(uname)"					# get the os name
 UPDATE_TERM_TITLE="yep" # set to update the term title according to the path and the currently executed line
 UPDATE_CLOCK="yep"	  # set to update the top-right clock every second
 
-# fast termcaps
-SC=$(tput sc);						  # save cursor pos termcap
-RC=$(tput rc);						  # load cursor pos termcap
-DATE_C=$(tput setaf 226; tput smul; tput bold; tput civis); # yellow underlined bold
-DEF_C=$(tput cnorm; tput sgr0);									# reset colors
-
 # (UN)SETTING ZSH (COOL) OPTIONS #
 
 setopt promptsubst				# compute PS1 at each prompt print
@@ -122,15 +116,18 @@ function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 	fi
 }
 
-function clock()				# displays the time in the top right conrer
+
+PRE_CLOCK="$(tput setaf 226;tput smul;tput bold;tput civis)" # caching termcaps strings
+POST_CLOCK="$(tput cnorm;tput sgr0;)"
+function clock()				# displays the time in the top right corner
 {
-	echo -ne $SC
-	tput cup 0 $(( $(tput cols) - 10));
-	echo "$DATE_C$(date +"%T")$DEF_C";
-	echo -ne $RC
-	[ -z $UPDATE_CLOCK ] || sched +1 clock
+	if [ ! -z $UPDATE_CLOCK ]; then
+		tput sc;
+		tput cup 0 $(( $(tput cols) - 7));
+		echo "$PRE_CLOCK$(date +%R)$POST_CLOCK";
+		tput rc;
+	fi
 }
-[ -z $UPDATE_CLOCK ] || sched +1 clock
 
 
 # CALLBACK FUNCTIONS #
@@ -159,6 +156,7 @@ function preexec()				# pre execution hook
 
 function precmd()				# pre promt hook
 {
+	clock
 	[ -z $UPDATE_TERM_TITLE ] || print -Pn "\e]2;$PWD\a"		# set pwd as term title
 	
 	set_git_char
@@ -359,40 +357,40 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 
 function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
 {
-	local delta
+	local delta;
 	if [ $# = 0 ]; then
-		date +%s
+		date +%s;
 	elif [ $# = 1 ]; then
-		delta=$(( $(date +%s) - $1 ))
-		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )) fi
-		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )) fi
-		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )) fi
+		delta=$(( $(date +%s) - $1 ));
+		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )); fi
+		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )); fi
+		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )); fi
 		echo "$delta s ago";
 	elif [ $# = 2 ]; then
 			delta=$(( $2 - $1 ))
 			[ $delta -lt 0 ] && delta=$(( -delta ))
-		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )) fi
-		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )) fi
-		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )) fi
+		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )); fi
+		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )); fi
+		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )); fi
 		echo "$delta s";
 	fi
 }
 
 function rrm()					# real rm
 {
-	command rm $@
+	command rm $@;
 }
 
 function rm()					# safe rm with timestamped backup
 {
 	if [ $# -gt 0 ]; then
-		local backup
-		local idir
-		local rm_params
-		idir=""
-		rm_params=""
-		backup="/tmp/backup/$(date +%s)"
-		command mkdir -p "$backup"
+		local backup;
+		local idir;
+		local rm_params;
+		idir="";
+		rm_params="";
+		backup="/tmp/backup/$(date +%s)";
+		command mkdir -p "$backup";
 		for i in "$@"; do
 			if [ ${i:0:1} = "-" ]; then # if $i is an args list, save them
 				rm_params+="$i";
@@ -407,7 +405,7 @@ function rm()					# safe rm with timestamped backup
 					mv "$i" "$backup$i";
 				fi
 			else				# $i is not a param list nor a file/dir
-				echo "'$i' not found" 1>&2
+				echo "'$i' not found" 1>&2;
 			fi
 		done
 	fi
@@ -650,13 +648,6 @@ bindkey -s "^[c" "^A^Kgit checkout 		"
 # ZLE FUNCTIONS #
 
 bindkey -e 						# emacs style key binding
-
-if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
-	function zle-line-init() { echoti smkx }
-	function zle-line-finish() { echoti rmkx }
-	zle -N zle-line-init
-	zle -N zle-line-finish
-fi
 
 
 function get_terminfo_name()	# get the terminfo name according to the keycode
