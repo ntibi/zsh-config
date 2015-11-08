@@ -16,16 +16,20 @@ TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-25
 # USEFUL VARS #
 
 PERIOD=5			  # period used to hook periodic function (in sec)
+
 PWD_FILE=~/.pwd					# last pwd sav file
 CA_FILE=~/.ca					# cd aliases sav file
+
 OS="$(uname)"					# get the os name
-UPDATE_TERM_TITLE=""			# set to update the term title according to the path and the currently executed line
+
+UPDATE_TERM_TITLE="yep" # set to update the term title according to the path and the currently executed line
+UPDATE_CLOCK="yep"	  # set to update the top-right clock every second
 
 # fast termcaps
 SC=$(tput sc);						  # save cursor pos termcap
 RC=$(tput rc);						  # load cursor pos termcap
-YELLOWUB_C=$(tput setaf 226; tput smul; tput bold); # yellow underlined bold
-DEF_C=$(tput sgr0);									# reset colors
+DATE_C=$(tput setaf 226; tput smul; tput bold; tput civis); # yellow underlined bold
+DEF_C=$(tput cnorm; tput sgr0);									# reset colors
 
 # (UN)SETTING ZSH (COOL) OPTIONS #
 
@@ -122,11 +126,11 @@ function clock()				# displays the time in the top right conrer
 {
 	echo -ne $SC
 	tput cup 0 $(( $(tput cols) - 10));
-	echo "$YELLOWUB_C$(date +"%T")$DEF_C";
+	echo "$DATE_C$(date +"%T")$DEF_C";
 	echo -ne $RC
-	# sched +1 clock
+	[ -z $UPDATE_CLOCK ] || sched +1 clock
 }
-zle -N clock
+[ -z $UPDATE_CLOCK ] || sched +1 clock
 
 
 # CALLBACK FUNCTIONS #
@@ -155,7 +159,6 @@ function preexec()				# pre execution hook
 
 function precmd()				# pre promt hook
 {
-	clock
 	[ -z $UPDATE_TERM_TITLE ] || print -Pn "\e]2;$PWD\a"		# set pwd as term title
 	
 	set_git_char
@@ -253,7 +256,7 @@ function loop()					# loop parameter command every $LOOP_INT seconds (default 1)
 		clear
 		d=$(date +%s)
 		$@
-		while [ "$(( $(date +%s) - d ))" -lt "$LOOP_INT" ]; do; sleep 0.1; done
+		while [ "$(( $(date +%s) - d ))" -lt "$LOOP_INT" ]; do sleep 0.1; done
 	done
 }
 
@@ -467,6 +470,16 @@ function xtrace()				# debug cmd line with xtrace
 	set -x;
 	$@
 }
+
+function ftselect()
+{
+	typeset -A pos
+	
+	for p in $@; do
+		echo "[ ]: $p"
+	done
+}
+
 
 # LESS USEFUL USER FUNCTIONS #
 
