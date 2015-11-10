@@ -367,6 +367,7 @@ function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>`
 		date +%s;
 	elif [ $# = 1 ]; then
 		delta=$(( $(date +%s) - $1 ));
+		if [ $delta -gt 30758400 ]; then echo -n "$(( delta / 30758400 )) y "; delta=$(( delta % 30758400 )); fi
 		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )); fi
 		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )); fi
 		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )); fi
@@ -374,6 +375,7 @@ function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>`
 	elif [ $# = 2 ]; then
 			delta=$(( $2 - $1 ))
 			[ $delta -lt 0 ] && delta=$(( -delta ))
+		if [ $delta -gt 30758400 ]; then echo -n "$(( delta / 30758400 )) y "; delta=$(( delta % 30758400 )); fi
 		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )); fi
 		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )); fi
 		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )); fi
