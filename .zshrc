@@ -24,6 +24,8 @@ PERIOD=5			  # period used to hook periodic function (in sec)
 PWD_FILE=~/.pwd					# last pwd sav file
 CA_FILE=~/.ca					# cd aliases sav file
 
+DEF_C="$(tput sgr0)"
+
 OS="$(uname)"					# get the os name
 
 UPDATE_TERM_TITLE="yep" # set to update the term title according to the path and the currently executed line
@@ -802,7 +804,7 @@ bindkey $key[down] down-line-or-history
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
 alias lt="ls -ltFh"				# l with modification date sort
-alias ll="ls -l"				# simple list
+alias ll="ls -lFh"				# simple list
 alias .="ls"
 
 alias mkdir="mkdir -pv"			# create all the needed parent directories + inform user about creations
