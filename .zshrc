@@ -336,9 +336,9 @@ function ff()
 		fi
 	done
 	if [ -t ]; then				# disable colors if piped
-		find $(echo $root $name $additional $type | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
+		find -O3 $(echo $root $name $additional $type | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
 	else
-		find $(echo $root $name $additional $type | sed 's/ +/ /g') 2>/dev/null
+		find -O3 $(echo $root $name $additional $type | sed 's/ +/ /g') 2>/dev/null
 	fi
 }
 
