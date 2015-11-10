@@ -9,6 +9,8 @@
 #
 # Create a working todo function
 #
+# try the zcurses module (zmodload zsh/curses)
+#
 # # # # # # # #
 
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
@@ -140,7 +142,6 @@ function chpwd()				# chpwd hook
 	set_git_branch
 	update_pwd_datas
 	update_pwd_save
-	ztodo
 }
 
 function periodic()				# every $PERIOD secs - triggered by promt print
@@ -311,7 +312,7 @@ function ff() 					# faster find allowing parameters in disorder (ff [type|name|
 			 fi
 		fi
 	done
-	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters
+	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
 }
 
 function colorcode()  			# get the code to set the corresponding fg color
@@ -591,7 +592,6 @@ CLICOLOR=1
 
 autoload add-zsh-hook			# control the hooks (chpwd, precmd, ...)
 autoload zed					# zsh editor
-autoload ztodo					# per directory todo list
 
 # autoload predict-on				# fish like suggestion (with bundled lags !)
 # predict-on
@@ -815,8 +815,6 @@ alias less="less -R"			# -R Raw control chars
 
 alias ressource="source ~/.zshrc"
 alias res="source ~/.zshrc"
-
-alias todo=ztodo
 
 alias emacs="emacs -nw"
 alias xemacs="command emacs"
