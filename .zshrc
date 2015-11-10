@@ -7,6 +7,8 @@
 #
 # Set a nice PS4
 #
+# Create a working todo function
+#
 # # # # # # # #
 
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
@@ -123,7 +125,7 @@ function clock()				# displays the time in the top right corner
 {
 	if [ ! -z $UPDATE_CLOCK ]; then
 		tput sc;
-		tput cup 0 $(( $(tput cols) - 7));
+		tput cup 0 $(( $(tput cols) - 6));
 		echo "$PRE_CLOCK$(date +%R)$POST_CLOCK";
 		tput rc;
 	fi
@@ -639,7 +641,6 @@ bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
 bindkey -s "^[e" "^Uerror\n"			  # run error user function
 bindkey -s "^[s" "^Asudo ^E"	# insert sudo
 bindkey -s "\el" "^Uls\n"		# run ls
-bindkey -s "^X^X" "^Uemacs\n"	# run emacs
 bindkey -s "^X^M" "^Umake\n"	# make
 bindkey -s "^[g" "^A^Kgit commit -m\"\"^[OD"
 bindkey -s "^[c" "^A^Kgit checkout 		"
@@ -776,6 +777,9 @@ bindkey $key[M-left] goto-left-matching-delimiter
 
 bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
+
+function ctrlz() { suspend }; zle -N ctrlz
+bindkey "^X^Z" ctrlz			# ctrl z zsh
 
 bindkey $key[C-left] backward-word
 bindkey $key[C-right] forward-word
