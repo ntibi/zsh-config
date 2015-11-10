@@ -296,16 +296,37 @@ function -() 					# if 0 params, acts like 'cd -', else, act like the regular '-
 	[[ $# -eq 0 ]] && cd - || builtin - "$@"
 }
 
-function ff() 					# faster find allowing parameters in disorder (ff [type|name|root]+)
+
+# faster find allowing easier parameters in disorder
+
+# ie: ff f nx lol ~
+# = find (ff) all the files (f) not executable (nx) called lol (lol) in the home (~)
+
+# ie: ff /bin ne x f "*test*"
+# = in the /bin (/bin) get all the non empty (ne) executable (x) files (d) containing test (*test*)
+function ff()
 {
 	local p
 	local name=""
 	local type=""
+	local additional=""
 	local root="."
 	for p in "$@"; do
-		if $(echo $p | grep -q "^[bcdflps]$"); # is it a type ?
+		if $(echo $p | grep -Eq "^n?[erwxbcdflps]$"); # is it a type ?
 		then
-			type+=$([ -z $type ] && echo " -type $p" || echo " -or -type $p")
+			if $(echo $p | grep -q "n"); then # handle command negation
+				neg=" -not"
+				p=${p/n/}		# remove the 'n' from p, to get the real type
+			else
+				neg=""
+			fi
+			case $p in
+				e) additional+="$neg -empty";;
+				r) additional+="$neg -readable";;
+				w) additional+="$neg -writable";;
+				x) additional+="$neg -executable";;
+				*) type+=$([ -z $type ] && echo "$neg -type $p" || echo " -or $neg -type $p");;
+			esac
 		else if [ -d $p ];		# is it a path ?<
 			 then
 				 root=$p
@@ -314,7 +335,11 @@ function ff() 					# faster find allowing parameters in disorder (ff [type|name|
 			 fi
 		fi
 	done
-	find $(echo $root $name $type | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
+	if [ -t ]; then				# disable colors if piped
+		find $(echo $root $name $additional $type | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
+	else
+		find $(echo $root $name $additional $type | sed 's/ +/ /g') 2>/dev/null
+	fi
 }
 
 function colorcode()  			# get the code to set the corresponding fg color
