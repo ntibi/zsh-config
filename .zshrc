@@ -17,6 +17,8 @@
 
 TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/" # check if xterm-256 color is available, or if we are in a dumb shell
 
+fpath=(~/zsh-config $fpath)
+
 # USEFUL VARS #
 
 PERIOD=5			  # period used to hook periodic function (in sec)
@@ -299,10 +301,10 @@ function -() 					# if 0 params, acts like 'cd -', else, act like the regular '-
 
 # faster find allowing easier parameters in disorder
 
-# ie: ff f nx lol ~
-# = find (ff) all the files (f) not executable (nx) called lol (lol) in the home (~)
+# ie: ff f h nx lol ~
+# = find (ff) all the files (f)m even hidden ones (h) not executable (nx) called lol (lol) in the home (~)
 
-# ie: ff /bin ne x f "*test*"
+# ie: ff /bin ne x f "*test*" ""
 # = in the /bin (/bin) get all the non empty (ne) executable (x) files (d) containing test (*test*)
 function ff()
 {
@@ -310,9 +312,10 @@ function ff()
 	local name=""
 	local type=""
 	local additional=""
+	local hidden=" -not -regex .*/\..*" # hide hidden files by default
 	local root="."
 	for p in "$@"; do
-		if $(echo $p | grep -Eq "^n?[erwxbcdflps]$"); # is it a type ?
+		if $(echo $p | grep -Eq "^n?[herwxbcdflps]$"); # is it a type ?
 		then
 			if $(echo $p | grep -q "n"); then # handle command negation
 				neg=" -not"
@@ -321,13 +324,14 @@ function ff()
 				neg=""
 			fi
 			case $p in
+				h) [ -z $neg ] && hidden="" || hidden=" -not -regex .*/\..*";;
 				e) additional+="$neg -empty";;
 				r) additional+="$neg -readable";;
 				w) additional+="$neg -writable";;
 				x) additional+="$neg -executable";;
-				*) type+=$([ -z $type ] && echo "$neg -type $p" || echo " -or $neg -type $p");;
+				*) type+=$([ -z "$type" ] && echo "$neg -type $p" || echo " -or $neg -type $p");;
 			esac
-		else if [ -d $p ];		# is it a path ?<
+		else if [ -d $p ];		# is it a path ?
 			 then
 				 root=$p
 			 else				# then its a name !
@@ -336,9 +340,9 @@ function ff()
 		fi
 	done
 	if [ -t ]; then				# disable colors if piped
-		find -O3 $(echo $root $name $additional $type | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
+		find -O3 $(echo $root $name $additional $hidden $([ ! -z "$type" ] && echo "(") $type $([ ! -z "$type" ] && echo ")") | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
 	else
-		find -O3 $(echo $root $name $additional $type | sed 's/ +/ /g') 2>/dev/null
+		find -O3 $(echo $root $name $additional $hidden $type | sed 's/ +/ /g') 2>/dev/null
 	fi
 }
 
@@ -622,7 +626,7 @@ CLICOLOR=1
 autoload add-zsh-hook			# control the hooks (chpwd, precmd, ...)
 autoload zed					# zsh editor
 
-# autoload predict-on				# fish like suggestion (with bundled lags !)
+# autoload predict-on			# fish like suggestion (with bundled lags !)
 # predict-on
 
 autoload -z edit-command-line	# edit command line with $EDITOR
@@ -630,8 +634,9 @@ zle -N edit-command-line
 
 autoload -U colors && colors	# cool colors
 
-autoload -U compinit && compinit # enable completion
-zmodload zsh/complist			 # load compeltion list
+autoload -U compinit
+compinit						# enable completion
+zmodload zsh/complist			# load compeltion list
 
 
 # SETTING UP ZSH COMPLETION STUFF #
@@ -658,6 +663,7 @@ zstyle ":completion:*:approximate:*" max-errors "(( ($#PREFIX+$#SUFFIX)/3 ))" # 
 zle -C complete-file complete-word _generic
 zstyle ':completion:complete-file::::' completer _files
 
+zstyle ":completion:*:descriptions" format "%B%d%b"
 
 # ZSH KEY BINDINGS #
 
