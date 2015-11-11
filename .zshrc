@@ -17,7 +17,6 @@
 
 TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/" # check if xterm-256 color is available, or if we are in a dumb shell
 
-fpath=(~/zsh-config $fpath)
 
 # USEFUL VARS #
 
@@ -300,12 +299,6 @@ function -() 					# if 0 params, acts like 'cd -', else, act like the regular '-
 
 
 # faster find allowing easier parameters in disorder
-
-# ie: ff f h nx lol ~
-# = find (ff) all the files (f)m even hidden ones (h) not executable (nx) called lol (lol) in the home (~)
-
-# ie: ff /bin ne x f "*test*" ""
-# = in the /bin (/bin) get all the non empty (ne) executable (x) files (d) containing test (*test*)
 function ff()
 {
 	local p
@@ -665,6 +658,12 @@ zstyle ':completion:complete-file::::' completer _files
 
 zstyle ":completion:*:descriptions" format "%B%d%b"
 
+# Homemade functions completion
+
+_ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
+compdef _ff ff
+
+
 # ZSH KEY BINDINGS #
 
 
@@ -875,5 +874,5 @@ rehash							# hash commands in path
 
 # join_others_shells				# ask for joining others shells
 
-[ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD # execute user defined commands after init
+[ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
 
