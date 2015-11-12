@@ -128,7 +128,7 @@ PRE_CLOCK="$(tput setaf 226;tput smul;tput bold;tput civis)" # caching termcaps 
 POST_CLOCK="$(tput cnorm;tput sgr0;)"
 function clock()				# displays the time in the top right corner
 {
-	if [ ! -z $UPDATE_CLOCK ]; then
+	if [ -n $UPDATE_CLOCK ]; then
 		tput sc;
 		tput cup 0 $(( $(tput cols) - 6));
 		echo "$PRE_CLOCK$(date +%R)$POST_CLOCK";
@@ -333,7 +333,7 @@ function ff()
 		fi
 	done
 	if [ -t ]; then				# disable colors if piped
-		find -O3 $(echo $root $name $additional $hidden $([ ! -z "$type" ] && echo "(") $type $([ ! -z "$type" ] && echo ")") | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
+		find -O3 $(echo $root $name $additional $hidden $([ -n "$type" ] && echo "(") $type $([ -n "$type" ] && echo ")") | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
 	else
 		find -O3 $(echo $root $name $additional $hidden $type | sed 's/ +/ /g') 2>/dev/null
 	fi
@@ -466,9 +466,9 @@ function back()
 	echo -n "> "; tput setaf 1;
 	read to_restore;
 	tput sgr0;
-	if [ ! -z $back[to_restore] ]; then
+	if [ -n $back[to_restore] ]; then
 		files=$(find /tmp/backup/$back[to_restore] -type f)
-		if [ ! -z $files ]; then
+		if [ -n $files ]; then
 			for f in $files; do echo $f; done | command sed -r -e "s|/tmp/backup/$back[to_restore]||g" -e "s|/home/$USER|~|g"
 			read -q "?Restore ? (Y/n): " && cp -R $(realpath /tmp/backup/$back[to_restore]/*) /
 		else
@@ -573,23 +573,29 @@ PS1_USER_LEVEL="X"
 function setps1()
 {
 	PS1=''																									# simple quotes for post evaluation
-	[ -z $PS1_SSH ] 			|| 	PS1+='$ID_C$GET_SSH'													# 'ssh:' if in ssh
-	[ -z $PS1_USER ] 			||	PS1+='$ID_C%n'															# username
-	[ -z $PS1_MACHINE ]			|| 	PS1+='${SEP_C}@$ID_C%m'													# @machine
-	if [ ! -z $PS1_WD ] || [ ! -z $PS1_GIT_BRANCH ] || [ ! -z $PS1_DIR_INFOS ]; then 						# print separators if there is infos inside
+	[ -n $PS1_SSH ] 			&& 	PS1+='$ID_C$GET_SSH'													# 'ssh:' if in ssh
+	[ -n $PS1_USER ] 			&&	PS1+='$ID_C%n'															# username
+	[ -n $PS1_MACHINE ]			&& 	PS1+='${SEP_C}@$ID_C%m'													# @machine
+	if [ -n $PS1_WD ] || [ -n $PS1_GIT_BRANCH ] || [ -n $PS1_DIR_INFOS ]; then 						# print separators if there is infos inside
 		PS1+='${SEP_C}['
 	fi
-	[ -z $PS1_WD ] 				|| 	PS1+='$PWD_C%~${SEP_C}' 												# current short path
-	[ -z $PS1_GIT_BRANCH ] 		|| 	PS1+='$([ ! -z $GIT_BRANCH ] && echo "${SEP_C}:")${GB_C}$GIT_BRANCH'	# get current branch
-	[ -z $PS1_DIR_INFOS ] 		|| 	PS1+='${SEP_C}|$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS${SEP_C}' 			# nb of files and dirs in .
-	if [ ! -z $PS1_WD ] || [ ! -z $PS1_GIT_BRANCH ] || [ ! -z $PS1_DIR_INFOS ]; then 						# print separators if there is infos inside
+	[ -n $PS1_WD ] 				&& 	PS1+='$PWD_C%~${SEP_C}' 												# current short path
+	if [ -n $GIT_BRANCH ] && [ -n $PS1_WD ]; then
+		echo "${SEP_C}:";
+	fi
+	[ -n $PS1_GIT_BRANCH ] 		&& 	PS1+='${GB_C}$GIT_BRANCH' # get current branch
+	if [ -n $PS1_WD ] || [ -n $PS1_GIT_BRANCH ]; then
+		echo "${SEP_C}|";
+	fi
+	[ -n $PS1_DIR_INFOS ] 		&& 	PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS${SEP_C}' 			# nb of files and dirs in .
+	if [ -n $PS1_WD ] || [ -n $PS1_GIT_BRANCH ] || [ -n $PS1_DIR_INFOS ]; then 						# print separators if there is infos inside
 		PS1+="]%f%k "
 	fi
-	[ -z $PS1_RETURN_STATUS ] 	|| 	PS1+='%(0?.%F{82}o.%F{196}x)' 											# return status of last command (green O or red X)
-	[ -z $PS1_GIT_STATUS ] 		|| 	PS1+='$GET_GIT'															# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
-	[ -z $PS1_JOBS ] 			|| 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 						# number of running/sleeping bg jobs
-	[ -z $PS1_SHLVL ] 			|| 	PS1+='%F{205}$GET_SHLVL'						 						# static shlvl
-	[ -z $PS1_USER_LEVEL ] 		|| 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 						# static user level
+	[ -n $PS1_RETURN_STATUS ] 	&& 	PS1+='%(0?.%F{82}o.%F{196}x)' 											# return status of last command (green O or red X)
+	[ -n $PS1_GIT_STATUS ] 		&& 	PS1+='$GET_GIT'															# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
+	[ -n $PS1_JOBS ] 			&& 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 						# number of running/sleeping bg jobs
+	[ -n $PS1_SHLVL ] 			&& 	PS1+='%F{205}$GET_SHLVL'						 						# static shlvl
+	[ -n $PS1_USER_LEVEL ] 		&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 						# static user level
 	PS1+='${SEP_C}>%f%k '
 }
 setps1
