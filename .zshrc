@@ -839,6 +839,9 @@ alias lt="ls -ltFh"				# l with modification date sort
 alias ll="ls -lFh"				# simple list
 alias .="ls"
 
+alias gb="git branch"
+alias gc="git checkout"
+
 alias mkdir="mkdir -pv"			# create all the needed parent directories + inform user about creations
 
 alias grep="grep --color=always"
