@@ -573,23 +573,29 @@ PS1_USER_LEVEL="X"
 function setps1()
 {
 	PS1=''																									# simple quotes for post evaluation
-	[ -z $PS1_SSH ] 			|| 	PS1+='$ID_C$GET_SSH'													# 'ssh:' if in ssh
-	[ -z $PS1_USER ] 			||	PS1+='$ID_C%n'															# username
-	[ -z $PS1_MACHINE ]			|| 	PS1+='${SEP_C}@$ID_C%m'													# @machine
+	[ ! -z $PS1_SSH ] 			&& 	PS1+='$ID_C$GET_SSH'													# 'ssh:' if in ssh
+	[ ! -z $PS1_USER ] 			&&	PS1+='$ID_C%n'															# username
+	[ ! -z $PS1_MACHINE ]			&& 	PS1+='${SEP_C}@$ID_C%m'												# @machine
 	if [ ! -z $PS1_WD ] || [ ! -z $PS1_GIT_BRANCH ] || [ ! -z $PS1_DIR_INFOS ]; then 						# print separators if there is infos inside
 		PS1+='${SEP_C}['
 	fi
-	[ -z $PS1_WD ] 				|| 	PS1+='$PWD_C%~${SEP_C}' 												# current short path
-	[ -z $PS1_GIT_BRANCH ] 		|| 	PS1+='$([ ! -z $GIT_BRANCH ] && echo "${SEP_C}:")${GB_C}$GIT_BRANCH'	# get current branch
-	[ -z $PS1_DIR_INFOS ] 		|| 	PS1+='${SEP_C}|$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS${SEP_C}' 			# nb of files and dirs in .
+	[ ! -z $PS1_WD ] 				&& 	PS1+='$PWD_C%~${SEP_C}' 											# current short path
+	if [ ! -z $GIT_BRANCH ] && [ ! -z $PS1_WD ]; then
+		PS1+="${SEP_C}:";
+	fi
+	[ ! -z $PS1_GIT_BRANCH ] 		&& 	PS1+='${GB_C}$GIT_BRANCH' 											# get current branch
+	if [ ! -z $PS1_WD ] || [ ! -z $PS1_GIT_BRANCH ]; then
+		PS1+="${SEP_C}|";
+	fi
+	[ ! -z $PS1_DIR_INFOS ] 		&& 	PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS${SEP_C}' 				# nb of files and dirs in .
 	if [ ! -z $PS1_WD ] || [ ! -z $PS1_GIT_BRANCH ] || [ ! -z $PS1_DIR_INFOS ]; then 						# print separators if there is infos inside
 		PS1+="]%f%k "
 	fi
-	[ -z $PS1_RETURN_STATUS ] 	|| 	PS1+='%(0?.%F{82}o.%F{196}x)' 											# return status of last command (green O or red X)
-	[ -z $PS1_GIT_STATUS ] 		|| 	PS1+='$GET_GIT'															# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
-	[ -z $PS1_JOBS ] 			|| 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 						# number of running/sleeping bg jobs
-	[ -z $PS1_SHLVL ] 			|| 	PS1+='%F{205}$GET_SHLVL'						 						# static shlvl
-	[ -z $PS1_USER_LEVEL ] 		|| 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 						# static user level
+	[ ! -z $PS1_RETURN_STATUS ] 	&& 	PS1+='%(0?.%F{82}o.%F{196}x)' 										# return status of last command (green O or red X)
+	[ ! -z $PS1_GIT_STATUS ] 		&& 	PS1+='$GET_GIT'														# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
+	[ ! -z $PS1_JOBS ] 			&& 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 						# number of running/sleeping bg jobs
+	[ ! -z $PS1_SHLVL ] 			&& 	PS1+='%F{205}$GET_SHLVL'						 					# static shlvl
+	[ ! -z $PS1_USER_LEVEL ] 		&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 					# static user level
 	PS1+='${SEP_C}>%f%k '
 }
 setps1
