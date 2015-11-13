@@ -98,7 +98,7 @@ function set_git_branch()
 	if [ $REPO -eq 1 ]; then		# if in git repo, get git infos
 		GIT_BRANCH="$(git branch | grep \* | cut -d\  -f2)";
 	else
-		GIT_BRANCH="";
+		GIT_BRANCH="X";
 	fi
 }
 
@@ -587,7 +587,7 @@ function setps1()
 		PS1+="${SEP_C}:";
 	fi
 	[ ! -z $PS1_GIT_BRANCH ] 	&& 	PS1+='${GB_C}$GIT_BRANCH' 											# get current branch
-	if [ ! -z $PS1_WD ] || [ ! -z $PS1_GIT_BRANCH ]; then
+	if ([ ! -z $PS1_WD ] || [ ! -z $PS1_GIT_BRANCH ]) && [ ! -z $PS1_DIR_INFOS ]; then
 		PS1+="${SEP_C}|";
 	fi
 	[ ! -z $PS1_DIR_INFOS ] 	&& 	PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS${SEP_C}' 				# nb of files and dirs in .
