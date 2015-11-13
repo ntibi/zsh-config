@@ -15,6 +15,11 @@
 #
 # # # # # # # #
 
+if [ ! $(echo "$0" | grep -s "zsh") ]; then
+	echo "error: Not in zsh" 1>&2
+	return;
+fi
+
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
 
 TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/" # check if xterm-256 color is available, or if we are in a dumb shell
