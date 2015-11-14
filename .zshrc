@@ -11,8 +11,6 @@
 #
 # try the zcurses module (zmodload zsh/curses)
 #
-# put the PS1 description in an associative array (to allow prompt options setting by an iteration)
-#
 # # # # # # # #
 
 if [ ! $(echo "$0" | grep -s "zsh") ]; then
@@ -152,7 +150,7 @@ function chpwd()				# chpwd hook
 	set_git_branch
 	update_pwd_datas
 	update_pwd_save
-	setps1
+	setprompt					# update the prompt
 }
 
 function periodic()				# every $PERIOD secs - triggered by promt print
@@ -575,53 +573,58 @@ GET_SHLVL="$([[ $SHLVL -gt 9 ]] && echo "+" || echo $SHLVL)" # get the shell lev
 GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SEP_C:)" # 'ssh:' before username if logged in ssh
 
 
-# PS1_INFO="X" to activate INFO, PS1_INFO="" to desactivate
-typeset -A _PS1
-_PS1[ssh]="X"
-_PS1[user]="X"
-_PS1[machine]="X"
-_PS1[wd]="X"
-_PS1[git_branch]="X"
-_PS1[dir_infos]="X"
-_PS1[return_status]="X"
-_PS1[git_status]="X"
-_PS1[jobs]="X"
-_PS1[shlvl]="X"
-_PS1[user_level]="X"
-_PS1[end_char]=">"
-function setps1()
+
+_PS1=()
+
+_ssh=1				;_PS1+="on"
+_user=2				;_PS1+="on"
+_machine=3			;_PS1+="on"
+_wd=4				;_PS1+="on"
+_git_branch=5		;_PS1+="on"
+_dir_infos=6		;_PS1+="on"
+_return_status=7	;_PS1+="on"
+_git_status=8		;_PS1+="on"
+_jobs=9				;_PS1+="on"
+_shlvl=10			;_PS1+="on"
+_user_level=11		;_PS1+="on"
+_end_char=12		;_PS1+="> "
+function setprompt()
 {
+	case $1 in
+		("superlite") _PS1=("" "" "" "" "" "" "" "" "" "" "X" " ");;
+		("lite") _PS1=("X" "X" "X" "" "" "" "" "" "" "" "X" "> ");;
+		("nogit") _PS1=("X" "X" "X" "X" "" "X" "X" "" "X" "X" "X" "> ");;
+		("regular") _PS1=("X" "X" "X" "X" "" "" "" "" "" "" "X" "> ");;
+		("default") _PS1=("X" "X" "X" "X" "X" "X" "X" "X" "X" "X" "X" "> ");;
+	esac
 	PS1=''																								# simple quotes for post evaluation
-	[ ! -z $_PS1[ssh] ] 			&& 	PS1+='$ID_C$GET_SSH'												# 'ssh:' if in ssh
-	[ ! -z $_PS1[user] ] 			&&	PS1+='$ID_C%n'														# username
-	[ ! -z $_PS1[machine] ]		&& 	PS1+='${SEP_C}@$ID_C%m'												# @machine
-	if [ ! -z $_PS1[wd] ] || [ ! -z $_PS1[git_branch] ] || [ ! -z $_PS1[dir_infos] ]; then 					# print separators if there is infos inside
+	[ ! -z $_PS1[$_ssh] ] 			&& 	PS1+='$ID_C$GET_SSH'												# 'ssh:' if in ssh
+	[ ! -z $_PS1[$_user] ] 			&&	PS1+='$ID_C%n'														# username
+	[ ! -z $_PS1[$_machine] ]		&& 	PS1+='${SEP_C}@$ID_C%m'												# @machine
+	if [ ! -z $_PS1[$_wd] ] || [ ! -z $_PS1[$_git_branch] ] || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
 		PS1+='${SEP_C}['
 	fi
-	[ ! -z $_PS1[wd] ] 			&& 	PS1+='$PWD_C%~' 													# current short path
-	if ( [ ! -z $_PS1[git_branch] ] && [ ! -z $GIT_BRANCH ] ) && [ ! -z $_PS1[wd] ]; then
+	[ ! -z $_PS1[$_wd] ] 			&& 	PS1+='$PWD_C%~' 													# current short path
+	if ( [ ! -z $_PS1[$_git_branch] ] && [ ! -z $GIT_BRANCH ] ) && [ ! -z $_PS1[$_wd] ]; then
 		PS1+="${SEP_C}:";
 	fi
-	[ ! -z $_PS1[git_branch] ] 	&& 	PS1+='${GB_C}$GIT_BRANCH' 											# get current branch
-	if ([ ! -z $_PS1[wd] ] || ( [ ! -z $GIT_BRANCH ] && [ ! -z $_PS1[git_branch] ])) && [ ! -z $_PS1[dir_infos] ]; then
+	[ ! -z $_PS1[$_git_branch] ] 	&& 	PS1+='${GB_C}$GIT_BRANCH' 											# get current branch
+	if ([ ! -z $_PS1[$_wd] ] || ( [ ! -z $GIT_BRANCH ] && [ ! -z $_PS1[$_git_branch] ])) && [ ! -z $_PS1[$_dir_infos] ]; then
 		PS1+="${SEP_C}|";
 	fi
-	[ ! -z $_PS1[dir_infos] ] 	&& 	PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS${SEP_C}' 				# nb of files and dirs in .
-	if [ ! -z $_PS1[wd] ] || [ ! -z $_PS1[git_branch] ] || [ ! -z $_PS1[dir_infos] ]; then 					# print separators if there is infos inside
-		PS1+="]%f%k"
+	[ ! -z $_PS1[$_dir_infos] ] 	&& 	PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS' 				# nb of files and dirs in .
+	if [ ! -z $_PS1[$_wd] ] || [ ! -z $_PS1[$_git_branch] ] || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
+		PS1+="${SEP_C}]%f%k"
 	fi
 	[ ! -z $PS1 ] && PS1+=" "
-	[ ! -z $_PS1[return_status] ] && 	PS1+='%(0?.%F{82}o.%F{196}x)' 										# return status of last command (green O or red X)
-	[ ! -z $_PS1[git_status] ] 	&& 	PS1+='$GET_GIT'														# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
-	[ ! -z $_PS1[jobs] ] 			&& 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 					# number of running/sleeping bg jobs
-	[ ! -z $_PS1[shlvl] ] 		&& 	PS1+='%F{205}$GET_SHLVL'						 					# static shlvl
-	[ ! -z $_PS1[user_level] ] 	&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 					# static user level
-	PS1+='${SEP_C}$_PS1[end_char]%f%k '
+	[ ! -z $_PS1[$_return_status] ] && 	PS1+='%(0?.%F{82}o.%F{196}x)' 										# return status of last command (green O or red X)
+	[ ! -z $_PS1[$_git_status] ] 	&& 	PS1+='$GET_GIT'														# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
+	[ ! -z $_PS1[$_jobs] ] 			&& 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 					# number of running/sleeping bg jobs
+	[ ! -z $_PS1[$_shlvl] ] 		&& 	PS1+='%F{205}$GET_SHLVL'						 					# static shlvl
+	[ ! -z $_PS1[$_user_level] ] 	&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 					# static user level
+	PS1+='${SEP_C}$_PS1[$_end_char]%f%k'
 }
-setps1
-
-# RPS1="$TIM_C%T%u%f%b"		# right part of the PS1
-
+setprompt
 
 
 bindkey "$(echotc kl)" backward-char # dunno why but everybody is doing it
@@ -688,6 +691,10 @@ zstyle ":completion:*:descriptions" format "%B%d%b"
 
 _ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
 compdef _ff ff
+
+_setprompt() { _arguments "1:prompt:(('default:default nice prompt' 'regular:casual prompt' 'lite:lite prompt' 'superlite:super lite prompt' 'nogit:default prompt without the git infos'))"}
+compdef _setprompt setprompt
+
 
 
 # ZSH KEY BINDINGS #
