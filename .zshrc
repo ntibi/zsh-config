@@ -39,6 +39,7 @@ UPDATE_CLOCK="X"	  # set to update the top-right clock every second
 
 # (UN)SETTING ZSH (COOL) OPTIONS #
 
+
 setopt promptsubst				# compute PS1 at each prompt print
 setopt inc_append_history
 setopt share_history
@@ -54,6 +55,7 @@ setopt completeinword			# complete from anywhere
 setopt shwordsplit				# sh like word split
 # setopt print_exit_value			# print exit value if non 0
 
+[ $EMACS = t ] && unsetopt zle	# allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
 
 
@@ -503,9 +505,9 @@ function xtrace()				# debug cmd line with xtrace
 	$@
 }
 
-function title()
+function title()				# set the title of the term, or toggle the title updating if no args
 {
-	if [ ! -z "$@" ]; then
+	if [ "$#" -ne "0" ]; then
 		print -Pn "\e]2;$@\a"
 		UPDATE_TERM_TITLE=""
 	else
@@ -513,11 +515,11 @@ function title()
 	fi
 }
 
-function ftselect()
+function ftselect()				# todo: function to select an element in a list
 {
 	typeset -A pos
 	
-	for p in $@; do
+	for p in "$@"; do
 		echo "[ ]: $p"
 	done
 }
