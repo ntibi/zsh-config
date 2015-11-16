@@ -222,7 +222,7 @@ function pimpprompt()			# pimp the PS1 variables one by one
 		_PS1[$i]="X";
 		setprompt;
 		print -P $PS1;
-		read -q "response?$_PS1_DOC[$i] ? (Y/n): "
+		read -q "response?$_PS1_DOC[$i] ? (Y/n): ";
 		if [ $response != "y" ]; then
 		   		_PS1[$i]="";
 		fi
@@ -252,13 +252,13 @@ function periodic()				# every $PERIOD secs - triggered by promt print
 
 function preexec()				# pre execution hook
 {
-	[ -z $UPDATE_TERM_TITLE ] || print -Pn "\e]2;$PWD : $1\a" # set 'pwd + cmd' set term title
+	[ -z $UPDATE_TERM_TITLE ] || printf "\e]2;%s : %s\a" "$PWD" "$1" # set 'pwd + cmd' set term title
 }
 
 function precmd()				# pre promt hook
 {
 	[ -z $UPDATE_CLOCK ] || clock
-	[ -z $UPDATE_TERM_TITLE ] || print -Pn "\e]2;$PWD\a"		# set pwd as term title
+	[ -z $UPDATE_TERM_TITLE ] || printf "\e]2;%s\a" "$PWD" # set pwd as term title
 	
 	set_git_char
 }
@@ -610,17 +610,22 @@ function title()				# set the title of the term, or toggle the title updating if
 function loadconf()				# load a visual config
 {
 	case "$1" in
-		(lite)
+		(lite)					# faster, lighter
 			UPDATE_TERM_TITLE="";
 			UPDATE_CLOCK="";
 			setprompt lite;
 			;;
-		(complete|*)
+		(complete|*)			# nicer, cooler
 			UPDATE_TERM_TITLE="X";
 			UPDATE_CLOCK="X";
 			setprompt complete;
 			;;
 	esac
+}
+
+function escape()				# escape a string
+{
+	printf "%q\n" "$@";
 }
 
 function ftselect()				# todo: function to select an element in a list
