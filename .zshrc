@@ -135,7 +135,7 @@ PRE_CLOCK="$(tput setaf 226;tput smul;tput bold;tput civis)" # caching termcaps 
 POST_CLOCK="$(tput cnorm;tput sgr0;)"
 function clock()				# displays the time in the top right corner
 {
-	if [ -n $UPDATE_CLOCK ]; then
+	if [ ! -z $UPDATE_CLOCK ]; then
 		tput sc;
 		tput cup 0 $(( $(tput cols) - 6));
 		echo "$PRE_CLOCK$(date +%R)$POST_CLOCK";
@@ -209,7 +209,6 @@ function setprompt()
 	[ ! -z $_PS1[$_user_level] ] 	&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 					# static user level
 	PS1+='${SEP_C}$_PS1[$_end_char]%f%k'
 }
-setprompt complete
 
 
 # CALLBACK FUNCTIONS #
@@ -222,7 +221,6 @@ function chpwd()				# chpwd hook
 	update_pwd_save
 	setprompt					# update the prompt
 }
-chpwd
 
 function periodic()				# every $PERIOD secs - triggered by promt print
 {
@@ -239,7 +237,7 @@ function preexec()				# pre execution hook
 
 function precmd()				# pre promt hook
 {
-	clock
+	[ -z $UPDATE_CLOCK ] || clock
 	[ -z $UPDATE_TERM_TITLE ] || print -Pn "\e]2;$PWD\a"		# set pwd as term title
 	
 	set_git_char
@@ -409,7 +407,7 @@ function ff()
 		fi
 	done
 	if [ -t ]; then				# disable colors if piped
-		find -O3 $(echo $root $name $additional $hidden $([ -n "$type" ] && echo "(") $type $([ -n "$type" ] && echo ")") | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
+		find -O3 $(echo $root $name $additional $hidden $([ ! -z "$type" ] && echo "(") $type $([ ! -z "$type" ] && echo ")") | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
 	else
 		find -O3 $(echo $root $name $additional $hidden $type | sed 's/ +/ /g') 2>/dev/null
 	fi
@@ -542,9 +540,9 @@ function back()					# list all backuped files
 	echo -n "> "; tput setaf 1;
 	read to_restore;
 	tput sgr0;
-	if [ -n $back[to_restore] ]; then
+	if [ ! -z "$back[to_restore]" ]; then
 		files=$(find /tmp/backup/$back[to_restore] -type f)
-		if [ -n $files ]; then
+		if [ ! -z "$files" ]; then
 			for f in $files; do echo $f; done | command sed -r -e "s|/tmp/backup/$back[to_restore]||g" -e "s|/home/$USER|~|g"
 			read -q "?Restore ? (Y/n): " && cp -R $(realpath /tmp/backup/$back[to_restore]/*) /
 		else
@@ -557,8 +555,8 @@ function back()					# list all backuped files
 
 
 function ft()					# find text in .
-{								# I (ignore binary) n (line number) H (print fn each line)
-	command find . -type f -exec grep --color=auto -InH -e "$@" {} +
+{
+	command find . -type f -exec grep --color=auto -InH -e "$@" {} +; # I (ignore binary) n (line number) H (print fn each line)
 }
 
 function installed()
@@ -580,8 +578,29 @@ function title()				# set the title of the term, or toggle the title updating if
 		print -Pn "\e]2;$@\a"
 		UPDATE_TERM_TITLE=""
 	else
-		UPDATE_TERM_TITLE="X"
+		if [ -z "$UPDATE_TERM_TITLE" ]; then
+			UPDATE_TERM_TITLE="X"
+		else
+			print -Pn "\e]2;\a"
+			UPDATE_TERM_TITLE=""
+		fi
 	fi
+}
+
+function loadconf()				# load a visual config
+{
+	case "$1" in
+		(lite)
+			UPDATE_TERM_TITLE="";
+			UPDATE_CLOCK="";
+			setprompt lite;
+			;;
+		(complete|*)
+			UPDATE_TERM_TITLE="X";
+			UPDATE_CLOCK="X";
+			setprompt complete;
+			;;
+	esac
 }
 
 function ftselect()				# todo: function to select an element in a list
@@ -663,6 +682,7 @@ zmodload zsh/complist			# load compeltion list
 zstyle ':completion:*:rm:*' ignore-line yes # remove suggestion if already in selection
 zstyle ':completion:*:mv:*' ignore-line yes # same
 zstyle ':completion:*:cp:*' ignore-line yes # same
+zstyle ':completion:*:emacs:*' ignore-line yes # same
 
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path .zcache
@@ -676,13 +696,12 @@ zstyle ":completion:*" group-name "" # group completion
 zstyle ":completion:*:warnings" format "Nope !" # custom error
 
 zstyle ":completion:::::" completer _complete _approximate # approx completion after regular one
-# zstyle ":completion:*:approximate:*" max-errors 2		   # complete 2 errors max
-zstyle ":completion:*:approximate:*" max-errors "(( ($#PREFIX+$#SUFFIX)/3 ))" # allow one error each 3 characters
+zstyle ":completion:*:approximate:*" max-errors "(( ($#BUFFER)/3 ))" # allow one error each 3 characters
 
 zle -C complete-file complete-word _generic
 zstyle ':completion:complete-file::::' completer _files
 
-zstyle ":completion:*:descriptions" format "%B%d%b"
+zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 
 # Homemade functions completion
 
@@ -691,6 +710,9 @@ compdef _ff ff
 
 _setprompt() { _arguments "1:prompt:(('complete:prompt with all the options' 'classic:classic prompt' 'lite:lite prompt' 'superlite:super lite prompt' 'nogit:default prompt without the git infos'))"}
 compdef _setprompt setprompt
+
+_loadconf() { _arguments "1:visual configuration:(('complete:complete configuration' 'lite:smaller configuration'))"}
+compdef _loadconf loadconf
 
 
 # ZSH KEY BINDINGS #
@@ -712,10 +734,6 @@ bindkey -s "^[c" "^A^Kgit checkout 		"
 # ZLE FUNCTIONS #
 
 bindkey -e 						# emacs style key binding
-bindkey "$(echotc kl)" backward-char # dunno why but everybody is doing it
-bindkey "$(echotc kr)" forward-char	 # looks like termcaps stuff
-bindkey "$(echotc ku)" up-line-or-history # arrows keys compatibility on dumb terms maybe ?
-bindkey "$(echotc kd)" down-line-or-history
 
 
 function get_terminfo_name()	# get the terminfo name according to the keycode
@@ -838,6 +856,8 @@ key[S-tab]=$terminfo[cbt]
 
 key[C-space]="^@"
 
+bindkey $key[left] backward-char
+bindkey $key[right] forward-char
 
 bindkey $key[M-right] goto-right-matching-delimiter
 bindkey $key[M-left] goto-left-matching-delimiter
@@ -906,6 +926,7 @@ check_git_repo
 update_pwd_datas
 update_pwd_save
 set_git_char
+loadconf complete
 rehash							# hash commands in path
 
 # join_others_shells				# ask for joining others shells
