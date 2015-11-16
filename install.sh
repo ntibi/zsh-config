@@ -1,33 +1,35 @@
 #!/bin/sh
 
+INSTALL_DIR=$(basename $0)
+
 echo "checking for updates..."
 git pull
 
-if [ ! -e ~/.zshrc ] && [ ! -L ~/.zshrc ];
+if [ ! -e "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ];
 then
-	echo "linking ~/.zshrc with ./.zshrc"
-	ln -s "$PWD/.zshrc" "$HOME/.zshrc"
+	echo "linking $HOME/.zshrc with ./.zshrc"
+	ln -s "$iNSTALL_DIR/.zshrc" "$HOME/.zshrc"
 else
-	if [ -L ~/.zshrc ];
+	if [ -L "$HOME/.zshrc" ];
 	then
-		if [ $(readlink ~/.zshrc) = $(echo "$PWD/.zshrc") ];
+		if [ $(readlink "$HOME/.zshrc") = $(echo "$iNSTALL_DIR/.zshrc") ];
 		then
 			echo "new .zshrc already installed"
 		else
-			echo "removing old ~/.zshrc pointing at $(readlink ~/.zshrc)"
-			unlink ~/.zshrc
-			echo "linking ~/.zshrc with .zshrc"
-			ln -s "$PWD/.zshrc" "$HOME/.zshrc"
+			echo "removing old $HOME/.zshrc pointing at $(readlink $HOME/.zshrc)"
+			unlink "$HOME/.zshrc"
+			echo "linking $HOME/.zshrc with .zshrc"
+			ln -s "$iNSTALL_DIR/.zshrc" "$HOME/.zshrc"
 		fi
 	else
-		echo "linking ~/.zshrc with .zshrc"
-		echo "old ~/.zshrc content is now in ~/.oldzshrc"
-		cat ~/.zshrc >> ~/.oldzshrc
-		rm ~/.zshrc
-		ln -s ./.zshrc ~/.zshrc
+		echo "linking $HOME/.zshrc with .zshrc"
+		echo "old $HOME/.zshrc content is now in $HOME/.oldzshrc"
+		cat "$HOME/.zshrc" >> "$HOME/.oldzshrc"
+		rm "$HOME/.zshrc"
+		ln -s "$iNSTALL_DIR/.zshrc" "$HOME/.zshrc"
 	fi
 fi
 
-echo "type 'source ~/.zshrc' to apply update"
+echo "type 'source $HOME/.zshrc' to apply update"
 echo "Done"
 
