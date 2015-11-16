@@ -140,7 +140,7 @@ function clock()				# displays the time in the top right corner
 		tput cup 0 $(( $(tput cols) - 6));
 		echo "$PRE_CLOCK$(date +%R)$POST_CLOCK";
 		tput rc;
-		# sched | command grep -q clock || clock  && sched +10 clock
+		sched | command grep -q clock || sched +10 clock # if no clock update in sched, set one in 10s
 	fi
 }
 
