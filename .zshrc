@@ -160,33 +160,35 @@ GET_SSH="$([[ $(echo $SSH_TTY$SSH_CLIENT$SSH_CONNECTION) != '' ]] && echo ssh$SE
 
 
 _PS1=()
+_PS1_DOC=()
 
-_ssh=1
-_user=2
-_machine=3
-_wd=4
-_git_branch=5
-_dir_infos=6
-_return_status=7
-_git_status=8
-_jobs=9
-_shlvl=10
-_user_level=11
-_end_char=12
-function setprompt()
+_ssh=1				;_PS1_DOC+="be prefixed if connected in ssh"
+_user=2				;_PS1_DOC+="print the username"
+_machine=3			;_PS1_DOC+="print the machine name"
+_wd=4				;_PS1_DOC+="print the current working directory"
+_git_branch=5		;_PS1_DOC+="print the current git branch if any"
+_dir_infos=6		;_PS1_DOC+="print the nb of files and dirs in '.'"
+_return_status=7	;_PS1_DOC+="print the return status of the last command (true/false)"
+_git_status=8		;_PS1_DOC+="print the status of git with a colored char (clean/dirty/...)"
+_jobs=9				;_PS1_DOC+="print the number of background jobs"
+_shlvl=10			;_PS1_DOC+="print the current sh level (shell depth)"
+_user_level=11		;_PS1_DOC+="print the current user level (root or not)"
+_end_char=12		;_PS1_DOC+="print a nice '>' at the end"
+
+function setprompt()			# set a special predefined prompt or update the prompt according to the prompt vars
 {
 	case $1 in
-		("superlite") _PS1=("" "" "" "" "" "" "" "" "" "" "X" " ");;
-		("lite") _PS1=("X" "X" "X" "" "" "" "" "" "" "" "X" "> ");;
-		("nogit") _PS1=("X" "X" "X" "X" "" "X" "X" "" "X" "X" "X" "> ");;
-		("classic") _PS1=("X" "X" "X" "X" "" "" "" "" "" "" "X" "> ");;
-		("complete") _PS1=("X" "X" "X" "X" "X" "X" "X" "X" "X" "X" "X" "> ");;
+		("superlite") _PS1=("" "" "" "" "" "" "" "" "" "" "X" "");;
+		("lite") _PS1=("X" "X" "X" "" "" "" "" "" "" "" "X" "X");;
+		("nogit") _PS1=("X" "X" "X" "X" "" "X" "X" "" "X" "X" "X" "X");;
+		("classic") _PS1=("X" "X" "X" "X" "" "" "" "" "" "" "X" "X");;
+		("complete") _PS1=("X" "X" "X" "X" "X" "X" "X" "X" "X" "X" "X" "X");;
 	esac
 	PS1=''																								# simple quotes for post evaluation
 	[ ! -z $_PS1[$_ssh] ] 			&& 	PS1+='$ID_C$GET_SSH'												# 'ssh:' if in ssh
 	[ ! -z $_PS1[$_user] ] 			&&	PS1+='$ID_C%n'														# username
 	[ ! -z $_PS1[$_machine] ]		&& 	PS1+='${SEP_C}@$ID_C%m'												# @machine
-	if [ ! -z $_PS1[$_wd] ] || [ ! -z $_PS1[$_git_branch] ] || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
+	if [ ! -z $_PS1[$_wd] ] || ( [ ! -z $GIT_BRANCH ] && [ ! -z $_PS1[$_git_branch] ]) || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
 		PS1+='${SEP_C}['
 	fi
 	[ ! -z $_PS1[$_wd] ] 			&& 	PS1+='$PWD_C%~' 													# current short path
@@ -198,7 +200,7 @@ function setprompt()
 		PS1+="${SEP_C}|";
 	fi
 	[ ! -z $_PS1[$_dir_infos] ] 	&& 	PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS' 				# nb of files and dirs in .
-	if [ ! -z $_PS1[$_wd] ] || [ ! -z $_PS1[$_git_branch] ] || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
+	if [ ! -z $_PS1[$_wd] ] || ( [ ! -z $GIT_BRANCH ] && [ ! -z $_PS1[$_git_branch] ]) || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
 		PS1+="${SEP_C}]%f%k"
 	fi
 	[ ! -z $PS1 ] && PS1+=" "
@@ -207,9 +209,27 @@ function setprompt()
 	[ ! -z $_PS1[$_jobs] ] 			&& 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 					# number of running/sleeping bg jobs
 	[ ! -z $_PS1[$_shlvl] ] 		&& 	PS1+='%F{205}$GET_SHLVL'						 					# static shlvl
 	[ ! -z $_PS1[$_user_level] ] 	&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 					# static user level
-	PS1+='${SEP_C}$_PS1[$_end_char]%f%k'
+	[ ! -z $_PS1[$_end_char] ] 		&& 	PS1+='${SEP_C}>'
+	PS1+='%f%k '
 }
 
+function pimpprompt()			# pimp the PS1 variables one by one
+{
+	local response;
+	_PS1=("" "" "" "" "" "" "" "" "" "" "" "");
+	echo "Do you want your prompt to:"
+	for i in $(seq "$#_PS1"); do
+		_PS1[$i]="X";
+		setprompt;
+		print -P $PS1;
+		read -q "response?$_PS1_DOC[$i] ? (Y/n): "
+		if [ $response != "y" ]; then
+		   		_PS1[$i]="";
+		fi
+		echo;
+		echo;
+	done
+}
 
 # CALLBACK FUNCTIONS #
 
