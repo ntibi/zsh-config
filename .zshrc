@@ -55,7 +55,7 @@ setopt completeinword			# complete from anywhere
 setopt shwordsplit				# sh like word split
 # setopt print_exit_value			# print exit value if non 0
 
-[ $EMACS = t ] && unsetopt zle	# allow zsh to work under emacs
+[ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
 
 
