@@ -210,7 +210,7 @@ function setprompt()			# set a special predefined prompt or update the prompt ac
 	[ ! -z $_PS1[$_shlvl] ] 		&& 	PS1+='%F{205}$GET_SHLVL'						 					# static shlvl
 	[ ! -z $_PS1[$_user_level] ] 	&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 					# static user level
 	[ ! -z $_PS1[$_end_char] ] 		&& 	PS1+='${SEP_C}>'
-	PS1+='%f%k '
+	[ ! -z "$PS1" ] 				&& PS1+="%f%k "
 }
 
 function pimpprompt()			# pimp the PS1 variables one by one
@@ -221,8 +221,8 @@ function pimpprompt()			# pimp the PS1 variables one by one
 	for i in $(seq "$#_PS1"); do
 		_PS1[$i]="X";
 		setprompt;
-		print -P $PS1;
-		read -q "response?$_PS1_DOC[$i] ? (Y/n): ";
+		print "$_PS1_DOC[$i] like this ?\n$(print -P "$PS1")"
+		read -q "response?(Y/n): ";
 		if [ $response != "y" ]; then
 		   		_PS1[$i]="";
 		fi
