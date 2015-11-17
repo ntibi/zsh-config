@@ -52,7 +52,7 @@ setopt cbases					# c-like bases conversions
 setopt emacs					# enable emacs like keybindigs
 setopt flow_control				# enable C-q and C-s to control the flooow
 setopt completeinword			# complete from anywhere
-setopt shwordsplit				# sh like word split
+# setopt shwordsplit				# sh like word split
 # setopt print_exit_value			# print exit value if non 0
 
 [ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
@@ -265,6 +265,12 @@ function precmd()				# pre promt hook
 
 # USEFUL USER FUNCTIONS #
 
+
+function escape()				# escape a string
+{
+	printf "%q\n" "$@";
+}
+
 function ca()					# add cd alias (ca <alias_name> || ca <alias_name> <aliased path>)
 {
 	local a
@@ -445,10 +451,10 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 {
 	local i
 	local last
-	local params
+	# local params
 	local col
 	i=0
-	params=""
+	params=()
 	col=""
 	for c in "$@"; do
 		case $c in
@@ -463,7 +469,8 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 			*) 			col=$c;;
 		esac
 		if [ "$((i % 2))" = "1" ]; then
-			params+=" -e s/($last)/$(tput setaf $col)\1$(tput sgr0)/g" # investigate about ```MDR=""; MDR="-e"; echo $MDR```
+			params+= "-e"
+			params+="s/($last)/$(tput setaf $col)\1$(tput sgr0)/g" # investigate about ```MDR=""; MDR="-e"; echo $MDR```
 		else
 			last=$c
 		fi
@@ -473,7 +480,7 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 		echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
 		return
 	fi
-	sed -re $(echo $params) 2>/dev/null || echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
+	sed -re $params
 }
 
 function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
@@ -621,11 +628,6 @@ function loadconf()				# load a visual config
 			setprompt complete;
 			;;
 	esac
-}
-
-function escape()				# escape a string
-{
-	printf "%q\n" "$@";
 }
 
 function ftselect()				# todo: function to select an element in a list
@@ -948,6 +950,7 @@ alias dzsh="zsh --norcs --xtrace" # debugzsh
 alias roadtrip='while true; do cd $(ls -pa1 | grep "/$" | grep -v "^\./$" | sort --random-sort | head -n1); echo -ne "\033[2K\r>$(pwd)"; done' # visit your computer
 
 check_git_repo
+set_git_branch
 update_pwd_datas
 update_pwd_save
 set_git_char
