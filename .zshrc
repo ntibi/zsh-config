@@ -451,7 +451,7 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 {
 	local i
 	local last
-	# local params
+	local params
 	local col
 	i=0
 	params=()
@@ -469,7 +469,7 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 			*) 			col=$c;;
 		esac
 		if [ "$((i % 2))" = "1" ]; then
-			params+= "-e"
+			params+="-e"
 			params+="s/($last)/$(tput setaf $col)\1$(tput sgr0)/g" # investigate about ```MDR=""; MDR="-e"; echo $MDR```
 		else
 			last=$c
@@ -480,7 +480,7 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 		echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
 		return
 	fi
-	sed -re $params
+	sed -r $params
 }
 
 function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
