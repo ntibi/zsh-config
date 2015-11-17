@@ -928,7 +928,7 @@ alias grep="grep --color=always"
 alias egrep="egrep --color=always"
 installed tree && alias tree="tree -C"		   # -C colorzzz
 installed colordiff && alias diff="colordiff" # diff with nicer colors
-alias less="less -R"			# -R Raw control chars
+alias less="less -RS"			# -R Raw control chars, -S to truncate the long lines instead of folding them
 
 alias ressource="source ~/.zshrc"
 alias res="source ~/.zshrc"
