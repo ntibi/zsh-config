@@ -187,7 +187,10 @@ function setprompt()			# set a special predefined prompt or update the prompt ac
 	PS1=''																								# simple quotes for post evaluation
 	[ ! -z $_PS1[$_ssh] ] 			&& 	PS1+='$ID_C$GET_SSH'												# 'ssh:' if in ssh
 	[ ! -z $_PS1[$_user] ] 			&&	PS1+='$ID_C%n'														# username
-	[ ! -z $_PS1[$_machine] ]		&& 	PS1+='${SEP_C}@$ID_C%m'												# @machine
+	if [ ! -z $_PS1[$_user] ] && [ ! -z $_PS1[$_machine] ]; then
+		PS1+='${SEP_C}@'
+	fi
+	[ ! -z $_PS1[$_machine] ]		&& 	PS1+='$ID_C%m'												# @machine
 	if [ ! -z $_PS1[$_wd] ] || ( [ ! -z $GIT_BRANCH ] && [ ! -z $_PS1[$_git_branch] ]) || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
 		PS1+='${SEP_C}['
 	fi
@@ -201,16 +204,15 @@ function setprompt()			# set a special predefined prompt or update the prompt ac
 	fi
 	[ ! -z $_PS1[$_dir_infos] ] 	&& 	PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS' 				# nb of files and dirs in .
 	if [ ! -z $_PS1[$_wd] ] || ( [ ! -z $GIT_BRANCH ] && [ ! -z $_PS1[$_git_branch] ]) || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
-		PS1+="${SEP_C}]%f%k"
+		PS1+="${SEP_C}]%f%k "
 	fi
-	[ ! -z $PS1 ] && PS1+=" "
 	[ ! -z $_PS1[$_return_status] ] && 	PS1+='%(0?.%F{82}o.%F{196}x)' 										# return status of last command (green O or red X)
 	[ ! -z $_PS1[$_git_status] ] 	&& 	PS1+='$GET_GIT'														# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
 	[ ! -z $_PS1[$_jobs] ] 			&& 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 					# number of running/sleeping bg jobs
 	[ ! -z $_PS1[$_shlvl] ] 		&& 	PS1+='%F{205}$GET_SHLVL'						 					# static shlvl
 	[ ! -z $_PS1[$_user_level] ] 	&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 					# static user level
 	[ ! -z $_PS1[$_end_char] ] 		&& 	PS1+='${SEP_C}>'
-	[ ! -z "$PS1" ] 				&& PS1+="%f%k "
+	[ ! -z "$PS1" ] 				&& 	PS1+="%f%k "
 }
 
 function pimpprompt()			# pimp the PS1 variables one by one
@@ -224,7 +226,8 @@ function pimpprompt()			# pimp the PS1 variables one by one
 		print "$_PS1_DOC[$i] like this ?\n$(print -P "$PS1")"
 		read -q "response?(Y/n): ";
 		if [ $response != "y" ]; then
-		   		_PS1[$i]="";
+		   	_PS1[$i]="";
+			setprompt;
 		fi
 		echo;
 		echo;
