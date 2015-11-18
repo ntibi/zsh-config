@@ -204,7 +204,10 @@ function setprompt()			# set a special predefined prompt or update the prompt ac
 	fi
 	[ ! -z $_PS1[$_dir_infos] ] 	&& 	PS1+='$NBF_C$NB_FILES${SEP_C}/$NBD_C$NB_DIRS' 				# nb of files and dirs in .
 	if [ ! -z $_PS1[$_wd] ] || ( [ ! -z $GIT_BRANCH ] && [ ! -z $_PS1[$_git_branch] ]) || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
-		PS1+="${SEP_C}]%f%k "
+		PS1+="${SEP_C}]%f%k"
+	fi
+	if ([ ! -z $_PS1[$_wd] ] || ( [ ! -z $GIT_BRANCH ] && [ ! -z $_PS1[$_git_branch] ]) || [ ! -z $_PS1[$_dir_infos] ]) && [ ! -z $_PS1[$_return_status] ] && [ ! -z $_PS1[$_git_status] ] && [ ! -z $_PS1[$_jobs] ] && [ ! -z $_PS1[$_shlvl] ] && [ ! -z $_PS1[$_user_level] ]; then
+		PS1+="%f%k "
 	fi
 	[ ! -z $_PS1[$_return_status] ] && 	PS1+='%(0?.%F{82}o.%F{196}x)' 										# return status of last command (green O or red X)
 	[ ! -z $_PS1[$_git_status] ] 	&& 	PS1+='$GET_GIT'														# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
