@@ -237,6 +237,10 @@ function pimpprompt()			# pimp the PS1 variables one by one
 	done
 }
 
+# alias PS4_fancy='PS4=%b+%N:%I %_\n%B'
+# alias PS4_default='PS4=+%N:%i> '
+
+
 # CALLBACK FUNCTIONS #
 
 function chpwd()				# chpwd hook
@@ -776,7 +780,6 @@ bindkey -s "^[c" "^A^Kgit checkout 		"
 # ZLE FUNCTIONS #
 
 bindkey -e 						# emacs style key binding
-
 
 function get_terminfo_name()	# get the terminfo name according to the keycode
 {
