@@ -237,9 +237,20 @@ function pimpprompt()			# pimp the PS1 variables one by one
 	done
 }
 
-# alias PS4_fancy='PS4=%b+%N:%I %_\n%B'
-# alias PS4_default='PS4=+%N:%i> '
 
+PS4="%N:%i> ";
+function setps4()				# toggle PS4 (xtrace prompt) between verbose and default
+{
+	case "$PS4" in
+		("%b%N:%I %_
+%B")
+			PS4="%N:%i> ";
+			;;
+		(*)
+			PS4="%b%N:%I %_
+%B";
+	esac 
+}
 
 # CALLBACK FUNCTIONS #
 
