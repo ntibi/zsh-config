@@ -630,6 +630,15 @@ function loadconf()				# load a visual config
 	esac
 }
 
+function uc()					# remove all? color escape chars
+{
+	if [ $# -eq 0 ]; then
+		sed -r "s/\[([0-9]{1,2}(;[0-9]{1,2})?(;[0-9]{1,3})?)?[mGK]//g"
+	else
+		$@ | sed -r "s/\[([0-9]{1,2}(;[0-9]{1,2})?(;[0-9]{1,3})?)?[mGK]//g"
+	fi
+}
+
 function ftselect()				# todo: function to select an element in a list
 {
 	typeset -A pos
