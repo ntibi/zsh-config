@@ -477,6 +477,10 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 	i=0
 	params=()
 	col=""
+	if [ $# -eq 0 ]; then
+		echo "Usage: colorize <exp1> <color1> <exp2> <color2> ..." 1>&2
+		return ;
+	fi
 	for c in "$@"; do
 		case $c in
 			"black") 	col=0;;
@@ -507,23 +511,35 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
 {
 	local delta;
+	local ts1=$1;
+	local ts2=$2;
+	local sign;
+
 	if [ $# = 0 ]; then
 		date +%s;
 	elif [ $# = 1 ]; then
-		delta=$(( $(date +%s) - $1 ));
-		if [ $delta -gt 30758400 ]; then echo -n "$(( delta / 30758400 )) y "; delta=$(( delta % 30758400 )); fi
-		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )); fi
-		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )); fi
-		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )); fi
-		echo "$delta s ago";
+		delta=$(( $(date +%s) - $ts1 ));
+		if [ $delta -lt 0 ]; then
+			delta=$(( -delta ));
+			sign="in the future";
+		else
+			sign="ago";
+		fi
+		if [ $delta -gt 30758400 ]; then echo -n "$(( delta / 30758400 ))y "; delta=$(( delta % 30758400 )); fi
+		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 ))d "; delta=$(( delta % 86400 )); fi
+		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 ))h "; delta=$(( delta % 3600 )); fi
+		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 ))m "; delta=$(( delta % 60 )); fi
+		echo "${delta}s $sign";
 	elif [ $# = 2 ]; then
-			delta=$(( $2 - $1 ))
-			[ $delta -lt 0 ] && delta=$(( -delta ))
-		if [ $delta -gt 30758400 ]; then echo -n "$(( delta / 30758400 )) y "; delta=$(( delta % 30758400 )); fi
-		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 )) d "; delta=$(( delta % 86400 )); fi
-		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 )) h "; delta=$(( delta % 3600 )); fi
-		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 )) m "; delta=$(( delta % 60 )); fi
-		echo "$delta s";
+		delta=$(( $ts2 - $ts1 ));
+		if [ $delta -lt 0 ]; then
+			delta=$(( -delta ));
+		fi
+		if [ $delta -gt 30758400 ]; then echo -n "$(( delta / 30758400 ))y "; delta=$(( delta % 30758400 )); fi
+		if [ $delta -gt 86400 ]; then echo -n "$(( delta / 86400 ))d "; delta=$(( delta % 86400 )); fi
+		if [ $delta -gt 3600 ]; then echo -n "$(( delta / 3600 ))h "; delta=$(( delta % 3600 )); fi
+		if [ $delta -gt 60 ]; then echo -n "$(( delta / 60 ))m "; delta=$(( delta % 60 )); fi
+		echo "${delta}s";
 	fi
 }
 
@@ -658,6 +674,31 @@ function uc()					# remove all? color escape chars
 	else
 		$@ | sed -r "s/\[([0-9]{1,2}(;[0-9]{1,2})?(;[0-9]{1,3})?)?[mGK]//g"
 	fi
+}
+
+function hscroll()				# test
+{
+	local string;
+	local i=0;
+	local key;
+	local crel="$(tput cr;tput el)";
+	local cols="$(tput cols)"
+	[ $# -eq 0 ] && return ;
+	string="$(cat /dev/zero | tr "\0" " " | head -c $cols)$@";
+	trap "tput cnorm; return;" INT
+	tput civis;
+	while [ $i -le $#string ]; do
+		echo -n ${string:$i:$cols};
+		read -sk 3 key;
+		echo -en "$crel";
+		case $(echo "$key" | cat -v) in
+			("^[[C")
+				i=$(( i - 1 ));;
+			("^[[D")
+				i=$(( i + 1 ));;
+		esac
+	done
+	tput cnorm;
 }
 
 function ftselect()				# todo: function to select an element in a list
