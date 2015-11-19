@@ -761,6 +761,7 @@ CLICOLOR=1
 
 autoload add-zsh-hook			# control the hooks (chpwd, precmd, ...)
 autoload zed					# zsh editor
+autoload _setxkbmap				# load setxkbmap autocompletion
 
 # autoload predict-on			# fish like suggestion (with bundled lags !)
 # predict-on
@@ -800,6 +801,8 @@ zle -C complete-file complete-word _generic
 zstyle ':completion:complete-file::::' completer _files
 
 zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
+
+compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 
 # Homemade functions completion
 
