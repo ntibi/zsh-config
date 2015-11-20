@@ -1,8 +1,6 @@
 # # # # # # # #
 # TODO:
 #
-# Don't list all the files in back if there is too many of them
-# Set the backup path dynamically instead of "/tmp/backup"
 # Add pagination in the back function
 #
 # Set a nice PS4
@@ -608,7 +606,7 @@ function back()					# list all backuped files
 		files=( $(find /tmp/backup/$back[to_restore] -type f) )
 		if [ ! -z "$files" ]; then
 			for f in $files; do echo $f; done | command sed -r -e "s|/tmp/backup/$back[to_restore]||g" -e "s|/home/$USER|~|g"
-			read -q "?Restore ? (Y/n): " && cp -R $(realpath /tmp/backup/$back[to_restore]/*) /
+			read -q "?Restore ? (Y/n): " && cp --backup=t -R $(realpath /tmp/backup/$back[to_restore]/*) / # create file.~1~ if file already exists
 		else
 			echo "No such back"
 		fi
