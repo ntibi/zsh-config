@@ -576,37 +576,60 @@ function rm()					# safe rm with timestamped backup
 	fi
 }
 
+CLEAR_LINE="$(tput sgr0; tput el1; tput cub 2)"
 function back()					# list all backuped files
 {
 	local files;
 	local peek;
 	local backs;
-	local to_restore=""
-	local nb=1;
+	local to_restore="";
+	local b;
+	local i;
+	local key;
 
 	[ -d /tmp/backup ] || return
-	back=( $(command ls -t1 /tmp/backup/) )
-	for b in $back; do
+	back=( $(command ls -t1 /tmp/backup/) );
+	i=1;
+	while [ $i -le $#back ] && [ -z "$to_restore" ]; do
+		b=$back[i];
 		files=( $(find /tmp/backup/$b -type f) )
 		if [ ! $#files -eq 0 ]; then
 			peek=""
 			for f in $files; do peek+="$(basename $f), "; if [ $#peek -ge $COLUMNS ]; then break; fi; done
 			peek=${peek:0:(-2)}; # remove the last ', '
 			[ $#peek -gt $COLUMNS ] && peek="$(echo $peek | head -c $(( COLUMNS - 3 )) )..." # truncate and add '...' at the end if the peek is too large
-			echo "\033[31m#$nb$DEF_C: \033[4;32m$(ts $b)$DEF_C: \033[34m$(echo $files | wc -w)$DEF_C file(s)"
+			echo "\033[31m#$i$DEF_C: \033[4;32m$(ts $b)$DEF_C: \033[34m$(echo $files | wc -w)$DEF_C file(s)"
 			echo "$peek";
 			echo;
-			nb=$(( nb + 1 ));
+		fi
+		if [ $(( i % 8 == 0 || i == $#back )) -eq 1 ]; then
+			key="";
+			echo -n "> "; tput setaf 2;
+			read -sk1 key;
+			case "$(echo -n $key | cat -e)" in
+				"^[")
+					echo -n "$CLEAR_LINE";
+					read -sk2 key; # handle 3 characters arrow key press as next
+					i=$(( i + 1 ));;
+				"$"|" ")			# hangle enter and space as next
+					echo -n "$CLEAR_LINE";
+					i=$(( i + 1 ));;
+				*)				# handle everything else as a first character of backup number
+					echo -n $key; # print the silently read key on the prompt
+					read to_restore;
+					to_restore="$key$to_restore";;
+			esac
+			tput sgr0;
+		else
+			i=$(( i + 1 ));
 		fi
 	done
-	echo -n "> "; tput setaf 1;
-	read to_restore;
-	tput sgr0;
 	if [ ! -z "$back[to_restore]" ]; then
 		files=( $(find /tmp/backup/$back[to_restore] -type f) )
 		if [ ! -z "$files" ]; then
 			for f in $files; do echo $f; done | command sed -r -e "s|/tmp/backup/$back[to_restore]||g" -e "s|/home/$USER|~|g"
 			read -q "?Restore ? (Y/n): " && cp --backup=t -R $(realpath /tmp/backup/$back[to_restore]/*) / # create file.~1~ if file already exists
+			echo;
 		else
 			echo "No such back"
 		fi
