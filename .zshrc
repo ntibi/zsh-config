@@ -587,12 +587,12 @@ function back()					# list all backuped files
 	local nb=1;
 
 	[ -d /tmp/backup ] || return
-	back=($(command ls -t1 /tmp/backup/))
+	back=( $(command ls -t1 /tmp/backup/) )
 	for b in $back; do
-		files=$(find /tmp/backup/$b -type f)
+		files=( $(find /tmp/backup/$b -type f) )
 		if [ ! $#files -eq 0 ]; then
 			peek=""
-			for f in $files; do peek+="$(basename $f), "; done
+			for f in $files; do peek+="$(basename $f), "; if [ $#peek -ge $COLUMNS ]; then break; fi; done
 			peek=${peek:0:(-2)}; # remove the last ', '
 			[ $#peek -gt $COLUMNS ] && peek="$(echo $peek | head -c $(( COLUMNS - 3 )) )..." # truncate and add '...' at the end if the peek is too large
 			echo "\033[31m#$nb$DEF_C: \033[4;32m$(ts $b)$DEF_C: \033[34m$(echo $files | wc -w)$DEF_C file(s)"
@@ -605,7 +605,7 @@ function back()					# list all backuped files
 	read to_restore;
 	tput sgr0;
 	if [ ! -z "$back[to_restore]" ]; then
-		files=$(find /tmp/backup/$back[to_restore] -type f)
+		files=( $(find /tmp/backup/$back[to_restore] -type f) )
 		if [ ! -z "$files" ]; then
 			for f in $files; do echo $f; done | command sed -r -e "s|/tmp/backup/$back[to_restore]||g" -e "s|/home/$USER|~|g"
 			read -q "?Restore ? (Y/n): " && cp -R $(realpath /tmp/backup/$back[to_restore]/*) /
