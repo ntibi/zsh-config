@@ -1030,6 +1030,8 @@ set_git_char
 loadconf complete
 rehash							# hash commands in path
 
+trap clock WINCH
+
 # join_others_shells				# ask for joining others shells
 
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
