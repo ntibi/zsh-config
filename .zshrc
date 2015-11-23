@@ -3,11 +3,7 @@
 #
 # Add pagination in the back function
 #
-# Set a nice PS4
-#
 # Create a working todo function
-#
-# try the zcurses module (zmodload zsh/curses)
 #
 # # # # # # # #
 
@@ -583,6 +579,7 @@ function back()					# list all backuped files
 	local peek;
 	local backs;
 	local to_restore="";
+	local peeks_nbr=$(( (LINES) / 3 ));
 	local b;
 	local i;
 	local key;
@@ -602,7 +599,7 @@ function back()					# list all backuped files
 			echo "$peek";
 			echo;
 		fi
-		if [ $(( i % 8 == 0 || i == $#back )) -eq 1 ]; then
+		if [ $(( i % $peeks_nbr == 0 || i == $#back )) -eq 1 ]; then
 			key="";
 			echo -n "> "; tput setaf 2;
 			read -sk1 key;
