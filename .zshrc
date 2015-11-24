@@ -555,16 +555,12 @@ function rm()					# safe rm with timestamped backup
 		for i in "$@"; do
 			if [ ${i:0:1} = "-" ]; then # if $i is an args list, save them
 				rm_params+="$i";
-			elif [ -e $i ] || [ -d $i ]; then # $i exist ?
-				if [ ${i:0:4} = "/tmp" ]; then # really remove files if they are in /tmp
-					command rm "$rm_params" "$i";
-				else
-					[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
-					i="$(realpath $i)";						# simplify the path
-					idir="$(dirname $i)";
-					command mkdir -p "$backup/$idir";
-					mv "$i" "$backup$i";
-				fi
+			elif [ -f "$i" ] || [ -d "$i" ] || [ -L "$i" ] || [ -p "$i" ]; then # $i exist ?
+				[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
+				i="$(realpath $i)";						# simplify the path
+				idir="$(dirname $i)";
+				command mkdir -p "$backup/$idir";
+				mv "$i" "$backup$i";
 			else				# $i is not a param list nor a file/dir
 				echo "'$i' not found" 1>&2;
 			fi
@@ -572,6 +568,7 @@ function rm()					# safe rm with timestamped backup
 	fi
 }
 
+RM_BACKUP_DIR="~/.backup"
 CLEAR_LINE="$(tput sgr0; tput el1; tput cub 2)"
 function back()					# list all backuped files
 {
@@ -584,12 +581,12 @@ function back()					# list all backuped files
 	local i;
 	local key;
 
-	[ -d /tmp/backup ] || return
-	back=( $(command ls -t1 /tmp/backup/) );
+	[ -d $RM_BACKUP_DIR ] || return
+	back=( $(command ls -t1 $RM_BACKUP_DIR/) );
 	i=1;
 	while [ $i -le $#back ] && [ -z "$to_restore" ]; do
 		b=$back[i];
-		files=( $(find /tmp/backup/$b -type f) )
+		files=( $(find $RM_BACKUP_DIR/$b -type f) )
 		if [ ! $#files -eq 0 ]; then
 			peek=""
 			for f in $files; do peek+="$(basename $f), "; if [ $#peek -ge $COLUMNS ]; then break; fi; done
@@ -622,10 +619,10 @@ function back()					# list all backuped files
 		fi
 	done
 	if [ ! -z "$back[to_restore]" ]; then
-		files=( $(find /tmp/backup/$back[to_restore] -type f) )
+		files=( $(find $RM_BACKUP_DIR/$back[to_restore] -type f) )
 		if [ ! -z "$files" ]; then
-			for f in $files; do echo $f; done | command sed -r -e "s|/tmp/backup/$back[to_restore]||g" -e "s|/home/$USER|~|g"
-			read -q "?Restore ? (Y/n): " && cp --backup=t -R $(realpath /tmp/backup/$back[to_restore]/*) / # create file.~1~ if file already exists
+			for f in $files; do echo $f; done | command sed -r -e "s|$RM_BACKUP_DIR/$back[to_restore]||g" -e "s|/home/$USER|~|g"
+			read -q "?Restore ? (Y/n): " && cp --backup=t -R $(realpath $RM_BACKUP_DIR/$back[to_restore]/*) / # create file.~1~ if file already exists
 			echo;
 		else
 			echo "No such back"
