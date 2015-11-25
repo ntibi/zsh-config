@@ -544,13 +544,13 @@ function rrm()					# real rm
 }
 
 RM_BACKUP_DIR="$HOME/.backup"
-[ ! -d "$RM_BACKUP_DIR" ] && mkdir "$RM_BACKUP_DIR"
 function rm()					# safe rm with timestamped backup
 {
 	if [ $# -gt 0 ]; then
 		local backup;
 		local idir;
-		locl rm_params;
+		local rm_params;
+		local i;
 		idir="";
 		rm_params="";
 		backup="$RM_BACKUP_DIR/$(date +%s)";
