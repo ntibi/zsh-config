@@ -1033,7 +1033,6 @@ bindkey $key[right] forward-char
 bindkey $key[M-right] goto-right-matching-delimiter
 bindkey $key[M-left] goto-left-matching-delimiter
 
-bindkey "[/" complete-file		# complete files only
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 
 function ctrlz() { suspend }; zle -N ctrlz
