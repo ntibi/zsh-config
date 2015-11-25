@@ -1,5 +1,4 @@
 # # # # # # # #
-# TODO:
 #
 # Add pagination in the back function
 #
@@ -539,18 +538,22 @@ function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>`
 
 function rrm()					# real rm
 {
-	command rm $@;
+	if [ "$@" != "$HOME" ] && [ "$@" != "/" ]; then
+		command rm $@;
+	fi
 }
 
+RM_BACKUP_DIR="$HOME/.backup"
+[ ! -d "$RM_BACKUP_DIR" ] && mkdir "$RM_BACKUP_DIR"
 function rm()					# safe rm with timestamped backup
 {
 	if [ $# -gt 0 ]; then
 		local backup;
 		local idir;
-		local rm_params;
+		locl rm_params;
 		idir="";
 		rm_params="";
-		backup="/tmp/backup/$(date +%s)";
+		backup="$RM_BACKUP_DIR/$(date +%s)";
 		command mkdir -p "$backup";
 		for i in "$@"; do
 			if [ ${i:0:1} = "-" ]; then # if $i is an args list, save them
@@ -568,7 +571,6 @@ function rm()					# safe rm with timestamped backup
 	fi
 }
 
-RM_BACKUP_DIR="~/.backup"
 CLEAR_LINE="$(tput sgr0; tput el1; tput cub 2)"
 function back()					# list all backuped files
 {
@@ -714,6 +716,29 @@ function hscroll()				# test
 		esac
 	done
 	tput cnorm;
+}
+
+function iter()
+{
+	local i;
+	local command;
+	local sep;
+	local elts;
+
+	elts=();
+	for i in $@; do
+		# echo $i;
+		if [ ! -z "$sep" ]; then
+			command+="$i";
+		elif [ "$i" = "-" ]; then
+			sep="-";
+		else
+			elts+="$i";
+		fi
+	done
+	for i in $elts; do
+		$command $i;
+	done
 }
 
 function ftselect()				# todo: function to select an element in a list
