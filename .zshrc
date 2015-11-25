@@ -571,6 +571,37 @@ function rm()					# safe rm with timestamped backup
 	fi
 }
 
+function save()					# backup the files
+{
+	if [ $# -gt 0 ]; then
+		local backup;
+		local idir;
+		local rm_params;
+		local i;
+		idir="";
+		rm_params="";
+		backup="$RM_BACKUP_DIR/$(date +%s)";
+		command mkdir -p "$backup";
+		for i in "$@"; do
+			if [ ${i:0:1} = "-" ]; then # if $i is an args list, save them
+				rm_params+="$i";
+			elif [ -f "$i" ] || [ -d "$i" ] || [ -L "$i" ] || [ -p "$i" ]; then # $i exist ?
+				[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
+				i="$(realpath $i)";						# simplify the path
+				idir="$(dirname $i)";
+				command mkdir -p "$backup/$idir";
+				if [ -d "$i" ]; then
+					cp -R "$i" "$backup$i";
+				else
+					cp "$i" "$backup$i";
+				fi
+			else				# $i is not a param list nor a file/dir
+				echo "'$i' not found" 1>&2;
+			fi
+		done
+	fi
+}
+
 CLEAR_LINE="$(tput sgr0; tput el1; tput cub 2)"
 function back()					# list all backuped files
 {
