@@ -341,16 +341,18 @@ function cd()					# cd wrap to use aliases - priority over real path instead of 
 
 function showcolors()			# display the 256 colors by shades - useful to get pimpy colors
 {
-	for c in {0..15}; do tput setaf $c ; echo -ne " $c "; done # 16 colors
-	echo
+	tput setaf 0;
+	for c in {0..15}; do tput setab $c ; printf " % 2d " "$c"; done # 16 colors
+	tput sgr0; echo;
+	tput setaf 0;
 	for s in {16..51}; do		# all the color tints
 		for ((i = $s; i < 232; i+=36)); do
-			tput setaf $i ; echo -ne " $i ";
-		done;
-		echo
+			tput setab $i ; printf "% 4d " "$i";
+		done
+		tput sgr0; echo; tput setaf 0;
 	done
-	for c in {232..255}; do tput setaf $c ; echo -ne " $c "; done # grey tints
-	echo
+	for c in {232..255}; do tput setaf $((255 - c + 232)); tput setab $c ; printf "% 3d" "$c"; done # grey tints
+	tput sgr0; echo;
 }
 
 function error()				# give error nb to get the corresponding error string
@@ -770,6 +772,11 @@ function iter()
 	for i in $elts; do
 		$command $i;
 	done
+}
+
+function c()					# simple calculator
+{
+	echo $(($@));
 }
 
 function ftselect()				# todo: function to select an element in a list
