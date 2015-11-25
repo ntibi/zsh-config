@@ -937,6 +937,12 @@ function down-line-or-search-prefix () # same with down
 }
 zle -N down-line-or-search-prefix
 
+function sub-function()			# put the suffix in a sub shell command
+{
+	BUFFER="${BUFFER:0:$CURSOR}\$(${BUFFER:$CURSOR})";
+	CURSOR+=2;
+}
+zle -N sub-function
 
 function goto-right-matching-delimiter () # explicit name
 {
@@ -1005,6 +1011,12 @@ function save-line()			# save the current line at its state in ~/.saved_commands
 }
 zle -N save-line
 
+function ctrlz()
+{
+	suspend;
+}
+zle -N ctrlz
+
 # ZSH FUNCTIONS BINDS #
 
 typeset -A key				# associative array with more explicit names
@@ -1042,8 +1054,9 @@ bindkey $key[M-left] goto-left-matching-delimiter
 
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 
-function ctrlz() { suspend }; zle -N ctrlz
 bindkey "^X^Z" ctrlz			# ctrl z zsh
+
+bindkey "\`\`" sub-function
 
 bindkey $key[C-left] backward-word
 bindkey $key[C-right] forward-word
