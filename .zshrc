@@ -560,7 +560,7 @@ function rm()					# safe rm with timestamped backup
 				rm_params+="$i";
 			elif [ -f "$i" ] || [ -d "$i" ] || [ -L "$i" ] || [ -p "$i" ]; then # $i exist ?
 				[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
-				i="$(realpath $i)";						# simplify the path
+				i="$(readlink -f $i)";						# simplify the path
 				idir="$(dirname $i)";
 				command mkdir -p "$backup/$idir";
 				mv "$i" "$backup$i";
@@ -587,7 +587,7 @@ function save()					# backup the files
 				rm_params+="$i";
 			elif [ -f "$i" ] || [ -d "$i" ] || [ -L "$i" ] || [ -p "$i" ]; then # $i exist ?
 				[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
-				i="$(realpath $i)";						# simplify the path
+				i="$(readlink -f $i)";						# simplify the path
 				idir="$(dirname $i)";
 				command mkdir -p "$backup/$idir";
 				if [ -d "$i" ]; then
@@ -655,7 +655,7 @@ function back()					# list all backuped files
 		files=( $(find $RM_BACKUP_DIR/$back[to_restore] -type f) )
 		if [ ! -z "$files" ]; then
 			for f in $files; do echo $f; done | command sed -r -e "s|$RM_BACKUP_DIR/$back[to_restore]||g" -e "s|/home/$USER|~|g"
-			read -q "?Restore ? (Y/n): " && cp --backup=t -R $(realpath $RM_BACKUP_DIR/$back[to_restore]/*) / # create file.~1~ if file already exists
+			read -q "?Restore ? (Y/n): " && cp --backup=t -R $(readlink -f $RM_BACKUP_DIR/$back[to_restore]/*) / # create file.~1~ if file already exists
 			echo;
 		else
 			echo "No such back"
