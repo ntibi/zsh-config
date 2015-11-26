@@ -895,7 +895,7 @@ bindkey -s "^[e" "^Uerror\n"			  # run error user function
 bindkey -s "^[s" "^Asudo ^E"	# insert sudo
 bindkey -s "\el" "^Uls\n"		# run ls
 bindkey -s "^X^M" "^Umake\n"	# make
-bindkey -s "^[g" "^A^Kgit commit -m\"\"^[OD"
+bindkey -s "^[g" "^A^Kgit commit -m\"\""
 bindkey -s "^[c" "^A^Kgit checkout 		"
 
 
@@ -924,12 +924,23 @@ function down-line-or-search-prefix () # same with down
 }
 zle -N down-line-or-search-prefix
 
-function sub-function()			# put the suffix in a sub shell command
+function quote-end() # open and close quoting chars and put the cursor at the beginning of the quoting
 {
-	BUFFER="${BUFFER:0:$CURSOR}\$(${BUFFER:$CURSOR})";
-	CURSOR+=2;
+	if [ $# -eq 2 ]; then
+		BUFFER="${BUFFER:0:$CURSOR}$1${BUFFER:$CURSOR}$2";
+		CURSOR+=$#1;
+	fi
 }
+zle -N quote-end
+
+function sub-function() zle quote-end "\$(" ")"
 zle -N sub-function
+
+function simple-quote() zle quote-end \' \'
+zle -N simple-quote
+
+function double-quote() zle quote-end \" \"
+zle -N double-quote
 
 function goto-right-matching-delimiter () # explicit name
 {
@@ -1030,9 +1041,11 @@ function shift-arrow()			# emacs-like shift selection
 	((REGION_ACTIVE)) || zle set-mark-command;
 	zle $1;
 }
+zle -N shift-arrow
 
 function select-left() shift-arrow backward-char; zle -N select-left
 function select-right() shift-arrow forward-char; zle -N select-right
+
 
 # ZSH FUNCTIONS BINDS #
 
@@ -1087,6 +1100,8 @@ bindkey "^X^Z" ctrlz			# ctrl z zsh
 bindkey "^X^X" exchange-point-and-mark
 
 bindkey "\`\`" sub-function
+bindkey "\'\'" simple-quote
+bindkey "\"\"" double-quote
 
 bindkey $key[C-left] backward-word
 bindkey $key[C-right] forward-word
