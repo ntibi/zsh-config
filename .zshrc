@@ -4,6 +4,9 @@
 #
 # Create a working todo function
 #
+# fix emacs-like mark
+# add shift + arrows mark control
+#
 # # # # # # # #
 
 if [ ! $(echo "$0" | grep -s "zsh") ]; then
@@ -1022,6 +1025,20 @@ function clear-and-accept()
 }
 zle -N clear-and-accept
 
+function move-text-right()
+{
+	BUFFER="${BUFFER:0:$CURSOR} ${BUFFER:$CURSOR}";
+	CURSOR+=1;
+}
+zle -N move-text-right
+
+function move-text-left()
+{
+	BUFFER="${BUFFER:0:$((CURSOR-1))}${BUFFER:$CURSOR}";
+	CURSOR+=-1;
+}
+zle -N move-text-left
+
 # ZSH FUNCTIONS BINDS #
 
 bindkey -e 						# load emacs style key binding
@@ -1069,6 +1086,8 @@ bindkey "^X^E" edit-command-line # edit line with $EDITOR
 
 bindkey "^X^Z" ctrlz			# ctrl z zsh
 
+bindkey "^X^X" exchange-point-and-mark
+
 bindkey "\`\`" sub-function
 
 bindkey $key[C-left] backward-word
@@ -1079,7 +1098,7 @@ bindkey "^w" kill-region		 # emacs-like kill
 
 bindkey $key[S-tab] reverse-menu-complete # shift tab for backward completion
 
-bindkey $key[C-space] save-line
+bindkey "^[=" save-line
 
 bindkey $key[C-up] up-line-or-search-prefix # ctrl + arrow = smart completion
 bindkey $key[C-down] down-line-or-search-prefix
