@@ -1018,7 +1018,7 @@ zle -N ctrlz
 function clear-and-accept()
 {
 	zle clear-screen;
-	zle accept-line;
+	[ $#BUFFER -ne 0 ] && zle accept-line;
 }
 zle -N clear-and-accept
 
