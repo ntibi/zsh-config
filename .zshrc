@@ -912,8 +912,6 @@ bindkey -s "^[c" "^A^Kgit checkout 		"
 
 # ZLE FUNCTIONS #
 
-bindkey -e 						# emacs style key binding
-
 function get_terminfo_name()	# get the terminfo name according to the keycode
 {
 	for k in "${(@k)terminfo}"; do
@@ -1017,7 +1015,17 @@ function ctrlz()
 }
 zle -N ctrlz
 
+function clear-and-accept()
+{
+	zle clear-screen;
+	zle accept-line;
+}
+zle -N clear-and-accept
+
 # ZSH FUNCTIONS BINDS #
+
+bindkey -e 						# load emacs style key binding
+
 
 typeset -A key				# associative array with more explicit names
 
@@ -1046,6 +1054,11 @@ key[S-tab]=$terminfo[cbt]
 
 key[C-space]="^@"
 
+key[enter]=$terminfo[cr]
+key[C-enter]="^J"
+key[M-enter]="^[^J"
+
+
 bindkey $key[left] backward-char
 bindkey $key[right] forward-char
 
@@ -1073,6 +1086,8 @@ bindkey $key[C-down] down-line-or-search-prefix
 
 bindkey $key[up] up-line-or-history # up/down scroll through history
 bindkey $key[down] down-line-or-history
+
+bindkey $key[C-enter] clear-and-accept
 
 # USEFUL ALIASES #
 
@@ -1109,8 +1124,6 @@ alias df="df -Tha --total"		# disk usage infos
 alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e VSZ -e " # fps <processname> to get ps infos only for the matching processes
 alias tt="tail --retry -fn0"	# real time tail a log
 alias dzsh="zsh --norcs --xtrace" # debugzsh
-
-alias roadtrip='while true; do cd $(ls -pa1 | grep "/$" | grep -v "^\./$" | sort --random-sort | head -n1); echo -ne "\033[2K\r>$(pwd)"; done' # visit your computer
 
 check_git_repo
 set_git_branch
