@@ -28,10 +28,10 @@ CA_FILE=~/.ca					# cd aliases sav file
 
 DEF_C="$(tput sgr0)"
 
-OS="$(uname)"					# get the os name
+OS="$(uname | tr "A-Z" "a-z")"	# get the os name
 
-UPDATE_TERM_TITLE="X" # set to update the term title according to the path and the currently executed line
-UPDATE_CLOCK="X"	  # set to update the top-right clock every second
+UPDATE_TERM_TITLE="" # set to update the term title according to the path and the currently executed line
+UPDATE_CLOCK=""		 # set to update the top-right clock every second
 
 # (UN)SETTING ZSH (COOL) OPTIONS #
 
@@ -48,30 +48,9 @@ setopt cbases					# c-like bases conversions
 setopt emacs					# enable emacs like keybindigs
 setopt flow_control				# enable C-q and C-s to control the flooow
 setopt completeinword			# complete from anywhere
-# setopt shwordsplit				# sh like word split
-# setopt print_exit_value			# print exit value if non 0
 
 [ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
-
-
-case "$(uname)" in
-	*Darwin*)					# Mac os
-		PM="brew install"
-		alias update="brew update && brew upgrade"
-		LS_COLORS='exfxcxdxbxexexabagacad'
-		alias ls="ls -G";;
-	*cygwin*)
-		PM="pact install"
-		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
-		alias ls="ls --color=always";;
-	*Linux*|*)
-		PM="sudo apt-get install"
-		alias update="sudo apt-get update && sudo apt-get upgrade"
-		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
-		alias ls="ls --color=always";;
-esac
-
 
 
 # PS1 FUNCTIONS #
@@ -436,12 +415,12 @@ function ff()
 				neg=""
 			fi
 			case $p in
-				h) [ -z $neg ] && hidden="" || hidden=" -not -regex .*/\..*";;
-				e) additional+="$neg -empty";;
-				r) additional+="$neg -readable";;
-				w) additional+="$neg -writable";;
-				x) additional+="$neg -executable";;
-				*) type+=$([ -z "$type" ] && echo "$neg -type $p" || echo " -or $neg -type $p");;
+				(h) [ -z $neg ] && hidden="" || hidden=" -not -regex .*/\..*";;
+				(e) additional+="$neg -empty";;
+				(r) additional+="$neg -readable";;
+				(w) additional+="$neg -writable";;
+				(x) additional+="$neg -executable";;
+				(*) type+=$([ -z "$type" ] && echo "$neg -type $p" || echo " -or $neg -type $p");;
 			esac
 		else if [ -d $p ];		# is it a path ?
 			 then
@@ -481,15 +460,15 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 	fi
 	for c in "$@"; do
 		case $c in
-			"black") 	col=0;;
-			"red") 		col=1;;
-			"green") 	col=2;;
-			"yellow") 	col=3;;
-			"blue") 	col=4;;
-			"purple") 	col=5;;
-			"cyan") 	col=6;;
-			"white") 	col=7;;
-			*) 			col=$c;;
+			("black") 	col=0;;
+			("red") 	col=1;;
+			("green") 	col=2;;
+			("yellow") 	col=3;;
+			("blue") 	col=4;;
+			("purple") 	col=5;;
+			("cyan") 	col=6;;
+			("white") 	col=7;;
+			(*) 		col=$c;;
 		esac
 		if [ "$((i % 2))" = "1" ]; then
 			params+="-e"
@@ -639,14 +618,14 @@ function back()					# list all backuped files
 			echo -n "> "; tput setaf 2;
 			read -sk1 key;
 			case "$(echo -n $key | cat -e)" in
-				"^[")
+				("^[")
 					echo -n "$CLEAR_LINE";
 					read -sk2 key; # handle 3 characters arrow key press as next
 					i=$(( i + 1 ));;
-				"$"|" ")			# hangle enter and space as next
+				("$"|" ")			# hangle enter and space as next
 					echo -n "$CLEAR_LINE";
 					i=$(( i + 1 ));;
-				*)				# handle everything else as a first character of backup number
+				(*)				# handle everything else as a first character of backup number
 					echo -n $key; # print the silently read key on the prompt
 					read to_restore;
 					to_restore="$key$to_restore";;
@@ -711,6 +690,11 @@ function loadconf()				# load a visual config
 			UPDATE_TERM_TITLE="";
 			UPDATE_CLOCK="";
 			setprompt lite;
+			;;
+		(static)				# nicer, cooler, but without clock update nor title update
+			UPDATE_TERM_TITLE="";
+			UPDATE_CLOCK="";
+			setprompt complete;
 			;;
 		(complete|*)			# nicer, cooler
 			UPDATE_TERM_TITLE="X";
@@ -781,6 +765,8 @@ function c()					# simple calculator
 {
 	echo $(($@));
 }
+
+
 
 function ftselect()				# todo: function to select an element in a list
 {
@@ -893,7 +879,7 @@ compdef _ff ff
 _setprompt() { _arguments "1:prompt:(('complete:prompt with all the options' 'classic:classic prompt' 'lite:lite prompt' 'superlite:super lite prompt' 'nogit:default prompt without the git infos'))"}
 compdef _setprompt setprompt
 
-_loadconf() { _arguments "1:visual configuration:(('complete:complete configuration' 'lite:smaller configuration'))"}
+_loadconf() { _arguments "1:visual configuration:(('complete:complete configuration' 'static:complete configuration without the dynamic title and clock updates' 'lite:smaller configuration'))"}
 compdef _loadconf loadconf
 
 
@@ -1018,26 +1004,35 @@ function ctrlz()
 }
 zle -N ctrlz
 
-function clear-and-accept()
+function clear-and-accept()		# clear the screen and accepts the line
 {
 	zle clear-screen;
 	[ $#BUFFER -ne 0 ] && zle accept-line;
 }
 zle -N clear-and-accept
 
-function move-text-right()
+function move-text-right()		# shift text after cursor to the right
 {
 	BUFFER="${BUFFER:0:$CURSOR} ${BUFFER:$CURSOR}";
 	CURSOR+=1;
 }
 zle -N move-text-right
 
-function move-text-left()
+function move-text-left()		# shift text after cursor to the left
 {
 	BUFFER="${BUFFER:0:$((CURSOR-1))}${BUFFER:$CURSOR}";
 	CURSOR+=-1;
 }
 zle -N move-text-left
+
+function shift-arrow()			# emacs-like shift selection
+{
+	((REGION_ACTIVE)) || zle set-mark-command;
+	zle $1;
+}
+
+function select-left() shift-arrow backward-char; zle -N select-left
+function select-right() shift-arrow forward-char; zle -N select-right
 
 # ZSH FUNCTIONS BINDS #
 
@@ -1072,8 +1067,11 @@ key[S-tab]=$terminfo[cbt]
 key[C-space]="^@"
 
 key[enter]=$terminfo[cr]
-key[C-enter]="^J"
 key[M-enter]="^[^J"
+case "$OS" in
+	(*cygwin*) 	key[C-enter]="^^";;
+	(*) 		key[C-enter]="^J";;
+esac
 
 
 bindkey $key[left] backward-char
@@ -1106,9 +1104,30 @@ bindkey $key[C-down] down-line-or-search-prefix
 bindkey $key[up] up-line-or-history # up/down scroll through history
 bindkey $key[down] down-line-or-history
 
+bindkey $key[S-right] select-right # emacs like shift selection
+bindkey $key[S-left] select-left
+
 bindkey $key[C-enter] clear-and-accept
 
 # USEFUL ALIASES #
+
+
+case "$OS" in
+	(*darwin*)					# Mac os
+		alias pm="brew install"
+		alias update="brew update && brew upgrade"
+		LS_COLORS='exfxcxdxbxexexabagacad'
+		alias ls="ls -G";;
+	(*cygwin*)					# cygwin
+		alias pm="apt-cyg install"
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+		alias ls="ls --color=always";;
+	(*linux*|*)					# Linux
+		alias pm="sudo apt-get install"
+		alias update="sudo apt-get update && sudo apt-get upgrade"
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+		alias ls="ls --color=always";;
+esac
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
@@ -1149,7 +1168,7 @@ set_git_branch
 update_pwd_datas
 update_pwd_save
 set_git_char
-loadconf complete
+loadconf static
 rehash							# hash commands in path
 
 trap clock WINCH
