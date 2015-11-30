@@ -33,6 +33,15 @@ OS="$(uname | tr "A-Z" "a-z")"	# get the os name
 UPDATE_TERM_TITLE="" # set to update the term title according to the path and the currently executed line
 UPDATE_CLOCK=""		 # set to update the top-right clock every second
 
+case "$OS" in
+	(*darwin*)					# Mac os
+		LS_COLORS='exfxcxdxbxexexabagacad'
+	(*cygwin*)					# cygwin
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+	(*linux*|*)					# Linux
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+esac
+
 # (UN)SETTING ZSH (COOL) OPTIONS #
 
 
@@ -267,58 +276,63 @@ function escape()				# escape a string
 	printf "%q\n" "$@";
 }
 
-function ca()					# add cd alias (ca <alias_name> || ca <alias_name> <aliased path>)
-{
-	local a
-	local p
-	p=$(pwd)
-	if [ "$#" -ne 1 ] && [ "$#" -ne 2 ]; then
-		echo "Usage: ca alias (path)";
-		return;
-	fi;
-	if [ "$#" -eq 2 ]; then
-		[ ${2:0:1} = '/' ] && p="$2" || p+="/$2"
-	fi;
-	a=$1
-	touch $CA_FILE;
-	if [ "$(grep "^$a=" $CA_FILE)" != "" ]; then
-		echo "replacing old '$a' alias"
-		sed -i "s/^$a=.*$//g" $CA_FILE;
-		sed -i "/^$/d" $CA_FILE;
-	fi;
-	echo "$a=$p" >> $CA_FILE;
-}
+# function ca()					# add cd alias (ca <alias_name> || ca <alias_name> <aliased path>)
+# {
+	# local a
+	# local p
+	# p=$(pwd)
+	# if [ "$#" -ne 1 ] && [ "$#" -ne 2 ]; then
+		# echo "Usage: ca alias (path)";
+		# return;
+	# fi;
+	# if [ "$#" -eq 2 ]; then
+		# [ ${2:0:1} = '/' ] && p="$2" || p+="/$2"
+	# fi;
+	# a=$1
+	# touch $CA_FILE;
+	# if [ "$(grep "^$a=" $CA_FILE)" != "" ]; then
+		# echo "replacing old '$a' alias"
+		# sed -i "s/^$a=.*$//g" $CA_FILE;
+		# sed -i "/^$/d" $CA_FILE;
+	# fi;
+	# echo "$a=$p" >> $CA_FILE;
+# }
 
-function dca()					# delete cd alias (dca <alias 1> <alias 2> ... <alias n>)
-{
-	local a
-	if [ -e $CA_FILE ] && [ "$#" -gt 0 ]; then
-		for a in "$@"
-		do
-			sed -i "s/^$a=.*$//g" $CA_FILE;
-		done
-		sed -i "/^$/d" $CA_FILE;
-	fi
-}
+# function dca()					# delete cd alias (dca <alias 1> <alias 2> ... <alias n>)
+# {
+	# local a
+	# if [ -e $CA_FILE ] && [ "$#" -gt 0 ]; then
+		# for a in "$@"
+		# do
+			# sed -i "s/^$a=.*$//g" $CA_FILE;
+		# done
+		# sed -i "/^$/d" $CA_FILE;
+	# fi
+# }
 
-function sca()					# show cd aliases
-{
-	[ -e $CA_FILE ] && cat $CA_FILE | egrep --color=always "^[^=]+" || echo "No cd aliases yet";
-}
+# function sca()					# show cd aliases
+# {
+	# [ -e $CA_FILE ] && cat $CA_FILE | egrep --color=always "^[^=]+" || echo "No cd aliases yet";
+# }
 
-function cd()					# cd wrap to use aliases - priority over real path instead of alias
+# function cd()					# cd wrap to use aliases - priority over real path instead of alias
+# {
+	# local a
+	# local p
+	# if [ -e $CA_FILE ] && [ "$#" -eq 1 ] && [ ! -d $1 ]; then
+		# a="$(command grep -o "^$1=.*$" $CA_FILE)";
+		# if [ "$a" != "" ]; then
+			# p="$(echo $a | cut -d'=' -f2)"
+			# builtin cd "$p" 2> /dev/null && echo $p || echo "Invalid alias '$a'" 1>&2;
+			# return 0;
+		# fi;
+	# fi;
+	# builtin cd "$@" 2> /dev/null || echo "Nope" 1>&2;
+# }
+
+function cd()					# if cd fails, try with hashed directories
 {
-	local a
-	local p
-	if [ -e $CA_FILE ] && [ "$#" -eq 1 ] && [ ! -d $1 ]; then
-		a="$(command grep -o "^$1=.*$" $CA_FILE)";
-		if [ "$a" != "" ]; then
-			p="$(echo $a | cut -d'=' -f2)"
-			builtin cd "$p" 2> /dev/null && echo $p || echo "Invalid alias '$a'" 1>&2;
-			return 0;
-		fi;
-	fi;
-	builtin cd "$@" 2> /dev/null || echo "Nope" 1>&2;
+	{ builtin cd $@ || builtin cd ~"$1" } 2>/dev/null
 }
 
 function showcolors()			# display the 256 colors by shades - useful to get pimpy colors
@@ -345,7 +359,7 @@ function error()				# give error nb to get the corresponding error string
 function join_others_shells()	# ask for joining path specified in $PWD_FILE if not already in it
 {
 	if [[ -e $PWD_FILE ]] && [[ $(pwd) != $(cat $PWD_FILE) ]]; then
-		read -q "?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):"  && cd "$(cat $PWD_FILE)"
+		read -q "?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):" && cd "$(cat $PWD_FILE)"
 	fi
 }
 
@@ -1131,16 +1145,13 @@ case "$OS" in
 	(*darwin*)					# Mac os
 		alias pm="brew install"
 		alias update="brew update && brew upgrade"
-		LS_COLORS='exfxcxdxbxexexabagacad'
 		alias ls="ls -G";;
 	(*cygwin*)					# cygwin
 		alias pm="apt-cyg install"
-		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
 		alias ls="ls --color=always";;
 	(*linux*|*)					# Linux
 		alias pm="sudo apt-get install"
 		alias update="sudo apt-get update && sudo apt-get upgrade"
-		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
 		alias ls="ls --color=always";;
 esac
 
