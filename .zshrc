@@ -194,7 +194,7 @@ function setprompt()			# set a special predefined prompt or update the prompt ac
 		PS1+="%f%k "
 	fi
 	[ ! -z $_PS1[$_return_status] ] && 	PS1+='%(0?.%F{82}o.%F{196}x)' 										# return status of last command (green O or red X)
-	[ ! -z $_PS1[$_git_status] ] 	&& 	PS1+='$GET_GIT'														# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
+-	[ ! -z $_PS1[$_git_status] ] 	&& 	PS1+='$GET_GIT'														# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
 	[ ! -z $_PS1[$_jobs] ] 			&& 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 					# number of running/sleeping bg jobs
 	[ ! -z $_PS1[$_shlvl] ] 		&& 	PS1+='%F{205}$GET_SHLVL'						 					# static shlvl
 	[ ! -z $_PS1[$_user_level] ] 	&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 					# static user level
@@ -908,7 +908,6 @@ bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
 bindkey -s "^[e" "^Uerror\n"			  # run error user function
 bindkey -s "^[s" "^Asudo ^E"	# insert sudo
 bindkey -s "\el" "^Uls\n"		# run ls
-bindkey -s "^X^M" "^Umake\n"	# make
 bindkey -s "^[g" "^A^Kgit commit -m\"\""
 bindkey -s "^[c" "^A^Kgit checkout 		"
 
@@ -938,22 +937,22 @@ function down-line-or-search-prefix () # same with down
 }
 zle -N down-line-or-search-prefix
 
-function quote-end() # open and close quoting chars and put the cursor at the beginning of the quoting
+function open-delims() # open and close quoting chars and put the cursor at the beginning of the quoting
 {
 	if [ $# -eq 2 ]; then
-		BUFFER="${BUFFER:0:$CURSOR}$1${BUFFER:$CURSOR}$2";
+		BUFFER="$LBUFFER$1$2$RBUFFER"
 		CURSOR+=$#1;
 	fi
 }
-zle -N quote-end
+zle -N open-delims
 
-function sub-function() zle quote-end "\$(" ")"
+function sub-function() zle open-delims "\$(" ")"
 zle -N sub-function
 
-function simple-quote() zle quote-end \' \'
+function simple-quote() zle open-delims \' \'
 zle -N simple-quote
 
-function double-quote() zle quote-end \" \"
+function double-quote() zle open-delims \" \"
 zle -N double-quote
 
 function save-line()			# save the current line at its state in ~/.saved_commands
@@ -1001,13 +1000,48 @@ zle -N shift-arrow
 function select-left() shift-arrow backward-char; zle -N select-left
 function select-right() shift-arrow forward-char; zle -N select-right
 
-function split-buffer()			# TODO
+function get-word-at-point()
 {
-	WORDS=( ${(@s/ /)BUFFER} );
-	BUFFER=$WORDS;
+	echo "${LBUFFER/* /}${RBUFFER/ */}";
 }
-zle -N split-buffer
-bindkey "^]" split-buffer
+zle -N get-word-at-point
+
+function highlight-syntax()
+{
+	local START;
+	local END;
+	local COLOR;
+	local WORD;
+	local SAV_CURSOR;
+
+	SAV_CURSOR=$CURSOR;
+	CURSOR=0;
+	region_highlight=( );
+	while [ $#BUFFER -ne $CURSOR ]; do
+		START=$(( $#LBUFFER - ${#LBUFFER/* /} ));
+		END=$(( CURSOR + ${#RBUFFER/ */} ));
+		COLOR=15;
+		WORD="${LBUFFER/* /}${RBUFFER/ */}";
+		case "$(type -- $WORD)" in
+			("$WORD is /"*) 				COLOR=214;;
+			("$WORD is an alias for"*) 		COLOR=202;;
+			("$WORD is a reserved word") 	COLOR=128;;
+			("$WORD is a shell builtin") 	COLOR=111;;
+			("$WORD is a shell function") 	COLOR=105;;
+			(*) case "$WORD" in
+					("\|")					COLOR=64;;
+					(*)						COLOR=160;;
+				esac;;
+		esac
+		region_highlight+="$START $END fg=$COLOR";
+		zle forward-word;
+	done
+	CURSOR=$SAV_CURSOR;
+}
+zle -N highlight-syntax
+
+function space-and-highlight() {BUFFER="$LBUFFER $RBUFFER"; CURSOR+=1; zle highlight-syntax}; zle -N space-and-highlight
+bindkey " " space-and-highlight
 
 # ZSH FUNCTIONS BINDS #
 
