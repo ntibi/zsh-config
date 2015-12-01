@@ -1137,6 +1137,8 @@ alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e VSZ -e " # fps <
 alias tt="tail --retry -fn0"	# real time tail a log
 alias dzsh="zsh --norcs --xtrace" # debugzsh
 
+alias trunc='sed "s/^\(.\{0,$COLUMNS\}\).*$/\1/g"' # truncate too long lines
+
 check_git_repo
 set_git_branch
 update_pwd_datas
