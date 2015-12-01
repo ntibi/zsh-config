@@ -35,11 +35,11 @@ UPDATE_CLOCK=""		 # set to update the top-right clock every second
 
 case "$OS" in
 	(*darwin*)					# Mac os
-		LS_COLORS='exfxcxdxbxexexabagacad'
+		LS_COLORS='exfxcxdxbxexexabagacad';;
 	(*cygwin*)					# cygwin
-		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
 	(*linux*|*)					# Linux
-		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:'
+		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
 esac
 
 # (UN)SETTING ZSH (COOL) OPTIONS #
@@ -332,7 +332,7 @@ function escape()				# escape a string
 
 function cd()					# if cd fails, try with hashed directories
 {
-	{ builtin cd $@ || builtin cd ~"$1" } 2>/dev/null
+	builtin cd $@ 2>/dev/null || builtin cd ~"$1" 
 }
 
 function showcolors()			# display the 256 colors by shades - useful to get pimpy colors
@@ -956,67 +956,6 @@ zle -N simple-quote
 function double-quote() zle quote-end \" \"
 zle -N double-quote
 
-function goto-right-matching-delimiter () # explicit name
-{
-       L_DELIMS="[({";
-       R_DELIMS="])}";
-       local i=0;
-       local start;
-       local end;
-       local sav=$CURSOR;
-       local old;
-       local balance=0;
-	   CURSOR=$(( CURSOR + 1 ));
-       start=$BUFFER[$CURSOR];
-       for i in $(seq $#L_DELIMS); do
-           [ "$L_DELIMS[$i]" = "$start" ] && end="$R_DELIMS[$i]";
-       done
-       if [ $#end -eq 1 ]; then
-               balance=1;
-               CURSOR=$(( CURSOR + 1 ));
-               while [ $balance -ne 0 ] && [ "$CURSOR" -le $#BUFFER ]; do
-                       if [ "$BUFFER[$CURSOR]" = "$start" ]; then balance=$(( balance + 1 ));
-					   elif [ "$BUFFER[$CURSOR]" = "$end" ]; then balance=$(( balance - 1 ));
-					   fi
-                       old=$CURSOR;
-                       [ $balance -ne 0 ] && CURSOR=$(( CURSOR + 1 ));
-               done
-               [ $CURSOR = $#BUFFER ] && CURSOR=$sav;
-       fi
-}
-zle -N goto-right-matching-delimiter
-
-function goto-left-matching-delimiter () # yea
-{
-       L_DELIMS="[({";
-       R_DELIMS="])}";
-       local i=0;
-       local start;
-       local end;
-       local sav=$CURSOR;
-       local old;
-       local balance=0;
-	   CURSOR=$(( CURSOR ));
-       start=$BUFFER[$CURSOR];
-       for i in $(seq $#R_DELIMS); do
-           [ "$R_DELIMS[$i]" = "$start" ] && end="$L_DELIMS[$i]";
-       done
-       if [ $#end -eq 1 ]; then
-               balance="-1";
-               CURSOR=$(( CURSOR - 1 ));
-               while [ $balance -ne 0 ] && [ "$CURSOR" -ge 0 ]; do
-                       if [ "$BUFFER[$CURSOR]" = "$start" ]; then balance=$(( balance - 1 ));
-					   elif [ "$BUFFER[$CURSOR]" = "$end" ]; then balance=$(( balance + 1 ));
-					   fi
-                       old=$CURSOR;
-                       [ $balance -ne 0 ] && CURSOR=$(( CURSOR - 1 ));
-               done
-               [ $CURSOR = $#BUFFER ] && CURSOR=$sav;
-       fi
-}
-zle -N goto-left-matching-delimiter
-
-
 function save-line()			# save the current line at its state in ~/.saved_commands
 {
 	echo $BUFFER >> ~/.saved_commands
@@ -1045,8 +984,10 @@ zle -N move-text-right
 
 function move-text-left()		# shift text after cursor to the left
 {
-	BUFFER="${BUFFER:0:$((CURSOR-1))}${BUFFER:$CURSOR}";
-	CURSOR+=-1;
+	if [ $CURSOR -ne 0 ]; then
+		BUFFER="${BUFFER:0:$((CURSOR-1))}${BUFFER:$CURSOR}";
+		CURSOR+=-1;
+	fi
 }
 zle -N move-text-left
 
@@ -1060,6 +1001,13 @@ zle -N shift-arrow
 function select-left() shift-arrow backward-char; zle -N select-left
 function select-right() shift-arrow forward-char; zle -N select-right
 
+function split-buffer()			# TODO
+{
+	WORDS=( ${(@s/ /)BUFFER} );
+	BUFFER=$WORDS;
+}
+zle -N split-buffer
+bindkey "^]" split-buffer
 
 # ZSH FUNCTIONS BINDS #
 
@@ -1104,8 +1052,8 @@ esac
 bindkey $key[left] backward-char
 bindkey $key[right] forward-char
 
-bindkey $key[M-right] goto-right-matching-delimiter
-bindkey $key[M-left] goto-left-matching-delimiter
+bindkey $key[M-right] move-text-right
+bindkey $key[M-left] move-text-left
 
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 
