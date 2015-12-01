@@ -1013,35 +1013,44 @@ function highlight-syntax()
 	local COLOR;
 	local WORD;
 	local SAV_CURSOR;
+	local i;
 
-	SAV_CURSOR=$CURSOR;
-	CURSOR=0;
 	region_highlight=( );
-	while [ $#BUFFER -ne $CURSOR ]; do
-		START=$(( $#LBUFFER - ${#LBUFFER/* /} ));
-		END=$(( CURSOR + ${#RBUFFER/ */} ));
-		COLOR=15;
-		WORD="${LBUFFER/* /}${RBUFFER/ */}";
-		case "$(type -- $WORD)" in
-			("$WORD is /"*) 				COLOR=214;;
-			("$WORD is an alias for"*) 		COLOR=202;;
-			("$WORD is a reserved word") 	COLOR=128;;
-			("$WORD is a shell builtin") 	COLOR=111;;
-			("$WORD is a shell function") 	COLOR=105;;
-			(*) case "$WORD" in
-					("\|")					COLOR=64;;
-					(*)						COLOR=160;;
-				esac;;
-		esac
-		region_highlight+="$START $END fg=$COLOR";
-		zle forward-word;
+	i=1;
+	while [ $i -ne $#BUFFER ]; do
+		if [ $i -eq 1 ] || [ "$BUFFER[$i]" != " " -a "$BUFFER[$(( i - 1 ))]" = " " ] ; then
+			LEFT=$BUFFER[1,$i];
+			RIGHT=$BUFFER[$(( i + 1 )),$#BUFFER];
+			BUFFER="$LEFT$RIGHT";
+			START=$(( $#LEFT - ${#LEFT/* /} ));
+			END=$(( i + ${#RIGHT/ */} ));
+			COLOR=15;
+			WORD="${LEFT/* /}${RIGHT/ */}";
+			case "$(type -- $WORD)" in
+				("$WORD is "*) 						COLOR=40;;
+				("$WORD is an alias for"*) 				COLOR=46;;
+				("$WORD is a reserved word") 			COLOR=76;;
+				("$WORD is a shell builtin") 			COLOR=112;;
+				("$WORD is a shell function"*) 			COLOR=118;;
+				(*) case "$WORD" in
+						("|"|";")						COLOR=106;;
+						("-"*)							COLOR=154;;
+						(.|..|.\/|..\/|/|~|\*|"**/*")		COLOR=28;;
+						(*)								COLOR=160;;
+					esac;;
+			esac
+			region_highlight+="$START $END fg=$COLOR";
+		fi
+		i=$(( i + 1 ));
 	done
-	CURSOR=$SAV_CURSOR;
 }
 zle -N highlight-syntax
 
+function enable-highlighting
+{
 function space-and-highlight() {BUFFER="$LBUFFER $RBUFFER"; CURSOR+=1; zle highlight-syntax}; zle -N space-and-highlight
 bindkey " " space-and-highlight
+}
 
 # ZSH FUNCTIONS BINDS #
 
