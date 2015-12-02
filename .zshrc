@@ -1,11 +1,8 @@
 # # # # # # # #
 #
-# Add pagination in the back function
+# TODO:
 #
-# Create a working todo function
 #
-# fix emacs-like mark
-# add shift + arrows mark control
 #
 # # # # # # # #
 
@@ -44,18 +41,18 @@ esac
 # (UN)SETTING ZSH (COOL) OPTIONS #
 
 
-setopt promptsubst				# compute PS1 at each prompt print
+setopt prompt_subst				# compute PS1 at each prompt print
 setopt inc_append_history
 setopt share_history
-setopt histignoredups			# ignore dups in history
+setopt hist_ignore_dups			# ignore dups in history
 setopt hist_expire_dups_first	# remove all dubs in history when full
 setopt auto_remove_slash		# remove slash when pressing space in auto completion
-setopt nullglob					# remove pointless globs
+setopt null_glob				# remove pointless globs
 setopt auto_cd					# './dir' = 'cd dir'
-setopt cbases					# c-like bases conversions
+setopt c_bases					# c-like bases conversions
 setopt emacs					# enable emacs like keybindigs
 setopt flow_control				# enable C-q and C-s to control the flooow
-setopt completeinword			# complete from anywhere
+setopt complete_in_word			# complete from anywhere
 
 [ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
@@ -78,7 +75,7 @@ function update_pwd_datas()		# update the numbers of files and dirs in .
 
 function update_pwd_save()		# update the $PWD_FILE
 {
-	[[ $PWD != ~ ]] && echo $PWD > $PWD_FILE
+	[[ $PWD != "$HOME" ]] && echo $PWD > $PWD_FILE
 }
 
 function set_git_branch()
@@ -124,6 +121,8 @@ function clock()				# displays the time in the top right corner
 		echo "$PRE_CLOCK$(date +%R)$POST_CLOCK";
 		tput rc;
 		sched | command grep -q clock || sched +10 clock # if no clock update in sched, set one in 10s
+	else
+		trap - WINCH
 	fi
 }
 
@@ -275,6 +274,7 @@ function escape()				# escape a string
 	printf "%q\n" "$@";
 }
 
+# CA_FILE=~/.ca
 # function ca()					# add cd alias (ca <alias_name> || ca <alias_name> <aliased path>)
 # {
 	# local a
@@ -328,11 +328,6 @@ function escape()				# escape a string
 	# fi;
 	# builtin cd "$@" 2> /dev/null || echo "Nope" 1>&2;
 # }
-
-function cd()					# if cd fails, try with hashed directories
-{
-	builtin cd $@ 2>/dev/null || builtin cd ~"$1" 
-}
 
 function showcolors()			# display the 256 colors by shades - useful to get pimpy colors
 {
@@ -551,7 +546,6 @@ function rm()					# safe rm with timestamped backup
 		idir="";
 		rm_params="";
 		backup="$RM_BACKUP_DIR/$(date +%s)";
-		command mkdir -p "$backup";
 		for i in "$@"; do
 			if [ ${i:0:1} = "-" ]; then # if $i is an args list, save them
 				rm_params+="$i";
@@ -663,9 +657,9 @@ function back()					# list all backuped files
 }
 
 
-function ft()					# find text in .
+function ft()					# find arg1 in all files from arg2 or .
 {
-	command find . -type f -exec grep --color=always -InH -e "$@" {} +; # I (ignore binary) n (line number) H (print fn each line)
+	command find ${2:=.} -type f -exec grep --color=always -InH -e "$1" {} +; # I (ignore binary) n (line number) H (print fn each line)
 }
 
 function installed()
@@ -760,7 +754,6 @@ function iter()
 
 	elts=();
 	for i in $@; do
-		# echo $i;
 		if [ ! -z "$sep" ]; then
 			command+="$i";
 		elif [ "$i" = "-" ]; then
@@ -779,15 +772,14 @@ function c()					# simple calculator
 	echo $(($@));
 }
 
-
-
-function ftselect()				# todo: function to select an element in a list
+function d2h()					# decimal to hexa
 {
-	typeset -A pos
-	
-	for p in "$@"; do
-		echo "[ ]: $p"
-	done
+	printf "0x%x\n" "$1"
+}
+
+function h2d()					# hexa to decimal
+{
+	echo $((16#$1));
 }
 
 
@@ -1006,55 +998,6 @@ function get-word-at-point()
 }
 zle -N get-word-at-point
 
-function highlight-syntax()
-{
-	local START;
-	local END;
-	local COLOR;
-	local WORD;
-	local SAV_CURSOR;
-	local i;
-
-	region_highlight=( );
-	i=1;
-	while [ $i -ne $#BUFFER ]; do
-		if [ $i -eq 1 ] || [ "$BUFFER[$i]" != " " -a "$BUFFER[$(( i - 1 ))]" = " " ] ; then
-			LEFT=$BUFFER[1,$i];
-			RIGHT=$BUFFER[$(( i + 1 )),$#BUFFER];
-			BUFFER="$LEFT$RIGHT";
-			START=$(( $#LEFT - ${#LEFT/* /} ));
-			END=$(( i + ${#RIGHT/ */} ));
-			COLOR=15;
-			WORD="${LEFT/* /}${RIGHT/ */}";
-			case "$(type -- $WORD)" in
-				("$WORD is "*) 						COLOR=40;;
-				("$WORD is an alias for"*) 				COLOR=46;;
-				("$WORD is a reserved word") 			COLOR=76;;
-				("$WORD is a shell builtin") 			COLOR=112;;
-				("$WORD is a shell function"*) 			COLOR=118;;
-				(*) case "$WORD" in
-						("|"|";")						COLOR=106;;
-						("-"*)							COLOR=154;;
-						(.|..|.\/|..\/|/|~|\*|"**/*")	COLOR=28;;
-						(*)								COLOR=160;;
-					esac;;
-			esac
-			region_highlight+="$START $END fg=$COLOR";
-		fi
-		i=$(( i + 1 ));
-	done
-}
-zle -N highlight-syntax
-
-function enable-highlighting
-{
-	local c;
-	local CHARS;
-	CHARS=( "q" "w" "e" "r" "t" "y" "u" "i" "o" "p" "a" "s" "d" "f" "g" "h" "j" "k" "l" "z" "x" "c" "v" "b" "n" "m" );
-	for c in $CHARS; do
-		bindkey "$c" $c-and-highlight
-	done
-}
 
 # ZSH FUNCTIONS BINDS #
 
@@ -1145,11 +1088,11 @@ case "$OS" in
 		alias ls="ls -G";;
 	(*cygwin*)					# cygwin
 		alias pm="apt-cyg install"
-		alias ls="ls --color=always";;
+		alias ls="ls --color=auto";;
 	(*linux*|*)					# Linux
 		alias pm="sudo apt-get install"
 		alias update="sudo apt-get update && sudo apt-get upgrade"
-		alias ls="ls --color=always";;
+		alias ls="ls --color=auto";;
 esac
 
 alias l="ls -lFh"				# list + classify + human readable
@@ -1163,8 +1106,8 @@ alias gc="git checkout"
 
 alias mkdir="mkdir -pv"			# create all the needed parent directories + inform user about creations
 
-alias grep="grep --color=always"
-alias egrep="egrep --color=always"
+alias grep="grep --color=auto"
+alias egrep="egrep --color=auto"
 installed tree && alias tree="tree -C"		   # -C colorzzz
 installed colordiff && alias diff="colordiff" # diff with nicer colors
 alias less="less -RS"			# -R Raw control chars, -S to truncate the long lines instead of folding them
