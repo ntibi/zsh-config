@@ -53,6 +53,7 @@ setopt c_bases					# c-like bases conversions
 setopt emacs					# enable emacs like keybindigs
 setopt flow_control				# enable C-q and C-s to control the flooow
 setopt complete_in_word			# complete from anywhere
+setopt clobber					# i aint no pussy
 
 [ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
@@ -817,6 +818,23 @@ function window()				# prints weather info
 	curl -s "http://www.wunderground.com/q/zmw:00000.37.07156" | grep "og:title" | cut -d\" -f4 | sed 's/&deg;/ degrees/';
 }
 
+function useless_fractal()
+{
+	local lines columns colour a b p q i pnew;
+	clear;
+	((columns=COLUMNS-1, lines=LINES-1, colour=0))
+	for ((b=-1.5; b<=1.5; b+=3.0/lines)); do
+		for ((a=-2.0; a<=1; a+=3.0/columns)); do
+			for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)); do
+				((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew));
+			done
+			((colour=(i/4)%8));
+			echo -n "\\e[4${colour}m ";
+		done
+		echo;
+	done
+}
+
 
 # SETTING STUFF #
 
@@ -850,17 +868,12 @@ zmodload zsh/complist			# load compeltion list
 
 # SETTING UP ZSH COMPLETION STUFF #
 
-zstyle ':completion:*:rm:*' ignore-line yes # remove suggestion if already in selection
-zstyle ':completion:*:mv:*' ignore-line yes # same
-zstyle ':completion:*:cp:*' ignore-line yes # same
-zstyle ':completion:*:emacs:*' ignore-line yes # same
-
-zstyle ':completion::complete:*' use-cache on
-zstyle ':completion::complete:*' cache-path .zcache
+zstyle ':completion:*:(rm|cp|mv|emacs):*' ignore-line yes # remove suggestion if already in selection
+zstyle ':completion:*' ignore-parents parent pwd		  # avoid stupid ./../currend_dir
 
 zstyle ":completion:*" menu select # select menu completion
 
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS} # ls colors for files/dirs completion
 
 zstyle ":completion:*" group-name "" # group completion
 
@@ -871,6 +884,8 @@ zstyle ":completion:*:approximate:*" max-errors "(( ($#BUFFER)/3 ))" # allow one
 
 zle -C complete-file complete-word _generic
 zstyle ':completion:complete-file::::' completer _files
+
+zstyle ':completion:*' file-sort modification reverse # newest files at first
 
 zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 
