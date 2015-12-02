@@ -1,8 +1,49 @@
 # # # # # # # #
 #
-# TODO:
+# Loading .myzshrc and .prezshrc
 #
+# USEFUL VARS
+#	defines useful variables
 #
+# (UN)SETTING ZSH (COOL) OPTIONS
+#	(un)setting zsh opts
+#
+# PS1 FUNCTIONS
+#	prompt related functions
+#
+# CALLBACK FUNCTIONS
+#	defining callbacks functions
+#
+# USEFUL USER FUNCTIONS
+#	defining useful shell functions
+#
+# LESS USEFUL USER FUNCTIONS
+#	defining less useful shell functions
+#
+# ZSH FUNCTIONS LOAD
+#	loading of useful builtin zsh functions
+#
+# SETTING UP ZSH COMPLETION STUFF
+#
+# HOMEMADE FUNCTIONS COMPLETION
+#	setting zsh completions for user functions
+#
+# SHELL COMMANDS BINDS
+#	keybinds to shell commands
+#
+# ZLE FUNCTIONS
+#	shell functions using zsh line editor
+#
+# ZSH FUNCTIONS BINDS
+#	binds to user and builtin zle functions
+#
+# USEFUL ALIASES
+#	yes
+#
+# MANDATORY FUNCTIONS CALLS
+#	functions calls setting datas for the first time
+#
+# Loading .postzshrc
 #
 # # # # # # # #
 
@@ -12,11 +53,15 @@ if [ ! $(echo "$0" | grep -s "zsh") ]; then
 fi
 
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
+[ -e ~/.preszhrc ] && source ~/.preszhrc
+
+
+### USEFUL VARS ###
 
 TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/" # check if xterm-256 color is available, or if we are in a dumb shell
 
-
-# USEFUL VARS #
+typeset -Ug PATH				# do not accept doubles
+typeset -Ag abbrev				# global associative array to define abbrevations
 
 PERIOD=5			  # period used to hook periodic function (in sec)
 
@@ -29,6 +74,15 @@ OS="$(uname | tr "A-Z" "a-z")"	# get the os name
 UPDATE_TERM_TITLE="" # set to update the term title according to the path and the currently executed line
 UPDATE_CLOCK=""		 # set to update the top-right clock every second
 
+EDITOR="emacs"
+VISUAL="emacs"
+
+HISTFILE=~/.zshrc_history
+SAVEHIST=65536
+HISTSIZE=65536
+
+CLICOLOR=1
+
 case "$OS" in
 	(*darwin*)					# Mac os
 		LS_COLORS='exfxcxdxbxexexabagacad';;
@@ -38,7 +92,7 @@ case "$OS" in
 		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
 esac
 
-# (UN)SETTING ZSH (COOL) OPTIONS #
+### (UN)SETTING ZSH (COOL) OPTIONS ###
 
 
 setopt prompt_subst				# compute PS1 at each prompt print
@@ -54,13 +108,14 @@ setopt emacs					# enable emacs like keybindigs
 setopt flow_control				# enable C-q and C-s to control the flooow
 setopt complete_in_word			# complete from anywhere
 setopt clobber					# i aint no pussy
-setopt extended_glob			# i aint no pussy
+setopt extended_glob			# used in matching im some functions
+setopt multios					# no more tee !
 
 [ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
 
 
-# PS1 FUNCTIONS #
+### PS1 FUNCTIONS ###
 
 function check_git_repo()		# check if pwd is a git repo
 {
@@ -236,7 +291,7 @@ function setps4()				# toggle PS4 (xtrace prompt) between verbose and default
 	esac 
 }
 
-# CALLBACK FUNCTIONS #
+### CALLBACK FUNCTIONS ###
 
 function chpwd()				# chpwd hook
 {
@@ -268,68 +323,13 @@ function precmd()				# pre promt hook
 	set_git_char
 }
 
-# USEFUL USER FUNCTIONS #
+### USEFUL USER FUNCTIONS ###
 
 
 function escape()				# escape a string
 {
 	printf "%q\n" "$@";
 }
-
-# CA_FILE=~/.ca
-# function ca()					# add cd alias (ca <alias_name> || ca <alias_name> <aliased path>)
-# {
-	# local a
-	# local p
-	# p=$(pwd)
-	# if [ "$#" -ne 1 ] && [ "$#" -ne 2 ]; then
-		# echo "Usage: ca alias (path)";
-		# return;
-	# fi;
-	# if [ "$#" -eq 2 ]; then
-		# [ ${2:0:1} = '/' ] && p="$2" || p+="/$2"
-	# fi;
-	# a=$1
-	# touch $CA_FILE;
-	# if [ "$(grep "^$a=" $CA_FILE)" != "" ]; then
-		# echo "replacing old '$a' alias"
-		# sed -i "s/^$a=.*$//g" $CA_FILE;
-		# sed -i "/^$/d" $CA_FILE;
-	# fi;
-	# echo "$a=$p" >> $CA_FILE;
-# }
-
-# function dca()					# delete cd alias (dca <alias 1> <alias 2> ... <alias n>)
-# {
-	# local a
-	# if [ -e $CA_FILE ] && [ "$#" -gt 0 ]; then
-		# for a in "$@"
-		# do
-			# sed -i "s/^$a=.*$//g" $CA_FILE;
-		# done
-		# sed -i "/^$/d" $CA_FILE;
-	# fi
-# }
-
-# function sca()					# show cd aliases
-# {
-	# [ -e $CA_FILE ] && cat $CA_FILE | egrep --color=always "^[^=]+" || echo "No cd aliases yet";
-# }
-
-# function cd()					# cd wrap to use aliases - priority over real path instead of alias
-# {
-	# local a
-	# local p
-	# if [ -e $CA_FILE ] && [ "$#" -eq 1 ] && [ ! -d $1 ]; then
-		# a="$(command grep -o "^$1=.*$" $CA_FILE)";
-		# if [ "$a" != "" ]; then
-			# p="$(echo $a | cut -d'=' -f2)"
-			# builtin cd "$p" 2> /dev/null && echo $p || echo "Invalid alias '$a'" 1>&2;
-			# return 0;
-		# fi;
-	# fi;
-	# builtin cd "$@" 2> /dev/null || echo "Nope" 1>&2;
-# }
 
 function showcolors()			# display the 256 colors by shades - useful to get pimpy colors
 {
@@ -784,8 +784,24 @@ function h2d()					# hexa to decimal
 	echo $((16#$1));
 }
 
+function add-abbrev()			# add a dynamic abbreviation
+{
+	if [ $# -eq 2 ]; then
+		abbrev+=("$1" "$2");
+	else
+		echo "Usage: add-abbrev 'word' 'abbrev'" >&2;
+	fi
+}
 
-# LESS USEFUL USER FUNCTIONS #
+function show-abbrevs()			# list all the defined abbreviations
+{
+	for k in "${(@k)abbrev}"; do
+		printf "$(tput setaf 4)%-10s$(tput setaf 8)->$(tput sgr0)  $(tput setaf 2)\"%s\"$(tput sgr0)\n" "$k" "$abbrev[$k]";
+	done
+}
+
+
+### LESS USEFUL USER FUNCTIONS ###
 
 
 function race()					# race between tokens given in parameters
@@ -837,18 +853,7 @@ function useless_fractal()
 }
 
 
-# SETTING STUFF #
-
-EDITOR="emacs"					# variables set for git editor and edit-command-line
-VISUAL="emacs"
-
-HISTFILE=~/.zshrc_history
-SAVEHIST=65536
-HISTSIZE=65536
-
-CLICOLOR=1
-
-# ZSH FUNCTIONS LOAD #
+### ZSH FUNCTIONS LOAD ###
 
 autoload add-zsh-hook			# control the hooks (chpwd, precmd, ...)
 autoload zed					# zsh editor
@@ -867,7 +872,7 @@ compinit						# enable completion
 zmodload zsh/complist			# load compeltion list
 
 
-# SETTING UP ZSH COMPLETION STUFF #
+### SETTING UP ZSH COMPLETION STUFF ###
 
 zstyle ':completion:*:(rm|cp|mv|emacs):*' ignore-line yes # remove suggestion if already in selection
 zstyle ':completion:*' ignore-parents parent pwd		  # avoid stupid ./../currend_dir
@@ -892,7 +897,7 @@ zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 
 compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 
-# Homemade functions completion
+### HOMEMADE FUNCTIONS COMPLETION ###
 
 _ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
 compdef _ff ff
@@ -904,10 +909,7 @@ _loadconf() { _arguments "1:visual configuration:(('complete:complete configurat
 compdef _loadconf loadconf
 
 
-# ZSH KEY BINDINGS #
-
-
-# SHELL COMMANDS BINDS #
+### SHELL COMMANDS BINDS ###
 
 # C-v or 'cat -v' to get the keycode
 bindkey -s "^[j" "^Ujoin_others_shells\n" # join_others_shells user function
@@ -920,7 +922,7 @@ bindkey -s "^[c" "^A^Kgit checkout 		"
 
 bindkey -s ";;" "~"
 
-# ZLE FUNCTIONS #
+### ZLE FUNCTIONS ###
 
 function get_terminfo_name()	# get the terminfo name according to the keycode
 {
@@ -1014,24 +1016,22 @@ function get-word-at-point()
 }
 zle -N get-word-at-point
 
-typeset -Ag abbrev
-
-function magic-abbrev-expand()
+function magic-abbrev-expand()	# expand the last word in the complete corresponding abbreviation if any
 {
 	local MATCH
 	LBUFFER=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
-	LBUFFER+=${abbrev[$MATCH]:-$MATCH};
-	zle self-insert;
+	LBUFFER+="${abbrev[$MATCH]:-$MATCH }";
 }
 zle -N magic-abbrev-expand
 
-function no-magic-abbrev-expand()
+function no-magic-abbrev-expand() # space
 {
 	LBUFFER+=" ";
 }
 zle -N no-magic-abbrev-expand
 
-# ZSH FUNCTIONS BINDS #
+
+### ZSH FUNCTIONS BINDS ###
 
 bindkey -e 						# load emacs style key binding
 
@@ -1113,8 +1113,8 @@ bindkey $key[S-left] select-left
 
 bindkey $key[C-enter] clear-and-accept
 
-# USEFUL ALIASES #
 
+### USEFUL ALIASES ###
 
 case "$OS" in
 	(*darwin*)					# Mac os
@@ -1130,16 +1130,14 @@ case "$OS" in
 		alias ls="ls --color=auto";;
 esac
 
-abbrev=(						# dynamic abbreviations
-	"ll"	"| less"
-	"tt"	"| tail -n"
-	"hh"	"| head -n"
-	"lc"	"| wc -l"
-	"gg"	"| grep"
-	"ee"	"emacs"
-	"gb"	"git branch"
-	"gc"	"git checkout"
-)
+add-abbrev "ll"	"| less"
+add-abbrev "tt"	"| tail -n"
+add-abbrev "hh"	"| head -n"
+add-abbrev "lc"	"| wc -l"
+add-abbrev "gg"	"| grep "
+add-abbrev "ee"	"emacs "
+add-abbrev "gb"	"git branch "
+add-abbrev "gc"	"git checkout "
 
 
 alias l="ls -lFh"				# list + classify + human readable
@@ -1174,6 +1172,8 @@ alias dzsh="zsh --norcs --xtrace" # debugzsh
 
 alias trunc='sed "s/^\(.\{0,$COLUMNS\}\).*$/\1/g"' # truncate too long lines
 
+### MANDATORY FUNCTIONS CALLS ###
+
 check_git_repo
 set_git_branch
 update_pwd_datas
@@ -1184,7 +1184,9 @@ rehash							# hash commands in path
 
 trap clock WINCH
 
-# join_others_shells				# ask for joining others shells
+[ -e ~/.postzshrc ] && source ~/.postzshrc # load user file if any
+
+# join_others_shells				# ask to join others shells
 
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
 
