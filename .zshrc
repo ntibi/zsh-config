@@ -24,7 +24,6 @@ TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-25
 PERIOD=5			  # period used to hook periodic function (in sec)
 
 PWD_FILE=~/.pwd					# last pwd sav file
-CA_FILE=~/.ca					# cd aliases sav file
 
 DEF_C="$(tput sgr0)"
 
@@ -911,6 +910,7 @@ bindkey -s "\el" "^Uls\n"		# run ls
 bindkey -s "^[g" "^A^Kgit commit -m\"\""
 bindkey -s "^[c" "^A^Kgit checkout 		"
 
+bindkey -s ";;" "~"
 
 # ZLE FUNCTIONS #
 
@@ -1035,7 +1035,7 @@ function highlight-syntax()
 				(*) case "$WORD" in
 						("|"|";")						COLOR=106;;
 						("-"*)							COLOR=154;;
-						(.|..|.\/|..\/|/|~|\*|"**/*")		COLOR=28;;
+						(.|..|.\/|..\/|/|~|\*|"**/*")	COLOR=28;;
 						(*)								COLOR=160;;
 					esac;;
 			esac
@@ -1048,8 +1048,12 @@ zle -N highlight-syntax
 
 function enable-highlighting
 {
-function space-and-highlight() {BUFFER="$LBUFFER $RBUFFER"; CURSOR+=1; zle highlight-syntax}; zle -N space-and-highlight
-bindkey " " space-and-highlight
+	local c;
+	local CHARS;
+	CHARS=( "q" "w" "e" "r" "t" "y" "u" "i" "o" "p" "a" "s" "d" "f" "g" "h" "j" "k" "l" "z" "x" "c" "v" "b" "n" "m" );
+	for c in $CHARS; do
+		bindkey "$c" $c-and-highlight
+	done
 }
 
 # ZSH FUNCTIONS BINDS #
@@ -1101,6 +1105,8 @@ bindkey $key[M-left] move-text-left
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 
 bindkey "^X^Z" ctrlz			# ctrl z zsh
+
+bindkey "^D" delete-char
 
 bindkey "^X^X" exchange-point-and-mark
 
