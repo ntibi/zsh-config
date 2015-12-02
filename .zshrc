@@ -1015,14 +1015,6 @@ function get-word-at-point()
 zle -N get-word-at-point
 
 typeset -Ag abbrev
-abbrev=(
-	"LL"	"| less"
-	"TT"	"| tail -n"
-	"HH"	"| head -n"
-	"CL"	"| wc -l"
-	"GG"	"| grep"
-	"EE"	"emacs"
-)
 
 function magic-abbrev-expand()
 {
@@ -1138,14 +1130,22 @@ case "$OS" in
 		alias ls="ls --color=auto";;
 esac
 
+abbrev=(						# dynamic abbreviations
+	"ll"	"| less"
+	"tt"	"| tail -n"
+	"hh"	"| head -n"
+	"lc"	"| wc -l"
+	"gg"	"| grep"
+	"ee"	"emacs"
+	"gb"	"git branch"
+	"gc"	"git checkout"
+)
+
+
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
 alias lt="ls -ltFh"				# l with modification date sort
-alias ll="ls -lFh"				# simple list
 alias .="ls"
-
-alias gb="git branch"
-alias gc="git checkout"
 
 alias mkdir="mkdir -pv"			# create all the needed parent directories + inform user about creations
 
