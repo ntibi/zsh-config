@@ -54,6 +54,7 @@ setopt emacs					# enable emacs like keybindigs
 setopt flow_control				# enable C-q and C-s to control the flooow
 setopt complete_in_word			# complete from anywhere
 setopt clobber					# i aint no pussy
+setopt extended_glob			# i aint no pussy
 
 [ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
@@ -1013,6 +1014,30 @@ function get-word-at-point()
 }
 zle -N get-word-at-point
 
+typeset -Ag abbrev
+abbrev=(
+	"LL"	"| less"
+	"TT"	"| tail -n"
+	"HH"	"| head -n"
+	"CL"	"| wc -l"
+	"GG"	"| grep"
+	"EE"	"emacs"
+)
+
+function magic-abbrev-expand()
+{
+	local MATCH
+	LBUFFER=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
+	LBUFFER+=${abbrev[$MATCH]:-$MATCH};
+	zle self-insert;
+}
+zle -N magic-abbrev-expand
+
+function no-magic-abbrev-expand()
+{
+	LBUFFER+=" ";
+}
+zle -N no-magic-abbrev-expand
 
 # ZSH FUNCTIONS BINDS #
 
@@ -1053,6 +1078,9 @@ case "$OS" in
 	(*) 		key[C-enter]="^J";;
 esac
 
+bindkey " " magic-abbrev-expand
+bindkey "^X " no-magic-abbrev-expand
+bindkey -M isearch " " self-insert
 
 bindkey $key[left] backward-char
 bindkey $key[right] forward-char
