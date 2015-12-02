@@ -1137,7 +1137,9 @@ add-abbrev "lc"	"| wc -l"
 add-abbrev "gg"	"| grep "
 add-abbrev "ee"	"emacs "
 add-abbrev "gb"	"git branch "
-add-abbrev "gc"	"git checkout "
+add-abbrev "gc"	"git commit "
+add-abbrev "gk"	"git checkout "
+add-abbrev "gp"	"git push"
 
 
 alias l="ls -lFh"				# list + classify + human readable
