@@ -67,7 +67,6 @@ PERIOD=5			  # period used to hook periodic function (in sec)
 
 PWD_FILE=~/.pwd					# last pwd sav file
 
-DEF_C="$(tput sgr0)"
 
 OS="$(uname | tr "A-Z" "a-z")"	# get the os name
 
@@ -92,6 +91,18 @@ case "$OS" in
 	(*linux*|*)					# Linux
 		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
 esac
+
+DEF_C="$(tput sgr0)"
+
+C_BLACK="$(tput setaf 0)"
+C_RED="$(tput setaf 1)"
+C_GREEN="$(tput setaf 2)"
+C_YELLOW="$(tput setaf 3)"
+C_BLUE="$(tput setaf 4)"
+C_PURPLE="$(tput setaf 5)"
+C_CYAN="$(tput setaf 6)"
+C_WHITE="$(tput setaf 7)"
+C_GREY="$(tput setaf 8)"
 
 ### (UN)SETTING ZSH (COOL) OPTIONS ###
 
@@ -356,7 +367,7 @@ function error()				# give error nb to get the corresponding error string
 function join_others_shells()	# ask for joining path specified in $PWD_FILE if not already in it
 {
 	if [[ -e $PWD_FILE ]] && [[ $(pwd) != $(cat $PWD_FILE) ]]; then
-		read -q "?Go to $(tput setaf 3)$(cat $PWD_FILE)$(tput setaf 7) ? (Y/n):" && cd "$(cat $PWD_FILE)"
+		read -q "?Go to $C_YELLOW$(cat $PWD_FILE)$C_WHITE ? (Y/n):" && cd "$(cat $PWD_FILE)"
 	fi
 }
 
@@ -619,13 +630,13 @@ function back()					# list all backuped files
 			for f in $files; do peek+="$(basename $f), "; if [ $#peek -ge $COLUMNS ]; then break; fi; done
 			peek=${peek:0:(-2)}; # remove the last ', '
 			[ $#peek -gt $COLUMNS ] && peek="$(echo $peek | head -c $(( COLUMNS - 3 )) )..." # truncate and add '...' at the end if the peek is too large
-			echo "\033[31m#$i$DEF_C: \033[4;32m$(ts $b)$DEF_C: \033[34m$(echo $files | wc -w)$DEF_C file(s)"
+			echo "$C_RED#$i$DEF_C: $C_GREEN$(ts $b)$DEF_C: $C_BLUE$(echo $files | wc -w)$DEF_C file(s)"
 			echo "$peek";
 			echo;
 		fi
 		if [ $(( i % $peeks_nbr == 0 || i == $#back )) -eq 1 ]; then
 			key="";
-			echo -n "> "; tput setaf 2;
+			echo -n "> $C_GREEN";
 			read -sk1 key;
 			case "$(echo -n $key | cat -e)" in
 				("^[")
@@ -640,7 +651,7 @@ function back()					# list all backuped files
 					read to_restore;
 					to_restore="$key$to_restore";;
 			esac
-			tput sgr0;
+			echo -n "$DEF_C"
 		else
 			i=$(( i + 1 ));
 		fi
@@ -797,7 +808,7 @@ function add-abbrev()			# add a dynamic abbreviation
 function show-abbrevs()			# list all the defined abbreviations
 {
 	for k in "${(@k)abbrev}"; do
-		printf "$(tput setaf 4)%-10s$(tput setaf 8)->$(tput sgr0)  $(tput setaf 2)\"%s\"$(tput sgr0)\n" "$k" "$abbrev[$k]";
+		printf "$C_BLUE%-10s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$abbrev[$k]";
 	done
 }
 
@@ -838,16 +849,17 @@ function window()				# prints weather info
 
 function useless_fractal()
 {
-	local lines columns colour a b p q i pnew;
+	local lines columns a b p q i pnew;
 	clear;
-	((columns=COLUMNS-1, lines=LINES-1, colour=0))
-	for ((b=-1.5; b<=1.5; b+=3.0/lines)); do
-		for ((a=-2.0; a<=1; a+=3.0/columns)); do
+	((columns=COLUMNS-1, lines=LINES-1, colour=0));
+	bi=$((3.0/lines));
+	ai=$((3.0/columns));
+	for ((b=-1.5; b<=1.5; b+=$bi)); do
+		for ((a=-2.0; a<=1; a+=$ai)); do
 			for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)); do
 				((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew));
 			done
-			((colour=(i/4)%8));
-			echo -n "\\e[4${colour}m ";
+			echo -n "\\e[4$(( (i/4)%8 ))m ";
 		done
 		echo;
 	done
