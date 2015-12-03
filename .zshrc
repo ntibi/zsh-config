@@ -1147,7 +1147,8 @@ add-abbrev "res"	"ressource"
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
 alias lt="ls -ltFh"				# l with modification date sort
-alias .="ls"
+alias lt="ls -ltFh"				# l with modification date sort
+alias l1="ls -1"				# one result per line
 
 alias mkdir="mkdir -pv"			# create all the needed parent directories + inform user about creations
 
