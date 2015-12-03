@@ -76,6 +76,7 @@ UPDATE_CLOCK=""		 # set to update the top-right clock every second
 
 EDITOR="emacs"
 VISUAL="emacs"
+PAGER="less"
 
 HISTFILE=~/.zshrc_history
 SAVEHIST=65536
@@ -1136,7 +1137,8 @@ add-abbrev "tf"		"tail -fn0"
 add-abbrev "hh"		"| head -n"
 add-abbrev "lc"		"| wc -l"
 add-abbrev "gg"		"| grep "
-add-abbrev "e"		"emacs "
+add-abbrev "e"		"$EDITOR "
+add-abbrev "p"		"$PAGER "
 add-abbrev "gb"		"git branch "
 add-abbrev "gc"		"git commit "
 add-abbrev "gk"		"git checkout "
