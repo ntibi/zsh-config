@@ -1130,17 +1130,19 @@ case "$OS" in
 		alias ls="ls --color=auto";;
 esac
 
-add-abbrev "ll"	"| less"
-add-abbrev "tt"	"| tail -n"
-add-abbrev "hh"	"| head -n"
-add-abbrev "lc"	"| wc -l"
-add-abbrev "gg"	"| grep "
-add-abbrev "ee"	"emacs "
-add-abbrev "gb"	"git branch "
-add-abbrev "gc"	"git commit "
-add-abbrev "gk"	"git checkout "
-add-abbrev "gp"	"git push"
-
+add-abbrev "ll"		"| less"
+add-abbrev "tt"		"| tail -n"
+add-abbrev "tf"		"tail -fn0"
+add-abbrev "hh"		"| head -n"
+add-abbrev "lc"		"| wc -l"
+add-abbrev "gg"		"| grep "
+add-abbrev "e"		"emacs "
+add-abbrev "gb"		"git branch "
+add-abbrev "gc"		"git commit "
+add-abbrev "gk"		"git checkout "
+add-abbrev "gp"		"git push"
+add-abbrev "py"		"python "
+add-abbrev "res"	"ressource"
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
@@ -1156,7 +1158,6 @@ installed colordiff && alias diff="colordiff" # diff with nicer colors
 alias less="less -RS"			# -R Raw control chars, -S to truncate the long lines instead of folding them
 
 alias ressource="source ~/.zshrc"
-alias res="source ~/.zshrc"
 
 alias emacs="emacs -nw"
 alias xemacs="command emacs"
