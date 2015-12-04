@@ -104,8 +104,8 @@ C_CYAN="$(tput setaf 6)"
 C_WHITE="$(tput setaf 7)"
 C_GREY="$(tput setaf 8)"
 
-### (UN)SETTING ZSH (COOL) OPTIONS ###
 
+### (UN)SETTING ZSH (COOL) OPTIONS ###
 
 setopt prompt_subst				# compute PS1 at each prompt print
 setopt inc_append_history
@@ -303,6 +303,7 @@ function setps4()				# toggle PS4 (xtrace prompt) between verbose and default
 	esac 
 }
 
+
 ### CALLBACK FUNCTIONS ###
 
 function chpwd()				# chpwd hook
@@ -334,6 +335,7 @@ function precmd()				# pre promt hook
 	
 	set_git_char
 }
+
 
 ### USEFUL USER FUNCTIONS ###
 
@@ -808,8 +810,32 @@ function add-abbrev()			# add a dynamic abbreviation
 function show-abbrevs()			# list all the defined abbreviations
 {
 	for k in "${(@k)abbrev}"; do
-		printf "$C_BLUE%-10s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$abbrev[$k]";
+		printf "$C_BLUE%-15s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$abbrev[$k]";
 	done
+}
+
+function show-aliases()			# list all aliases
+{
+	for k in "${(@k)aliases}"; do
+		printf "$C_BLUE%-15s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$aliases[$k]";
+	done
+}
+
+function mkback()				# create a backup file of . or the specified dir/file
+{
+	local toback;
+	local backfile;
+
+	if [ -e "$1" ] && [ "$1" != "." ] ; then
+		toback="$1";
+		backfile="$(basename $(readlink -f $1))";
+	else
+		toback=".";
+		backfile="$(basename $(pwd))";
+	fi
+	backfile+="-$(date +%s).back.tar.gz";
+	printf "Backing up %s in %s\n" "$toback" "$backfile";
+	tar -cf - "$toback"  | pv -F " %b %r - %e  %t" -s "$(du -sb | cut -d"	" -f1 )" | gzip --best > "$backfile";
 }
 
 
@@ -910,6 +936,7 @@ zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 
 compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 
+
 ### HOMEMADE FUNCTIONS COMPLETION ###
 
 _ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
@@ -934,6 +961,7 @@ bindkey -s "^[g" "^A^Kgit commit -m\"\""
 bindkey -s "^[c" "^A^Kgit checkout 		"
 
 bindkey -s ";;" "~"
+
 
 ### ZLE FUNCTIONS ###
 
@@ -1037,6 +1065,15 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 }
 zle -N magic-abbrev-expand
 
+function magic-accept-and-abbrev-expand()	# expand the last word in the complete corresponding abbreviation if any
+{
+	local MATCH
+	LBUFFER=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
+	LBUFFER+="${abbrev[$MATCH]:-$MATCH}";
+	zle accept-line;
+}
+zle -N magic-accept-and-abbrev-expand
+
 function no-magic-abbrev-expand() # space
 {
 	LBUFFER+=" ";
@@ -1084,8 +1121,12 @@ case "$OS" in
 esac
 
 bindkey " " magic-abbrev-expand
-bindkey "^X " no-magic-abbrev-expand
+bindkey "^V " no-magic-abbrev-expand
+bindkey "^M" magic-accept-and-abbrev-expand
+bindkey "^V^M" accept-line
+
 bindkey -M isearch " " self-insert
+bindkey -M isearch "^M" self-insert
 
 bindkey $key[left] backward-char
 bindkey $key[right] forward-char
@@ -1131,21 +1172,21 @@ bindkey $key[C-enter] clear-and-accept
 
 case "$OS" in
 	(*darwin*)					# Mac os
-		alias pm="brew install"
-		alias update="brew update && brew upgrade"
+		alias update="brew update && brew upgrade";
+		add-abbrev "install" "brew install ";
 		alias ls="ls -G";;
 	(*cygwin*)					# cygwin
-		alias pm="apt-cyg install"
-		alias ls="ls --color=auto";;
+		alias ls="ls --color=auto";
+		add-abbrev "install" "apt-cyg install ";;
 	(*linux*|*)					# Linux
-		alias pm="sudo apt-get install"
-		alias update="sudo apt-get update && sudo apt-get upgrade"
+		alias update="sudo apt-get update && sudo apt-get upgrade";
+		add-abbrev "install" "apt-get install ";
 		alias ls="ls --color=auto";;
 esac
 
 add-abbrev "ll"		"| less"
 add-abbrev "tt"		"| tail -n"
-add-abbrev "tf"		"tail -fn0"
+add-abbrev "tf"		"tail -fn0 "
 add-abbrev "hh"		"| head -n"
 add-abbrev "lc"		"| wc -l"
 add-abbrev "gg"		"| grep "
@@ -1174,21 +1215,23 @@ alias less="less -RS"			# -R Raw control chars, -S to truncate the long lines in
 
 alias ressource="source ~/.zshrc"
 
-alias emacs="emacs -nw"
-alias xemacs="command emacs"
+alias emacs="emacs -nw"			# default emacs is in console
+alias xemacs="command emacs"	# x one is not
 alias emax="command emacs"
 alias x="command emacs"
 alias e="emacs"
-alias qmacs="emacs -q"
+alias qmacs="emacs -q"			# faster with no config files loaded
 alias q="emacs -q"
 
-alias ss="du -a . | sort -nr | head -n10" # get the 10 biggest files
+alias size="du -sh"								# get the size of smthing
+alias fatfiles="du -a . | sort -nr | head -n10" # get the 10 biggest files
 alias df="df -Tha --total"		# disk usage infos
-alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e VSZ -e " # fps <processname> to get ps infos only for the matching processes
+alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e 'USER.*PID.*%CPU.*%MEM.*VSZ.*RSS TTY.*STAT.*START.*TIME COMMAND.*' -e " # fps <processname> to get ps infos only for the matching processes
 alias tt="tail --retry -fn0"	# real time tail a log
 alias dzsh="zsh --norcs --xtrace" # debugzsh
 
 alias trunc='sed "s/^\(.\{0,$COLUMNS\}\).*$/\1/g"' # truncate too long lines
+
 
 ### MANDATORY FUNCTIONS CALLS ###
 
