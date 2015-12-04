@@ -473,10 +473,10 @@ function colorcode()  			# get the code to set the corresponding fg color
 
 function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to colorize expr with color # maybe change the syntax to <regex>:fg:bg?:mod? ...
 {
-	local i
+	local -i i
 	local last
 	local params
-	local col
+	local -i col
 	i=0
 	params=()
 	col=""
@@ -513,9 +513,9 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 
 function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
 {
-	local delta;
-	local ts1=$1;
-	local ts2=$2;
+	local -i delta;
+	local -i ts1=$1;
+	local -i ts2=$2;
 	local sign;
 
 	if [ $# = 0 ]; then
@@ -560,7 +560,7 @@ function rm()					# safe rm with timestamped backup
 		local backup;
 		local idir;
 		local rm_params;
-		local i;
+		local -i i;
 		idir="";
 		rm_params="";
 		backup="$RM_BACKUP_DIR/$(date +%s)";
@@ -586,7 +586,7 @@ function save()					# backup the files
 		local backup;
 		local idir;
 		local rm_params;
-		local i;
+		local -i i;
 		idir="";
 		rm_params="";
 		backup="$RM_BACKUP_DIR/$(date +%s)";
@@ -620,7 +620,7 @@ function back()					# list all backuped files
 	local to_restore="";
 	local peeks_nbr=$(( (LINES) / 3 ));
 	local b;
-	local i;
+	local -i i;
 	local key;
 
 	[ -d $RM_BACKUP_DIR ] || return
@@ -741,10 +741,10 @@ function uc()					# remove all? color escape chars
 function hscroll()				# test
 {
 	local string;
-	local i=0;
+	local -i i=0;
 	local key;
 	local crel="$(tput cr;tput el)";
-	local cols="$(tput cols)"
+	local -i cols="$(tput cols)"
 	[ $# -eq 0 ] && return ;
 	string="$(cat /dev/zero | tr "\0" " " | head -c $cols)$@";
 	trap "tput cnorm; return;" INT
@@ -765,7 +765,7 @@ function hscroll()				# test
 
 function iter()
 {
-	local i;
+	local -i i;
 	local command;
 	local sep;
 	local elts;
@@ -1152,7 +1152,7 @@ bindkey $key[M-left] move-text-left
 
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 
-bindkey "^X^Z" ctrlz			# ctrl z zsh
+bindkey "^Z" ctrlz			# ctrl z zsh
 
 bindkey "^D" delete-char
 
