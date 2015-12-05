@@ -63,6 +63,8 @@ TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-25
 typeset -Ug PATH				# do not accept doubles
 typeset -Ag abbrev				# global associative array to define abbrevations
 
+WORDCHARS="*?_-.[]~=/&;!#$%^(){}<>|"
+
 PERIOD=5			  # period used to hook periodic function (in sec)
 
 PWD_FILE=~/.pwd					# last pwd sav file
@@ -956,9 +958,10 @@ bindkey -s "^[j" "^Ujoin_others_shells\n" # join_others_shells user function
 bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
 bindkey -s "^[e" "^Uerror\n"			  # run error user function
 bindkey -s "^[s" "^Asudo ^E"	# insert sudo
-bindkey -s "\el" "^Uls\n"		# run ls
 bindkey -s "^[g" "^A^Kgit commit -m\"\""
 bindkey -s "^[c" "^A^Kgit checkout 		"
+bindkey -s "\el" "^Uls\n"		# run ls
+bindkey -s "\ed" "^Upwd\n"		# run pwd
 
 bindkey -s ";;" "~"
 
@@ -1061,7 +1064,8 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 {
 	local MATCH
 	LBUFFER=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
-	LBUFFER+="${abbrev[$MATCH]:-$MATCH }";
+	LBUFFER+="${abbrev[$MATCH]:-$MATCH}";
+	zle self-insert;
 }
 zle -N magic-abbrev-expand
 
@@ -1080,13 +1084,26 @@ function no-magic-abbrev-expand() # space
 }
 zle -N no-magic-abbrev-expand
 
+function self-insert-hook() # hook at each non-binded key pressed
+{
+	
+}
+zle -N self-insert-hook
+
+function self-insert()
+{
+	zle .self-insert;
+	zle self-insert-hook;
+}
+zle -N self-insert
+
 
 ### ZSH FUNCTIONS BINDS ###
 
-bindkey -e 						# load emacs style key binding
+bindkey -e				  # load emacs style key binding
 
 
-typeset -A key				# associative array with more explicit names
+typeset -A key			  # associative array with more explicit names
 
 key[up]=$terminfo[kcuu1]
 key[down]=$terminfo[kcud1]
@@ -1119,6 +1136,21 @@ case "$OS" in
 	(*cygwin*) 	key[C-enter]="^^";;
 	(*) 		key[C-enter]="^J";;
 esac
+
+key[F1]=$terminfo[kf1]
+key[F2]=$terminfo[kf2]
+key[F3]=$terminfo[kf3]
+key[F4]=$terminfo[kf4]
+key[F5]=$terminfo[kf5]
+key[F6]=$terminfo[kf6]
+key[F7]=$terminfo[kf7]
+key[F8]=$terminfo[kf8]
+key[F9]=$terminfo[kf9]
+key[F10]=$terminfo[kf10]
+key[F11]=$terminfo[kf11]
+key[F12]=$terminfo[kf12]
+
+
 
 bindkey " " magic-abbrev-expand
 bindkey "^V " no-magic-abbrev-expand
@@ -1167,6 +1199,8 @@ bindkey $key[S-left] select-left
 
 bindkey $key[C-enter] clear-and-accept
 
+bindkey $key[F1] run-help
+bindkey $key[F5] clear-screen
 
 ### USEFUL ALIASES ###
 
