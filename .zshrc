@@ -980,16 +980,14 @@ function up-line-or-search-prefix () # smart up search (search in history anythi
 	local CURSOR_before_search=$CURSOR
 	zle up-line-or-search "$LBUFFER"
 	CURSOR=$CURSOR_before_search
-}
-zle -N up-line-or-search-prefix
+}; zle -N up-line-or-search-prefix
 
 function down-line-or-search-prefix () # same with down
 {
 	local CURSOR_before_search=$CURSOR
 	zle down-line-or-search "$LBUFFER"
 	CURSOR=$CURSOR_before_search
-}
-zle -N down-line-or-search-prefix
+}; zle -N down-line-or-search-prefix
 
 function open-delims() # open and close quoting chars and put the cursor at the beginning of the quoting
 {
@@ -997,8 +995,7 @@ function open-delims() # open and close quoting chars and put the cursor at the 
 		BUFFER="$LBUFFER$1$2$RBUFFER"
 		CURSOR+=$#1;
 	fi
-}
-zle -N open-delims
+}; zle -N open-delims
 
 function sub-function() zle open-delims "\$(" ")"
 zle -N sub-function
@@ -1012,28 +1009,24 @@ zle -N double-quote
 function save-line()			# save the current line at its state in ~/.saved_commands
 {
 	echo $BUFFER >> ~/.saved_commands
-}
-zle -N save-line
+}; zle -N save-line
 
 function ctrlz()
 {
 	suspend;
-}
-zle -N ctrlz
+}; zle -N ctrlz
 
 function clear-and-accept()		# clear the screen and accepts the line
 {
 	zle clear-screen;
 	[ $#BUFFER -ne 0 ] && zle accept-line;
-}
-zle -N clear-and-accept
+}; zle -N clear-and-accept
 
 function move-text-right()		# shift text after cursor to the right
 {
 	BUFFER="${BUFFER:0:$CURSOR} ${BUFFER:$CURSOR}";
 	CURSOR+=1;
-}
-zle -N move-text-right
+}; zle -N move-text-right
 
 function move-text-left()		# shift text after cursor to the left
 {
@@ -1041,15 +1034,13 @@ function move-text-left()		# shift text after cursor to the left
 		BUFFER="${BUFFER:0:$((CURSOR-1))}${BUFFER:$CURSOR}";
 		CURSOR+=-1;
 	fi
-}
-zle -N move-text-left
+}; zle -N move-text-left
 
 function shift-arrow()			# emacs-like shift selection
 {
 	((REGION_ACTIVE)) || zle set-mark-command;
 	zle $1;
-}
-zle -N shift-arrow
+}; zle -N shift-arrow
 
 function select-left() shift-arrow backward-char; zle -N select-left
 function select-right() shift-arrow forward-char; zle -N select-right
@@ -1057,17 +1048,14 @@ function select-right() shift-arrow forward-char; zle -N select-right
 function get-word-at-point()
 {
 	echo "${LBUFFER/* /}${RBUFFER/ */}";
-}
-zle -N get-word-at-point
+}; zle -N get-word-at-point
 
 function magic-abbrev-expand()	# expand the last word in the complete corresponding abbreviation if any
 {
 	local MATCH
 	LBUFFER=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
-	LBUFFER+="${abbrev[$MATCH]:-$MATCH}";
-	zle self-insert;
-}
-zle -N magic-abbrev-expand
+	LBUFFER+="${abbrev[$MATCH]:-$MATCH} ";
+}; zle -N magic-abbrev-expand
 
 function magic-accept-and-abbrev-expand()	# expand the last word in the complete corresponding abbreviation if any
 {
@@ -1075,27 +1063,23 @@ function magic-accept-and-abbrev-expand()	# expand the last word in the complete
 	LBUFFER=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
 	LBUFFER+="${abbrev[$MATCH]:-$MATCH}";
 	zle accept-line;
-}
-zle -N magic-accept-and-abbrev-expand
+}; zle -N magic-accept-and-abbrev-expand
 
 function no-magic-abbrev-expand() # space
 {
 	LBUFFER+=" ";
-}
-zle -N no-magic-abbrev-expand
+}; zle -N no-magic-abbrev-expand
 
-function self-insert-hook() # hook at each non-binded key pressed
+function self-insert-hook() # hook after each non-binded key pressed
 {
-	
-}
-zle -N self-insert-hook
+	# BUFFER=${BUFFER//;;/\~};
+}; zle -N self-insert-hook
 
-function self-insert()
+function self-insert()			# call pre hook, insert key, and cal post hook
 {
 	zle .self-insert;
 	zle self-insert-hook;
-}
-zle -N self-insert
+}; zle -N self-insert
 
 
 ### ZSH FUNCTIONS BINDS ###
@@ -1184,6 +1168,8 @@ bindkey $key[C-right] forward-word
 bindkey "^[k" kill-word
 bindkey "^w" kill-region		 # emacs-like kill
 
+bindkey "^y" yank-pop			# rotate yank array
+
 bindkey $key[S-tab] reverse-menu-complete # shift tab for backward completion
 
 bindkey "^[=" save-line
@@ -1220,7 +1206,7 @@ esac
 
 add-abbrev "ll"		"| less"
 add-abbrev "tt"		"| tail -n"
-add-abbrev "tf"		"tail -fn0 "
+add-abbrev "tf"		"tail -fn0"
 add-abbrev "hh"		"| head -n"
 add-abbrev "lc"		"| wc -l"
 add-abbrev "gg"		"| grep "
