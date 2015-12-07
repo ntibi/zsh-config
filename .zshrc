@@ -560,7 +560,7 @@ function rm()					# safe rm with timestamped backup
 		local backup;
 		local idir;
 		local rm_params;
-		local -i i;
+		local i;
 		idir="";
 		rm_params="";
 		backup="$RM_BACKUP_DIR/$(date +%s)";
@@ -634,7 +634,7 @@ function back()					# list all backuped files
 			for f in $files; do peek+="$(basename $f), "; if [ $#peek -ge $COLUMNS ]; then break; fi; done
 			peek=${peek:0:(-2)}; # remove the last ', '
 			[ $#peek -gt $COLUMNS ] && peek="$(echo $peek | head -c $(( COLUMNS - 3 )) )..." # truncate and add '...' at the end if the peek is too large
-			echo "$C_RED#$i$DEF_C: $C_GREEN$(ts $b)$DEF_C: $C_BLUE$(echo $files | wc -w)$DEF_C file(s)"
+			echo "$C_RED#$i$DEF_C: $C_GREEN$(ts $b)$DEF_C: $C_BLUE$(echo $files | wc -w)$DEF_C file(s) ($C_CYAN$(du -sh $RM_BACKUP_DIR/$b | cut -f1)$DEF_C)"
 			echo "$peek";
 			echo;
 		fi
@@ -838,6 +838,24 @@ function mkback()				# create a backup file of . or the specified dir/file
 	backfile+="-$(date +%s).back.tar.gz";
 	printf "Backing up %s in %s\n" "$toback" "$backfile";
 	tar -cf - "$toback"  | pv -F " %b %r - %e  %t" -s "$(du -sb | cut -d"	" -f1 )" | gzip --best > "$backfile";
+}
+
+BLOG_FILE="$HOME/.blog"
+function blog()					# blog or blog "text" to log it in a file; blog -v to view the logs
+{
+	if [ "$1" = "-v" ]; then
+		less -S "$BLOG_FILE";
+	else
+		trap "" INT
+		date "+%D %T" | tee -a "$BLOG_FILE"
+		if [ $# -eq 0 ]; then
+			cat >> "$BLOG_FILE"
+		else
+			echo "$@" >> "$BLOG_FILE"
+		fi
+		echo -e "\n" >> "$BLOG_FILE"
+		trap - INT
+	fi
 }
 
 
@@ -1054,7 +1072,7 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 {
 	local MATCH
 	LBUFFER=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
-	LBUFFER+="${abbrev[$MATCH]:-$MATCH} ";
+	LBUFFER+="${abbrev[$MATCH]:-$MATCH }";
 }; zle -N magic-abbrev-expand
 
 function magic-accept-and-abbrev-expand()	# expand the last word in the complete corresponding abbreviation if any
@@ -1166,9 +1184,10 @@ bindkey $key[C-left] backward-word
 bindkey $key[C-right] forward-word
 
 bindkey "^[k" kill-word
-bindkey "^w" kill-region		 # emacs-like kill
+bindkey "^W" kill-region		 # emacs-like kill
 
-bindkey "^y" yank-pop			# rotate yank array
+bindkey "^Y" yank				# paste
+bindkey "^[y" yank-pop			# rotate yank array
 
 bindkey $key[S-tab] reverse-menu-complete # shift tab for backward completion
 
