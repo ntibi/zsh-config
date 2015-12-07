@@ -476,7 +476,7 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 	local -i i
 	local last
 	local params
-	local -i col
+	local col
 	i=0
 	params=()
 	col=""
@@ -502,7 +502,7 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 		else
 			last=$c
 		fi
-		i=$(( i + 1))
+		i+=1;
 	done
 	if [ "$c" = "$last" ]; then
 		echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
@@ -548,7 +548,7 @@ function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>`
 
 function rrm()					# real rm
 {
-	if [ "$@" != "$HOME" ] && [ "$@" != "/" ]; then
+	if [ "$1" != "$HOME" -a "$1" != "/" ]; then
 		command rm $@;
 	fi
 }
@@ -844,7 +844,7 @@ BLOG_FILE="$HOME/.blog"
 function blog()					# blog or blog "text" to log it in a file; blog -v to view the logs
 {
 	if [ "$1" = "-v" ]; then
-		less -S "$BLOG_FILE";
+		[ -f "$BLOG_FILE" ] && less -S "$BLOG_FILE";
 	else
 		trap "" INT
 		date "+%D %T" | tee -a "$BLOG_FILE"
@@ -1105,7 +1105,7 @@ function self-insert()			# call pre hook, insert key, and cal post hook
 bindkey -e				  # load emacs style key binding
 
 
-typeset -A key			  # associative array with more explicit names
+typeset -Ag key			  # associative array with more explicit names
 
 key[up]=$terminfo[kcuu1]
 key[down]=$terminfo[kcud1]
