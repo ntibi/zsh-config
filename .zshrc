@@ -1090,7 +1090,7 @@ function no-magic-abbrev-expand() # space
 
 function self-insert-hook() # hook after each non-binded key pressed
 {
-	# BUFFER=${BUFFER//;;/\~};
+	
 }; zle -N self-insert-hook
 
 function self-insert()			# call pre hook, insert key, and cal post hook
