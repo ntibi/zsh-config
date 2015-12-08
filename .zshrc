@@ -958,7 +958,7 @@ zstyle ":completion:*:approximate:*" max-errors "(( ($#BUFFER)/3 ))" # allow one
 zle -C complete-file complete-word _generic
 zstyle ':completion:complete-file::::' completer _files
 
-zstyle ':completion:*' file-sort modification reverse # newest files at first
+zstyle ':completion:*' file-sort modification # newest files at first
 
 zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 
