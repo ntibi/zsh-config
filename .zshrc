@@ -46,6 +46,13 @@
 # Loading .postzshrc
 #
 # # # # # # # #
+#
+# Todo:
+# Use getops to parse options
+# Set file-completer sort by last modified
+# Try zrecompile
+#
+
 
 if [ ! $(echo "$0" | grep -s "zsh") ]; then
 	echo "error: Not in zsh" 1>&2
