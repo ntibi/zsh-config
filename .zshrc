@@ -765,7 +765,7 @@ function hscroll()				# test
 
 function iter()
 {
-	local -i i;
+	local i;
 	local command;
 	local sep;
 	local elts;
@@ -916,6 +916,7 @@ function useless_fractal()
 
 autoload add-zsh-hook			# control the hooks (chpwd, precmd, ...)
 autoload zed					# zsh editor
+autoload zargs					# xargs like in shell
 autoload _setxkbmap				# load setxkbmap autocompletion
 
 # autoload predict-on			# fish like suggestion (with bundled lags !)
@@ -1230,12 +1231,12 @@ add-abbrev "hh"		"| head -n"
 add-abbrev "lc"		"| wc -l"
 add-abbrev "gg"		"| grep "
 add-abbrev "ee"		"$EDITOR "
-add-abbrev "pp"		"$PAGER "
+add-abbrev "pa"		"$PAGER "
 add-abbrev "gb"		"git branch "
 add-abbrev "gc"		"git commit -m\"\""
 add-abbrev "gk"		"git checkout "
 add-abbrev "gp"		"git push"
-add-abbrev "py"		"python "
+add-abbrev "pyt"	"python "
 add-abbrev "res"	"ressource"
 
 alias l="ls -lFh"				# list + classify + human readable
