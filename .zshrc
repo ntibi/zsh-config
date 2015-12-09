@@ -48,6 +48,7 @@
 # # # # # # # #
 #
 # Todo:
+# Change the magic expand key to tab to see if it feels better
 # Use getops to parse options
 # Set file-completer sort by last modified
 # Try zrecompile
@@ -125,6 +126,7 @@ setopt auto_remove_slash		# remove slash when pressing space in auto completion
 setopt null_glob				# remove pointless globs
 setopt auto_cd					# './dir' = 'cd dir'
 setopt c_bases					# c-like bases conversions
+setopt c_precedences			# c-like operators
 setopt emacs					# enable emacs like keybindigs
 setopt flow_control				# enable C-q and C-s to control the flooow
 setopt complete_in_word			# complete from anywhere
@@ -865,6 +867,21 @@ function blog()					# blog or blog "text" to log it in a file; blog -v to view t
 	fi
 }
 
+function kbd()
+{
+	case $1 in
+		(caps-ctrl)
+			setxkbmap -option ctrl:nocaps;; # caps lock is a ctrl key
+		(caps-esc)
+			setxkbmap -option caps:escape;; # caps lock is an alt key
+		(caps-super)
+			setxkbmap -option caps:super;; # caps lock is a super key
+		(us)
+			setxkbmap us;;
+		(fr)
+			setxkbmap fr;;
+	esac
+}
 
 ### LESS USEFUL USER FUNCTIONS ###
 
@@ -970,12 +987,14 @@ compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 _ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
 compdef _ff ff
 
-_setprompt() { _arguments "1:prompt:(('complete:prompt with all the options' 'classic:classic prompt' 'lite:lite prompt' 'superlite:super lite prompt' 'nogit:default prompt without the git infos'))"}
+_setprompt() { _arguments "1:prompt:(('complete:prompt with all the options' 'classic:classic prompt' 'lite:lite prompt' 'superlite:super lite prompt' 'nogit:default prompt without the git infos'))" }
 compdef _setprompt setprompt
 
-_loadconf() { _arguments "1:visual configuration:(('complete:complete configuration' 'static:complete configuration without the dynamic title and clock updates' 'lite:smaller configuration'))"}
+_loadconf() { _arguments "1:visual configuration:(('complete:complete configuration' 'static:complete configuration without the dynamic title and clock updates' 'lite:smaller configuration'))" }
 compdef _loadconf loadconf
 
+_kbd() { _alternative "1:layouts:(('us:qwerty keyboard layout' 'fr:azerty keyboard layout'))" "2:capslock rebinds:(('caps-ctrl:capslock as control' 'caps-esc:capslock as escape' 'caps-super:capslock as super'))" }
+compdef _kbd kbd
 
 ### SHELL COMMANDS BINDS ###
 
@@ -1107,6 +1126,15 @@ function self-insert()			# call pre hook, insert key, and cal post hook
 	zle self-insert-hook;
 }; zle -N self-insert
 
+function show-kill-ring()
+{
+	local kr;
+	kr="$CUTBUFFER";
+	for k in $killring; do
+		kr+=", $k"
+	done
+	zle -M "$kr";
+}; zle -N show-kill-ring
 
 ### ZSH FUNCTIONS BINDS ###
 
@@ -1184,6 +1212,8 @@ bindkey "^D" delete-char
 
 bindkey "^X^X" exchange-point-and-mark
 
+bindkey "^X^K" show-kill-ring
+
 bindkey "\`\`" sub-function
 bindkey "\'\'" simple-quote
 bindkey "\"\"" double-quote
@@ -1245,6 +1275,8 @@ add-abbrev "gk"		"git checkout "
 add-abbrev "gp"		"git push"
 add-abbrev "pyt"	"python "
 add-abbrev "res"	"ressource"
+add-abbrev "pull"	"git pull"
+add-abbrev "push"	"git push"
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
