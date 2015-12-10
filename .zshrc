@@ -48,7 +48,8 @@
 # # # # # # # #
 #
 # Todo:
-# Change the magic expand key to tab to see if it feels better
+#
+#
 #
 
 
@@ -810,6 +811,9 @@ function add-abbrev()			# add a dynamic abbreviation
 {
 	if [ $# -eq 2 ]; then
 		abbrev+=("$1" "$2");
+		if [[ "$2" =~ "^[A-Za-z_-]+$" ]]; then
+			alias "$1"="$2";
+		fi
 	else
 		echo "Usage: add-abbrev 'word' 'abbrev'" >&2;
 	fi
@@ -1118,23 +1122,16 @@ function get-word-at-point()
 
 function magic-abbrev-expand()	# expand the last word in the complete corresponding abbreviation if any
 {
-	local MATCH
-	LBUFFER=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
-	LBUFFER+="${abbrev[$MATCH]:-$MATCH }";
+	local MATCH;
+	local tmp;
+	tmp=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
+	MATCH=${abbrev[$MATCH]};
+	if [ ! -z "$MATCH" ]; then
+		LBUFFER="$tmp$MATCH";
+	else
+		zle expand-or-complete;
+	fi
 }; zle -N magic-abbrev-expand
-
-function magic-accept-and-abbrev-expand()	# expand the last word in the complete corresponding abbreviation if any
-{
-	local MATCH
-	LBUFFER=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
-	LBUFFER+="${abbrev[$MATCH]:-$MATCH}";
-	zle accept-line;
-}; zle -N magic-accept-and-abbrev-expand
-
-function no-magic-abbrev-expand() # space
-{
-	LBUFFER+=" ";
-}; zle -N no-magic-abbrev-expand
 
 function self-insert-hook() # hook after each non-binded key pressed
 {
@@ -1212,10 +1209,7 @@ key[F12]=$terminfo[kf12]
 
 
 
-bindkey " " magic-abbrev-expand
-bindkey "^V " no-magic-abbrev-expand
-bindkey "^M" magic-accept-and-abbrev-expand
-bindkey "^V^M" accept-line
+bindkey "^I" magic-abbrev-expand
 
 bindkey -M isearch " " self-insert
 bindkey -M isearch "^M" self-insert
@@ -1289,16 +1283,19 @@ add-abbrev "tf"		"tail -fn0"
 add-abbrev "hh"		"| head -n"
 add-abbrev "lc"		"| wc -l"
 add-abbrev "gg"		"| grep "
-add-abbrev "ee"		"$EDITOR "
-add-abbrev "pa"		"$PAGER "
+add-abbrev "e"		"$EDITOR "
+add-abbrev "pp"		"$PAGER "
 add-abbrev "gb"		"git branch "
+add-abbrev "branch"	"git branch "
 add-abbrev "gc"		"git commit -m\"\""
+add-abbrev "commit"	"git commit -m\"\""
 add-abbrev "gk"		"git checkout "
 add-abbrev "gp"		"git push"
-add-abbrev "pyt"	"python "
+add-abbrev "py"		"python "
 add-abbrev "res"	"ressource"
-add-abbrev "pu"		"git pull"
-add-abbrev "ph"		"git push"
+add-abbrev "pull"	"git pull"
+add-abbrev "push"	"git push"
+add-abbrev "ce"		"cat -e"
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
