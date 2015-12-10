@@ -1279,10 +1279,11 @@ esac
 
 add-abbrev "ll"		"| less"
 add-abbrev "tt"		"| tail -n"
-add-abbrev "tf"		"tail -fn0"
 add-abbrev "hh"		"| head -n"
 add-abbrev "lc"		"| wc -l"
 add-abbrev "gg"		"| grep "
+add-abbrev "ce"		"| cat -e"
+add-abbrev "tf"		"tail -fn0"
 add-abbrev "e"		"$EDITOR "
 add-abbrev "pp"		"$PAGER "
 add-abbrev "gb"		"git branch "
@@ -1295,7 +1296,6 @@ add-abbrev "py"		"python "
 add-abbrev "res"	"ressource"
 add-abbrev "pull"	"git pull"
 add-abbrev "push"	"git push"
-add-abbrev "ce"		"cat -e"
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
