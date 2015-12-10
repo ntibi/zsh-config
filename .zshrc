@@ -49,9 +49,6 @@
 #
 # Todo:
 # Change the magic expand key to tab to see if it feels better
-# Use getops to parse options
-# Set file-completer sort by last modified
-# Try zrecompile
 #
 
 
@@ -1275,8 +1272,8 @@ add-abbrev "gk"		"git checkout "
 add-abbrev "gp"		"git push"
 add-abbrev "pyt"	"python "
 add-abbrev "res"	"ressource"
-add-abbrev "pull"	"git pull"
-add-abbrev "push"	"git push"
+add-abbrev "pu"		"git pull"
+add-abbrev "ph"		"git push"
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
