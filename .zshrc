@@ -883,6 +883,27 @@ function kbd()
 	esac
 }
 
+function popup()
+{
+	local -i x y;
+	local msg;
+	while getopts "x:y:" opt 2>/dev/null ; do
+		case $opt in
+			(x) x=$OPTARG;;
+			(y) y=$OPTARG;;
+			(*) echo "Invalid option" >&2;
+				return;;
+		esac
+	done
+	shift $(( $OPTIND - 1 ));
+	msg="$*";
+	tput sc;
+	tput cup $x $y;
+	echo -n "$msg";
+	tput rc;
+}
+
+
 ### LESS USEFUL USER FUNCTIONS ###
 
 
@@ -1135,6 +1156,7 @@ function show-kill-ring()
 	done
 	zle -M "$kr";
 }; zle -N show-kill-ring
+
 
 ### ZSH FUNCTIONS BINDS ###
 
