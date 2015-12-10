@@ -897,10 +897,13 @@ function popup()
 	done
 	shift $(( $OPTIND - 1 ));
 	msg="$*";
+	tput civis;
 	tput sc;
-	tput cup $x $y;
-	echo -n "$msg";
+	tput cup $y $x;
+	print "$msg";
 	tput rc;
+	tput cnorm;
+	read -sk1;
 }
 
 
