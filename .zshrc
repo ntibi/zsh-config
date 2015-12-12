@@ -811,7 +811,7 @@ function add-abbrev()			# add a dynamic abbreviation
 {
 	if [ $# -eq 2 ]; then
 		abbrev+=("$1" "$2");
-		if [[ "$2" =~ "^[A-Za-z_-]+$" ]]; then
+		if [[ "$2" =~ "^[A-Za-z0-9 _\"'\-]+$" ]]; then
 			alias "$1"="$2";
 		fi
 	else
@@ -821,15 +821,27 @@ function add-abbrev()			# add a dynamic abbreviation
 
 function show-abbrevs()			# list all the defined abbreviations
 {
+	local -i pad;
+
 	for k in "${(@k)abbrev}"; do
-		printf "$C_BLUE%-15s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$abbrev[$k]";
+		[ $#k -gt $pad ] && pad=$#k;
+	done
+	(( pad+=2 ));
+	for k in "${(@k)abbrev}"; do
+		printf "$C_BLUE%-${pad}s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$abbrev[$k]";
 	done
 }
 
 function show-aliases()			# list all aliases
 {
+	local -i pad;
+
 	for k in "${(@k)aliases}"; do
-		printf "$C_BLUE%-15s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$aliases[$k]";
+		[ $#k -gt $pad ] && pad=$#k;
+	done
+	(( pad+=2 ));
+	for k in "${(@k)aliases}"; do
+		printf "$C_BLUE%-${pad}s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$aliases[$k]";
 	done
 }
 
@@ -886,8 +898,11 @@ function kbd()
 
 function popup()
 {
+	trap "tput cnorm; tput rc; return;" INT;
 	local -i x y;
 	local msg;
+	x=-1;
+	y=-1;
 	while getopts "x:y:" opt 2>/dev/null ; do
 		case $opt in
 			(x) x=$OPTARG;;
@@ -902,9 +917,9 @@ function popup()
 	tput sc;
 	tput cup $y $x;
 	print "$msg";
+	read -sk1;
 	tput rc;
 	tput cnorm;
-	read -sk1;
 }
 
 
