@@ -97,7 +97,7 @@ case "$OS" in
 	(*cygwin*)					# cygwin
 		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
 	(*linux*|*)					# Linux
-		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
+		LS_COLORS='fi=1;34:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
 esac
 
 DEF_C="$(tput sgr0)"
@@ -521,8 +521,8 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
 {
 	local -i delta;
-	local -i ts1=$1;
-	local -i ts2=$2;
+	local -i ts1=$(echo $1 | grep -Eo "[0-9]+" | cut -d\  -f1);
+	local -i ts2=$(echo $2 | grep -Eo "[0-9]+" | cut -d\  -f1);
 	local sign;
 
 	if [ $# = 0 ]; then
@@ -811,7 +811,7 @@ function add-abbrev()			# add a dynamic abbreviation
 {
 	if [ $# -eq 2 ]; then
 		abbrev+=("$1" "$2");
-		if [[ "$2" =~ "^[A-Za-z0-9 _\"'\-]+$" ]]; then
+		if [[ "$2" =~ "^[A-Za-z0-9 _\"'\.\-]+$" ]]; then
 			alias "$1"="$2";
 		fi
 	else
@@ -1003,7 +1003,7 @@ zstyle ':completion:*' ignore-parents parent pwd		  # avoid stupid ./../currend_
 
 zstyle ":completion:*" menu select # select menu completion
 
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS} # ls colors for files/dirs completion
+zstyle ':completion:*:*' list-colors ${(s.:.)LS_COLORS} # ls colors for files/dirs completion
 
 zstyle ":completion:*" group-name "" # group completion
 
@@ -1139,7 +1139,7 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 {
 	local MATCH;
 	local tmp;
-	tmp=${LBUFFER%%(#m)[_a-zA-Z0-9]#};
+	tmp=${LBUFFER%%(#m)[_a-zA-Z0-9\[\]/\-]#};
 	MATCH=${abbrev[$MATCH]};
 	if [ ! -z "$MATCH" ]; then
 		LBUFFER="$tmp$MATCH";
@@ -1311,6 +1311,10 @@ add-abbrev "py"		"python "
 add-abbrev "res"	"ressource"
 add-abbrev "pull"	"git pull"
 add-abbrev "push"	"git push"
+add-abbrev "s2e"	"1>&2"
+add-abbrev "e2s"	"2>&1"
+add-abbrev "ns"		"1> /dev/null"
+add-abbrev "ne"		"2> /dev/null"
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
