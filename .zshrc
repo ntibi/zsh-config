@@ -1039,7 +1039,7 @@ compdef _kbd kbd
 ### SHELL COMMANDS BINDS ###
 
 # C-v or 'cat -v' to get the keycode
-bindkey -s "^[j" "^Ujoin_others_shells\n" # join_others_shells user function
+bindkey -s "^[j" "^A^Kjoin_others_shells\n" # join_others_shells user function
 bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
 bindkey -s "^[e" "^Uerror\n"			  # run error user function
 bindkey -s "^[s" "^Asudo ^E"	# insert sudo
@@ -1300,6 +1300,7 @@ add-abbrev "gg"		"| grep -E "
 add-abbrev "gv"		"| grep -Ev "
 add-abbrev "ce"		"| cat -e"
 add-abbrev "cutf"	"| cut -d\  -f"
+add-abbrev "T"		"| tee "
 add-abbrev "tf"		"tail -fn0"
 add-abbrev "e"		"$EDITOR "
 add-abbrev "pp"		"$PAGER "
@@ -1308,15 +1309,17 @@ add-abbrev "branch"	"git branch "
 add-abbrev "gc"		"git commit -m"
 add-abbrev "commit"	"git commit -m"
 add-abbrev "gk"		"git checkout "
-add-abbrev "gp"		"git push"
 add-abbrev "py"		"python "
 add-abbrev "res"	"ressource"
-add-abbrev "pull"	"git pull"
-add-abbrev "push"	"git push"
+add-abbrev "pull"	"git pull "
+add-abbrev "push"	"git push "
+add-abbrev "gp"		"git push "
 add-abbrev "s2e"	"1>&2"
 add-abbrev "e2s"	"2>&1"
 add-abbrev "ns"		"1> /dev/null"
 add-abbrev "ne"		"2> /dev/null"
+add-abbrev "col"	'${COLUMNS}'
+add-abbrev "lin"	'${LINES}'
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
