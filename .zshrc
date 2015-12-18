@@ -64,6 +64,7 @@ fi
 
 ### USEFUL VARS ###
 
+_TERM="$TERM"
 TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/" # check if xterm-256 color is available, or if we are in a dumb shell
 
 typeset -Ug PATH				# do not accept doubles
@@ -1186,6 +1187,10 @@ key[C-up]="^[[1;5A"
 key[C-down]="^[[1;5B"
 key[C-left]="^[[1;5D"
 key[C-right]="^[[1;5C"
+# key[C-up]="^[[A"				# when on old terms
+# key[C-down]="^[[B"
+# key[C-left]="^[[D"
+# key[C-right]="^[[C"
 
 key[M-up]="^[[1;3A"
 key[M-down]="^[[1;3B"
