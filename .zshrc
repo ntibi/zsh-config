@@ -593,7 +593,7 @@ function save()					# backup the files
 		local backup;
 		local idir;
 		local rm_params;
-		local -i i;
+		local i;
 		idir="";
 		rm_params="";
 		backup="$RM_BACKUP_DIR/$(date +%s)";
@@ -812,7 +812,7 @@ function add-abbrev()			# add a dynamic abbreviation
 	if [ $# -eq 2 ]; then
 		abbrev+=("$1" "$2");
 		if [[ "$2" =~ "^[A-Za-z0-9 _\"'\.\-]+$" ]]; then
-			alias "$1"="$2";
+			alias -- "$1"="$2";
 		fi
 	else
 		echo "Usage: add-abbrev 'word' 'abbrev'" >&2;
