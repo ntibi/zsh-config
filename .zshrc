@@ -926,7 +926,6 @@ function popup()
 
 ### LESS USEFUL USER FUNCTIONS ###
 
-
 function race()					# race between tokens given in parameters
 {
 	cat /dev/urandom | tr -dc "0-9A-Za-z" | command egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
@@ -971,6 +970,7 @@ function useless_fractal()
 				((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew));
 			done
 			echo -n "\\e[4$(( (i/4)%8 ))m ";
+			# echo -n "\\e[48;5;$(( ((i/4)%23) + 232 ))m ";
 		done
 		echo;
 	done
@@ -1036,6 +1036,7 @@ compdef _loadconf loadconf
 
 _kbd() { _alternative "1:layouts:(('us:qwerty keyboard layout' 'fr:azerty keyboard layout'))" "2:capslock rebinds:(('caps-ctrl:capslock as control' 'caps-esc:capslock as escape' 'caps-super:capslock as super'))" }
 compdef _kbd kbd
+
 
 ### SHELL COMMANDS BINDS ###
 
