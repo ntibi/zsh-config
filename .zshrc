@@ -790,7 +790,7 @@ function iter()					# iter elt1 elt2 ... - command -opt1 -opt2 ...
 		fi
 	done
 	for i in $elts; do
-		${=command} $i;			# perform word split on the array
+		${=command//{}/$i};		# perform word split on the array
 	done
 }
 
