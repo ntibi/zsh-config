@@ -771,7 +771,7 @@ function hscroll()				# test
 	tput cnorm;
 }
 
-function iter()
+function iter()					# iter elt1 elt2 ... - command -opt1 -opt2 ...
 {
 	local i;
 	local command;
@@ -779,6 +779,7 @@ function iter()
 	local elts;
 
 	elts=();
+	command=();
 	for i in $@; do
 		if [ ! -z "$sep" ]; then
 			command+="$i";
@@ -789,7 +790,7 @@ function iter()
 		fi
 	done
 	for i in $elts; do
-		$command $i;
+		${=command} $i;			# perform word split on the array
 	done
 }
 
@@ -969,8 +970,8 @@ function useless_fractal()
 			for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)); do
 				((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew));
 			done
-			echo -n "\\e[4$(( (i/4)%8 ))m ";
-			# echo -n "\\e[48;5;$(( ((i/4)%23) + 232 ))m ";
+			# echo -n "\\e[4$(( (i/4)%8 ))m ";
+			echo -n "\\e[48;5;$(( ((i/4)%23) + 232 ))m ";
 		done
 		echo;
 	done
