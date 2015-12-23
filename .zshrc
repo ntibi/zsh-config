@@ -479,12 +479,13 @@ function colorcode()  			# get the code to set the corresponding fg color
 	done
 }
 
-function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to colorize expr with color # maybe change the syntax to <regex>:fg:bg?:mod? ...
-{
+function colorize() 			# cmd | colorize <exp1> (f/b)?<color1> <exp2> (f/b)?<color2> ... to colorize expr with color
+{								# ie: cat log.log | colorize WARNING byellow ERROR bred DEBUG green INFO yellow "[0-9]+" 125 "\[[^\]]+\]" 207
 	local -i i
 	local last
 	local params
 	local col
+	local background;
 	i=0
 	params=()
 	col=""
@@ -493,20 +494,33 @@ function colorize() 			# cmd | colorize <exp1> <color1> <exp2> <color2> ... to c
 		return ;
 	fi
 	for c in "$@"; do
-		case $c in
-			("black") 	col=0;;
-			("red") 	col=1;;
-			("green") 	col=2;;
-			("yellow") 	col=3;;
-			("blue") 	col=4;;
-			("purple") 	col=5;;
-			("cyan") 	col=6;;
-			("white") 	col=7;;
-			(*) 		col=$c;;
-		esac
-		if [ "$((i % 2))" = "1" ]; then
-			params+="-e"
-			params+="s/($last)/$(tput setaf $col)\1$(tput sgr0)/g" # investigate about ```MDR=""; MDR="-e"; echo $MDR```
+		if [ "$((i % 2))" -eq 1 ]; then
+			case "$c[1]" in
+				(b*)
+					background="1";
+					c="${c[2,$#c]}";;
+				(f*)
+					background="";
+					c="${c[2,$#c]}";;
+			esac
+			case $c in
+				("black") 	col=0;;
+				("red") 	col=1;;
+				("green") 	col=2;;
+				("yellow") 	col=3;;
+				("blue") 	col=4;;
+				("purple") 	col=5;;
+				("cyan") 	col=6;;
+				("white") 	col=7;;
+				(*) 		col=$c;;
+			esac
+			if [ $#background -ne 0 ]; then
+				col="$(tput setab $col)";
+			else
+				col="$(tput setaf $col)";
+			fi
+			params+="-e";
+			params+="s/(${last//\//\\/})/$col\1$DEF_C/g"; # replace all / by \/ to don't fuck the regex
 		else
 			last=$c
 		fi
