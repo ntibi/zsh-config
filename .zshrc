@@ -335,13 +335,13 @@ function periodic()				# every $PERIOD secs - triggered by promt print
 
 function preexec()				# pre execution hook
 {
-	[ -z $UPDATE_TERM_TITLE ] || printf "\e]2;%s : %s\a" "$PWD" "$1" # set 'pwd + cmd' set term title
+	[ -z $UPDATE_TERM_TITLE ] || printf "\e]2;%s : %s\a" "${PWD/~/~}" "$1" # set 'pwd + cmd' set term title
 }
 
 function precmd()				# pre promt hook
 {
 	[ -z $UPDATE_CLOCK ] || clock
-	[ -z $UPDATE_TERM_TITLE ] || printf "\e]2;%s\a" "$PWD" # set pwd as term title
+	[ -z $UPDATE_TERM_TITLE ] || printf "\e]2;%s\a" "${PWD/~/~}" # set pwd as term title
 	
 	set_git_char
 }
@@ -530,7 +530,8 @@ function colorize() 			# cmd | colorize <exp1> (f/b)?<color1> <exp2> (f/b)?<colo
 		echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
 		return
 	fi
-	sed -r $params
+	# sed -r $params
+	sed --unbuffered -r $params
 }
 
 function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>` to know how long ago, `ts <timestamp1> <timestamp2>` timestamp diff)
@@ -804,7 +805,7 @@ function iter()					# iter elt1 elt2 ... - command -opt1 -opt2 ...
 		fi
 	done
 	for i in $elts; do
-		${=command//{}/$i};		# perform word split on the array
+		eval ${=command//{}/$i};		# perform word split on the array
 	done
 }
 
@@ -1384,6 +1385,7 @@ update_pwd_datas
 update_pwd_save
 set_git_char
 loadconf static
+title
 rehash							# hash commands in path
 
 trap clock WINCH
