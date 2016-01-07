@@ -1248,9 +1248,6 @@ key[F12]=$terminfo[kf12]
 
 bindkey "^I" magic-abbrev-expand
 
-bindkey -M isearch " " self-insert
-bindkey -M isearch "^M" self-insert
-
 bindkey $key[left] backward-char
 bindkey $key[right] forward-char
 
