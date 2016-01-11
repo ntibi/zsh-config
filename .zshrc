@@ -124,6 +124,7 @@ setopt hist_expire_dups_first	# remove all dubs in history when full
 setopt auto_remove_slash		# remove slash when pressing space in auto completion
 setopt null_glob				# remove pointless globs
 setopt auto_cd					# './dir' = 'cd dir'
+setopt auto_push_d					# './dir' = 'cd dir'
 setopt c_bases					# c-like bases conversions
 setopt c_precedences			# c-like operators
 setopt emacs					# enable emacs like keybindigs
@@ -131,7 +132,7 @@ setopt flow_control				# enable C-q and C-s to control the flooow
 setopt complete_in_word			# complete from anywhere
 setopt clobber					# i aint no pussy
 setopt extended_glob			# used in matching im some functions
-setopt multios					# no more tee !
+setopt multi_os					# no more tee !
 
 [ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
