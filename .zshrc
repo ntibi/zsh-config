@@ -160,7 +160,7 @@ function update_pwd_save()		# update the $PWD_FILE
 function set_git_branch()
 {
 	if [ $REPO -eq 1 ]; then		# if in git repo, get git infos
-		GIT_BRANCH="$(git branch | grep \* | cut -d\  -f2)";
+		GIT_BRANCH="$(git branch | grep \* | cut -d\  -f2-)";
 	else
 		GIT_BRANCH="";
 	fi
