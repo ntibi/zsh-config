@@ -986,8 +986,8 @@ function useless_fractal()
 			for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)); do
 				((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew));
 			done
-			# echo -n "\\e[4$(( (i/4)%8 ))m ";
-			echo -n "\\e[48;5;$(( ((i/4)%23) + 232 ))m ";
+			echo -n "\\e[4$(( (i/4)%8 ))m ";
+			# echo -n "\\e[48;5;$(( ((i/4)%23) + 232 ))m ";
 		done
 		echo;
 	done
@@ -1181,7 +1181,7 @@ function self-insert()			# call pre hook, insert key, and cal post hook
 function show-kill-ring()
 {
 	local kr;
-	kr="$CUTBUFFER";
+	kr="=> $CUTBUFFER";
 	for k in $killring; do
 		kr+=", $k"
 	done
@@ -1353,6 +1353,7 @@ alias grep="grep --color=auto"
 alias egrep="egrep --color=auto"
 installed tree && alias tree="tree -C"		   # -C colorzzz
 installed colordiff && alias diff="colordiff" # diff with nicer colors
+installed rsync && alias cpr="rsync -a --stats --progress" # faster
 alias less="less -RS"			# -R Raw control chars, -S to truncate the long lines instead of folding them
 
 alias ressource="source ~/.zshrc"
