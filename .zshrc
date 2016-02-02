@@ -133,6 +133,8 @@ setopt complete_in_word			# complete from anywhere
 setopt clobber					# i aint no pussy
 setopt extended_glob			# used in matching im some functions
 setopt multi_os					# no more tee !
+setopt cd_able_vars				# hash -d mdr=~/my/long/path/; cd mdr
+setopt hist_fcntl_lock
 
 [ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
@@ -816,14 +818,23 @@ function c()					# simple calculator
 }
 
 function d2h()					# decimal to hexa
-{
-	printf "0x%x\n" "$1"
-}
+{ echo $(( [#16]$1 )); }
 
 function h2d()					# hexa to decimal
-{
-	echo $((16#$1));
-}
+{ echo $(( 16#$1 )); }
+
+function d2b()					# decimal to binary
+{ echo $(( [#2]$1 )); }
+
+function h2b()					# binary to decimal
+{ echo $(( 2#$1 )); }
+
+function h2b()					# hexa to binary
+{ echo $(( [#2]16#$1 )); }
+
+function b2h()					# binary to hexa
+{ echo $(( [#16]2#$1 )); }
+
 
 function add-abbrev()			# add a dynamic abbreviation
 {
@@ -1016,6 +1027,7 @@ zmodload zsh/complist			# load compeltion list
 
 ### SETTING UP ZSH COMPLETION STUFF ###
 
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # case insensitive completion
 zstyle ':completion:*:(rm|cp|mv|emacs):*' ignore-line yes # remove suggestion if already in selection
 zstyle ':completion:*' ignore-parents parent pwd		  # avoid stupid ./../currend_dir
 
@@ -1163,7 +1175,10 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 	if [ ! -z "$MATCH" ]; then
 		LBUFFER="$tmp$MATCH";
 	else
-		zle expand-or-complete;
+		case "$KEYS" in
+			("	") zle expand-or-complete;;
+			(*) zle .self-insert;;
+		esac
 	fi
 }; zle -N magic-abbrev-expand
 
@@ -1248,6 +1263,7 @@ key[F12]=$terminfo[kf12]
 
 
 bindkey "^I" magic-abbrev-expand
+# bindkey " " magic-abbrev-expand	# a bit too intrusive
 
 bindkey $key[left] backward-char
 bindkey $key[right] forward-char
