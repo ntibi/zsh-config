@@ -49,7 +49,8 @@
 #
 # Todo:
 #
-#
+# Split the main file
+# Optimize all the callbacks
 #
 
 
@@ -1074,10 +1075,7 @@ bindkey -s "^[j" "^A^Kjoin_others_shells\n" # join_others_shells user function
 bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
 bindkey -s "^[e" "^Uerror\n"			  # run error user function
 bindkey -s "^[s" "^Asudo ^E"	# insert sudo
-bindkey -s "^[g" "^A^Kgit commit -m\"\""
-bindkey -s "^[c" "^A^Kgit checkout 		"
 bindkey -s "\el" "^Uls\n"		# run ls
-bindkey -s "\ed" "^Upwd\n"		# run pwd
 
 bindkey -s ";;" "~"
 
@@ -1328,6 +1326,7 @@ case "$OS" in
 		alias ls="ls --color=auto";;
 esac
 
+
 add-abbrev "ll"		"| less"
 add-abbrev "tt"		"| tail -n"
 add-abbrev "hh"		"| head -n"
@@ -1337,7 +1336,7 @@ add-abbrev "gv"		"| grep -Ev "
 add-abbrev "ce"		"| cat -e"
 add-abbrev "cutf"	"| cut -d\  -f"
 add-abbrev "T"		"| tee "
-add-abbrev "tf"		"tail -fn0"
+add-abbrev "tf"		"tail -fn10"
 add-abbrev "e"		"$EDITOR "
 add-abbrev "pp"		"$PAGER "
 add-abbrev "gb"		"git branch "
@@ -1348,6 +1347,7 @@ add-abbrev "gk"		"git checkout "
 add-abbrev "py"		"python "
 add-abbrev "res"	"ressource"
 add-abbrev "pull"	"git pull "
+add-abbrev "fetch"	"git fetch "
 add-abbrev "push"	"git push "
 add-abbrev "gp"		"git push "
 add-abbrev "s2e"	"1>&2"
@@ -1356,6 +1356,7 @@ add-abbrev "ns"		"1> /dev/null"
 add-abbrev "ne"		"2> /dev/null"
 add-abbrev "col"	'${COLUMNS}'
 add-abbrev "lin"	'${LINES}'
+
 
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
@@ -1367,9 +1368,9 @@ alias mkdir="mkdir -pv"			# create all the needed parent directories + inform us
 
 alias grep="grep --color=auto"
 alias egrep="egrep --color=auto"
-installed tree && alias tree="tree -C"		   # -C colorzzz
+installed tree && alias tree="tree -C"		  # -C colorzzz
 installed colordiff && alias diff="colordiff" # diff with nicer colors
-installed rsync && alias cpr="rsync -a --stats --progress" # faster
+installed rsync && alias cpr="rsync -a --stats --progress" || alias cpr="cp -R" # faster
 alias less="less -RS"			# -R Raw control chars, -S to truncate the long lines instead of folding them
 
 alias ressource="source ~/.zshrc"
