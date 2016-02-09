@@ -1029,7 +1029,7 @@ zmodload zsh/complist			# load compeltion list
 ### SETTING UP ZSH COMPLETION STUFF ###
 
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # case insensitive completion
-zstyle ':completion:*:(rm|cp|mv|emacs):*' ignore-line yes # remove suggestion if already in selection
+zstyle ':completion:*:(rm|emacs):*' ignore-line yes # remove suggestion if already in selection
 zstyle ':completion:*' ignore-parents parent pwd		  # avoid stupid ./../currend_dir
 
 zstyle ":completion:*" menu select # select menu completion
@@ -1050,6 +1050,10 @@ zstyle ':completion:*' file-sort modification # newest files at first
 
 zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 
+zstyle ':completion::complete:*' use-cache on # completion caching
+zstyle ':completion:*' cache-path ~/.zcache # cache path
+
+compdef _gnu_generic gdb emacs htop curl tr pv objdump # parse gnu getopts --help
 compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 
 
