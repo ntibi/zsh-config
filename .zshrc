@@ -596,7 +596,7 @@ function rm()					# safe rm with timestamped backup
 				rm_params+="$i";
 			elif [ -f "$i" ] || [ -d "$i" ] || [ -L "$i" ] || [ -p "$i" ]; then # $i exist ?
 				[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
-				i="$(readlink -f $i)";						# simplify the path
+				i=${i:A};		# simplify the path
 				idir="$(dirname $i)";
 				command mkdir -p "$backup/$idir";
 				mv "$i" "$backup$i";
@@ -623,7 +623,7 @@ function save()					# backup the files
 				rm_params+="$i";
 			elif [ -f "$i" ] || [ -d "$i" ] || [ -L "$i" ] || [ -p "$i" ]; then # $i exist ?
 				[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
-				i="$(readlink -f $i)";						# simplify the path
+				i=${i:A};						# simplify the path
 				idir="$(dirname $i)";
 				command mkdir -p "$backup/$idir";
 				if [ -d "$i" ]; then
@@ -691,7 +691,7 @@ function back()					# list all backuped files
 		files=( $(find $RM_BACKUP_DIR/$back[to_restore] -type f) )
 		if [ ! -z "$files" ]; then
 			for f in $files; do echo $f; done | command sed -r -e "s|$RM_BACKUP_DIR/$back[to_restore]||g" -e "s|/home/$USER|~|g"
-			read -q "?Restore ? (Y/n): " && cp --backup=t -R $(readlink -f $RM_BACKUP_DIR/$back[to_restore]/*) / # create file.~1~ if file already exists
+			read -q "?Restore ? (Y/n): " && cp --backup=t -R $RM_BACKUP_DIR/$back[to_restore]/*(:A) / # create file.~1~ if file already exists
 			echo;
 		else
 			echo "No such back"
@@ -882,7 +882,7 @@ function mkback()				# create a backup file of . or the specified dir/file
 
 	if [ -e "$1" ] && [ "$1" != "." ] ; then
 		toback="$1";
-		backfile="$(basename $(readlink -f $1))";
+		backfile="$(basename ${1:A})";
 	else
 		toback=".";
 		backfile="$(basename $(pwd))";
@@ -1175,7 +1175,7 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 	tmp=${LBUFFER%%(#m)[_a-zA-Z0-9\[\]/\-]#};
 	MATCH=${abbrev[$MATCH]};
 	if [ ! -z "$MATCH" ]; then
-		LBUFFER="$tmp$MATCH";
+		LBUFFER="$tmp${(e)MATCH}";
 	else
 		case "$KEYS" in
 			("	") zle expand-or-complete;;
@@ -1360,6 +1360,9 @@ add-abbrev "ns"		"1> /dev/null"
 add-abbrev "ne"		"2> /dev/null"
 add-abbrev "col"	'${COLUMNS}'
 add-abbrev "lin"	'${LINES}'
+add-abbrev "wd"		'$(pwd)'
+add-abbrev "rr"		'$(echo *(om[1]))'
+
 
 
 alias l="ls -lFh"				# list + classify + human readable
