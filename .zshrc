@@ -704,7 +704,7 @@ function back()					# list all backuped files
 
 function ft()					# find arg1 in all files from arg2 or .
 {
-	command find ${2:=.} -type f -exec grep --color=always -InH -e "$1" {} +; # I (ignore binary) n (line number) H (print fn each line)
+	command find ${2:=.} -type f -exec grep --color=always -EInH -e "$1" {} +; # E extended regex, I (ignore binary) n (line number) H (print fn each line)
 }
 
 function installed()
@@ -1284,8 +1284,8 @@ bindkey "^X^X" exchange-point-and-mark
 bindkey "^X^K" show-kill-ring
 
 bindkey "\`\`" sub-function
-bindkey "\'\'" simple-quote
-bindkey "\"\"" double-quote
+# bindkey "\'\'" simple-quote
+# bindkey "\"\"" double-quote
 
 bindkey $key[C-left] backward-word
 bindkey $key[C-right] forward-word
@@ -1411,7 +1411,9 @@ loadconf static
 title
 rehash							# hash commands in path
 
-trap clock WINCH
+# call the clock update when the term size change
+# trap clock WINCH
+
 
 [ -e ~/.postzshrc ] && source ~/.postzshrc # load user file if any
 
