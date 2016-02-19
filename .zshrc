@@ -702,9 +702,9 @@ function back()					# list all backuped files
 }
 
 
-function ft()					# find arg1 in all files from arg2 or .
+function ft()					# find $1 in all files or files containing $3 from $2 or .
 {
-	command find ${2:=.} -type f -exec grep --color=always -EInH -e "$1" {} +; # E extended regex, I (ignore binary) n (line number) H (print fn each line)
+	command find -O3 ${2:=.} -type f -name "*${3:=}*" -exec grep --color=always -EInH -e "$1" {} +; # E extended regex, I (ignore binary) n (line number) H (print fn each line)
 }
 
 function installed()
@@ -1031,6 +1031,8 @@ zmodload zsh/complist			# load compeltion list
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # case insensitive completion
 zstyle ':completion:*:(rm|emacs):*' ignore-line yes # remove suggestion if already in selection
 zstyle ':completion:*' ignore-parents parent pwd		  # avoid stupid ./../currend_dir
+zstyle ':completion:*:processes' command 'ps -au$USER'	  # list all user processes
+zstyle ':completion:*:*:kill:*:processes' list-colors "=(#b) #([0-9]#)*=29=34" # nicer kill
 
 zstyle ":completion:*" menu select # select menu completion
 
@@ -1186,7 +1188,7 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 
 function self-insert-hook() # hook after each non-binded key pressed
 {
-	
+	# region_highlight+=("10 30 bold")
 }; zle -N self-insert-hook
 
 function self-insert()			# call pre hook, insert key, and cal post hook
@@ -1284,8 +1286,8 @@ bindkey "^X^X" exchange-point-and-mark
 bindkey "^X^K" show-kill-ring
 
 bindkey "\`\`" sub-function
-# bindkey "\'\'" simple-quote
-# bindkey "\"\"" double-quote
+bindkey "\'\'" simple-quote
+bindkey "\"\"" double-quote
 
 bindkey $key[C-left] backward-word
 bindkey $key[C-right] forward-word
