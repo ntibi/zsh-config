@@ -119,13 +119,13 @@ C_GREY="$(tput setaf 8)"
 
 setopt prompt_subst				# compute PS1 at each prompt print
 setopt inc_append_history
-setopt share_history
+setopt share_history			# one history file to rule them all
 setopt hist_ignore_dups			# ignore dups in history
 setopt hist_expire_dups_first	# remove all dubs in history when full
 setopt auto_remove_slash		# remove slash when pressing space in auto completion
 setopt null_glob				# remove pointless globs
 setopt auto_cd					# './dir' = 'cd dir'
-setopt auto_push_d					# './dir' = 'cd dir'
+setopt auto_push_d				# for the cd -
 setopt c_bases					# c-like bases conversions
 setopt c_precedences			# c-like operators
 setopt emacs					# enable emacs like keybindigs
@@ -150,10 +150,11 @@ function check_git_repo()		# check if pwd is a git repo
 
 function update_pwd_datas()		# update the numbers of files and dirs in .
 {
-	local v
-	v=$(ls -pA1)
-	NB_FILES=$(echo "$v" | grep -v /$ | wc -l | tr -d ' ')
-	NB_DIRS=$(echo "$v" | grep /$ | wc -l | tr -d ' ')
+	local f d
+	f=( *(.D) )
+	d=( *(/D) )
+	NB_FILES=$#f
+	NB_DIRS=$#d
 }
 
 function update_pwd_save()		# update the $PWD_FILE
@@ -275,7 +276,7 @@ function setprompt()			# set a special predefined prompt or update the prompt ac
 		PS1+="%f%k "
 	fi
 	[ ! -z $_PS1[$_return_status] ] && 	PS1+='%(0?.%F{82}o.%F{196}x)' 										# return status of last command (green O or red X)
--	[ ! -z $_PS1[$_git_status] ] 	&& 	PS1+='$GET_GIT'														# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
+	[ ! -z $_PS1[$_git_status] ] 	&& 	PS1+='$GET_GIT'														# git status (red + -> dirty, orange + -> changes added, green + -> changes commited, green = -> changed pushed)
 	[ ! -z $_PS1[$_jobs] ] 			&& 	PS1+='%(1j.%(10j.%F{208}+.%F{226}%j).%F{210}%j)' 					# number of running/sleeping bg jobs
 	[ ! -z $_PS1[$_shlvl] ] 		&& 	PS1+='%F{205}$GET_SHLVL'						 					# static shlvl
 	[ ! -z $_PS1[$_user_level] ] 	&& 	PS1+='%(0!.%F{196}#.%F{26}\$)'					 					# static user level
@@ -471,7 +472,7 @@ function ff()
 	if [ -t ]; then				# disable colors if piped
 		find -O3 $(echo $root $name $additional $hidden $([ ! -z "$type" ] && echo "(") $type $([ ! -z "$type" ] && echo ")") | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
 	else
-		find -O3 $(echo $root $name $additional $hidden $type | sed 's/ +/ /g') 2>/dev/null
+		find -O3 $(echo $root $name $additional $hidden $([ ! -z "$type" ] && echo "(") $type $([ ! -z "$type" ] && echo ")") | sed 's/ +/ /g') 2>/dev/null
 	fi
 }
 
@@ -765,31 +766,6 @@ function uc()					# remove all? color escape chars
 	fi
 }
 
-function hscroll()				# test
-{
-	local string;
-	local -i i=0;
-	local key;
-	local crel="$(tput cr;tput el)";
-	local -i cols="$(tput cols)"
-	[ $# -eq 0 ] && return ;
-	string="$(cat /dev/zero | tr "\0" " " | head -c $cols)$@";
-	trap "tput cnorm; return;" INT
-	tput civis;
-	while [ $i -le $#string ]; do
-		echo -n ${string:$i:$cols};
-		read -sk 3 key;
-		echo -en "$crel";
-		case $(echo "$key" | cat -v) in
-			("^[[C")
-				i=$(( i - 1 ));;
-			("^[[D")
-				i=$(( i + 1 ));;
-		esac
-	done
-	tput cnorm;
-}
-
 function iter()					# iter elt1 elt2 ... - command -opt1 -opt2 ...
 {
 	local i;
@@ -819,22 +795,34 @@ function c()					# simple calculator
 }
 
 function d2h()					# decimal to hexa
-{ echo $(( [#16]$1 )); }
+{
+	echo $(( [#16]$1 ));
+}
 
 function h2d()					# hexa to decimal
-{ echo $(( 16#$1 )); }
+{
+	echo $(( 16#$1 ));
+}
 
 function d2b()					# decimal to binary
-{ echo $(( [#2]$1 )); }
+{
+	echo $(( [#2]$1 ));
+}
 
 function h2b()					# binary to decimal
-{ echo $(( 2#$1 )); }
+{
+	echo $(( 2#$1 ));
+}
 
 function h2b()					# hexa to binary
-{ echo $(( [#2]16#$1 )); }
+{
+	echo $(( [#2]16#$1 ));
+}
 
 function b2h()					# binary to hexa
-{ echo $(( [#16]2#$1 )); }
+{
+	echo $(( [#16]2#$1 ));
+}
 
 
 function add-abbrev()			# add a dynamic abbreviation
@@ -1318,6 +1306,46 @@ bindkey $key[F5] clear-screen
 
 ### USEFUL ALIASES ###
 
+add-abbrev "ll"		"| less"
+add-abbrev "tt"		"| tail -n"
+add-abbrev "hh"		"| head -n"
+add-abbrev "lc"		"| wc -l"
+add-abbrev "gg"		"| grep -E "
+add-abbrev "gv"		"| grep -Ev "
+add-abbrev "ce"		"| cat -e"
+add-abbrev "cutf"	"| cut -d\  -f"
+add-abbrev "T"		"| tee "
+add-abbrev "tf"		"tail -fn10"
+
+add-abbrev "e"		'$EDITOR '
+add-abbrev "pp"		'$PAGER '
+
+add-abbrev "gb"		"git branch "
+add-abbrev "branch"	"git branch "
+add-abbrev "gc"		"git commit -m"
+add-abbrev "commit"	"git commit -m"
+add-abbrev "gk"		"git checkout "
+add-abbrev "pull"	"git pull "
+add-abbrev "fetch"	"git fetch "
+add-abbrev "gf"		"git fetch "
+add-abbrev "push"	"git push "
+add-abbrev "gp"		"git push "
+
+add-abbrev "py"		"python "
+add-abbrev "res"	"ressource"
+
+add-abbrev "s2e"	"1>&2"
+add-abbrev "e2s"	"2>&1"
+add-abbrev "ns"		"1> /dev/null"
+add-abbrev "ne"		"2> /dev/null"
+
+add-abbrev "col"	'${COLUMNS}'
+add-abbrev "COL"	'\${COLUMNS}'
+add-abbrev "lin"	'${LINES}'
+add-abbrev "LIN"	'\${LINES}'
+add-abbrev "wd"		'$(pwd)'
+add-abbrev "rr"		'$(echo *(om[1]))'
+
 case "$OS" in
 	(*darwin*)					# Mac os
 		alias update="brew update && brew upgrade";
@@ -1331,40 +1359,6 @@ case "$OS" in
 		add-abbrev "install" "apt-get install ";
 		alias ls="ls --color=auto";;
 esac
-
-
-add-abbrev "ll"		"| less"
-add-abbrev "tt"		"| tail -n"
-add-abbrev "hh"		"| head -n"
-add-abbrev "lc"		"| wc -l"
-add-abbrev "gg"		"| grep -E "
-add-abbrev "gv"		"| grep -Ev "
-add-abbrev "ce"		"| cat -e"
-add-abbrev "cutf"	"| cut -d\  -f"
-add-abbrev "T"		"| tee "
-add-abbrev "tf"		"tail -fn10"
-add-abbrev "e"		"$EDITOR "
-add-abbrev "pp"		"$PAGER "
-add-abbrev "gb"		"git branch "
-add-abbrev "branch"	"git branch "
-add-abbrev "gc"		"git commit -m"
-add-abbrev "commit"	"git commit -m"
-add-abbrev "gk"		"git checkout "
-add-abbrev "py"		"python "
-add-abbrev "res"	"ressource"
-add-abbrev "pull"	"git pull "
-add-abbrev "fetch"	"git fetch "
-add-abbrev "push"	"git push "
-add-abbrev "gp"		"git push "
-add-abbrev "s2e"	"1>&2"
-add-abbrev "e2s"	"2>&1"
-add-abbrev "ns"		"1> /dev/null"
-add-abbrev "ne"		"2> /dev/null"
-add-abbrev "col"	'${COLUMNS}'
-add-abbrev "lin"	'${LINES}'
-add-abbrev "wd"		'$(pwd)'
-add-abbrev "rr"		'$(echo *(om[1]))'
-
 
 
 alias l="ls -lFh"				# list + classify + human readable
