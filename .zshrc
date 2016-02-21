@@ -40,6 +40,9 @@
 # USEFUL ALIASES
 #	yes
 #
+# USEFUL SNIPPETS
+#   useful snippets of unused code
+#
 # MANDATORY FUNCTIONS CALLS
 #	functions calls setting datas for the first time
 #
@@ -823,6 +826,20 @@ function b2h()					# binary to hexa
 	echo $(( [#16]2#$1 ));
 }
 
+function show-associative-array() # nicely list associative array
+{
+	local -A aarray=( $@ );
+	local -i pad;
+
+	for k in "${(@k)aarray}"; do
+		[ $#k -gt $pad ] && pad=$#k;
+	done
+	(( pad+=2 ));
+	for k in "${(@k)aarray}"; do
+		printf "$C_BLUE%-${pad}s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$aarray[$k]";
+	done	
+}
+
 
 function add-abbrev()			# add a dynamic abbreviation
 {
@@ -838,28 +855,26 @@ function add-abbrev()			# add a dynamic abbreviation
 
 function show-abbrevs()			# list all the defined abbreviations
 {
-	local -i pad;
+	show-associative-array ${(kv)abbrev};
+}
+
+function remove-abbrev()
+{
+	typeset -Ag new_abbrev;
 
 	for k in "${(@k)abbrev}"; do
-		[ $#k -gt $pad ] && pad=$#k;
+		if [ $k != $1 ]; then
+			new_abbrev[$k]="$abbrev[$k]";
+		else
+			unalias $k;
+		fi
 	done
-	(( pad+=2 ));
-	for k in "${(@k)abbrev}"; do
-		printf "$C_BLUE%-${pad}s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$abbrev[$k]";
-	done
+	abbrev=( ${(kv)new_abbrev} );
 }
 
 function show-aliases()			# list all aliases
 {
-	local -i pad;
-
-	for k in "${(@k)aliases}"; do
-		[ $#k -gt $pad ] && pad=$#k;
-	done
-	(( pad+=2 ));
-	for k in "${(@k)aliases}"; do
-		printf "$C_BLUE%-${pad}s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$aliases[$k]";
-	done
+	show-associative-array ${(kv)aliases};
 }
 
 function mkback()				# create a backup file of . or the specified dir/file
@@ -1042,13 +1057,16 @@ zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 zstyle ':completion::complete:*' use-cache on # completion caching
 zstyle ':completion:*' cache-path ~/.zcache # cache path
 
+zstyle ':completion:*:functions' ignored-patterns '_*' # ignore completion functions in functions completion (lol)
+
+
 compdef _gnu_generic gdb emacs htop curl tr pv objdump # parse gnu getopts --help
 compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 
 
 ### HOMEMADE FUNCTIONS COMPLETION ###
 
-_ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
+ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
 compdef _ff ff
 
 _setprompt() { _arguments "1:prompt:(('complete:prompt with all the options' 'classic:classic prompt' 'lite:lite prompt' 'superlite:super lite prompt' 'nogit:default prompt without the git infos'))" }
@@ -1303,6 +1321,7 @@ bindkey $key[C-enter] clear-and-accept
 bindkey $key[F1] run-help
 bindkey $key[F5] clear-screen
 
+
 ### USEFUL ALIASES ###
 
 add-abbrev "ll"		"| less"
@@ -1393,6 +1412,12 @@ alias tt="tail --retry -fn0"	# real time tail a log
 alias dzsh="zsh --norcs --xtrace" # debugzsh
 
 alias trunc='sed "s/^\(.\{0,$COLUMNS\}\).*$/\1/g"' # truncate too long lines
+
+
+### USEFUL SNIPPETS ###
+
+# buffer=("${(f)$(< filename)}")
+# split file in array by lines
 
 
 ### MANDATORY FUNCTIONS CALLS ###
