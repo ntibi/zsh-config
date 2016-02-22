@@ -380,7 +380,10 @@ function showcolors()			# display the 256 colors by shades - useful to get pimpy
 
 function error()				# give error nb to get the corresponding error string
 {
-	python -c "import os; print os.strerror($?)";
+	python -c "
+import os;
+print '{}: {}'.format($?, os.strerror($?))
+";
 }
 
 function join_others_shells()	# ask for joining path specified in $PWD_FILE if not already in it
@@ -828,9 +831,10 @@ function b2h()					# binary to hexa
 
 function show-associative-array() # nicely list associative array
 {
-	local -A aarray=( $@ );
+	local -A aarray;
 	local -i pad;
 
+	aarray=( "$@" );
 	for k in "${(@k)aarray}"; do
 		[ $#k -gt $pad ] && pad=$#k;
 	done
@@ -860,14 +864,18 @@ function show-abbrevs()			# list all the defined abbreviations
 
 function remove-abbrev()
 {
+	[ $# -ge 1 ] && return 1;
+	local to_remove;
 	typeset -Ag new_abbrev;
 
-	for k in "${(@k)abbrev}"; do
-		if [ $k != $1 ]; then
-			new_abbrev[$k]="$abbrev[$k]";
-		else
-			unalias $k;
-		fi
+	for to_remove in $@; do
+		for k in "${(@k)abbrev}"; do
+			if [ $k != $to_remove ]; then
+				new_abbrev[$k]="$abbrev[$k]";
+			else
+				unalias $k;
+			fi
+		done
 	done
 	abbrev=( ${(kv)new_abbrev} );
 }
@@ -1057,8 +1065,6 @@ zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 zstyle ':completion::complete:*' use-cache on # completion caching
 zstyle ':completion:*' cache-path ~/.zcache # cache path
 
-zstyle ':completion:*:functions' ignored-patterns '_*' # ignore completion functions in functions completion (lol)
-
 
 compdef _gnu_generic gdb emacs htop curl tr pv objdump # parse gnu getopts --help
 compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
@@ -1066,7 +1072,10 @@ compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 
 ### HOMEMADE FUNCTIONS COMPLETION ###
 
-ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
+_remove-abbrev() { local expl; _description tag expl abbreviation; compadd "$expl[@]" ${(k)abbrev} }
+compdef _remove-abbrev remove-abbrev
+
+_ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
 compdef _ff ff
 
 _setprompt() { _arguments "1:prompt:(('complete:prompt with all the options' 'classic:classic prompt' 'lite:lite prompt' 'superlite:super lite prompt' 'nogit:default prompt without the git infos'))" }
