@@ -834,7 +834,7 @@ function show-associative-array() # nicely list associative array
 	local -A aarray;
 	local -i pad;
 
-	aarray=( "$@" );
+	aarray=( $@ );
 	for k in "${(@k)aarray}"; do
 		[ $#k -gt $pad ] && pad=$#k;
 	done
@@ -864,18 +864,17 @@ function show-abbrevs()			# list all the defined abbreviations
 
 function remove-abbrev()
 {
-	[ $# -ge 1 ] && return 1;
-	local to_remove;
+	[ $# -lt 1 ] && return 1;
+	local -a to_remove;
 	typeset -Ag new_abbrev;
 
-	for to_remove in $@; do
-		for k in "${(@k)abbrev}"; do
-			if [ $k != $to_remove ]; then
-				new_abbrev[$k]="$abbrev[$k]";
-			else
-				unalias $k;
-			fi
-		done
+	to_remove=( $@ )
+	for k in "${(@k)abbrev}"; do
+		if [ -z $to_remove[(r)$k] ]; then # if current key is not in to_remove array
+			new_abbrev[$k]="$abbrev[$k]";
+		else
+			unhash -f $k 2>/dev/null;		# unalias
+		fi
 	done
 	abbrev=( ${(kv)new_abbrev} );
 }
@@ -1039,7 +1038,7 @@ zmodload zsh/complist			# load compeltion list
 ### SETTING UP ZSH COMPLETION STUFF ###
 
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # case insensitive completion
-zstyle ':completion:*:(rm|emacs):*' ignore-line yes # remove suggestion if already in selection
+zstyle ':completion:*:(rm|emacs|kill|remove-abbrev|unalias):*' ignore-line yes # remove suggestion if already in selection
 zstyle ':completion:*' ignore-parents parent pwd		  # avoid stupid ./../currend_dir
 zstyle ':completion:*:processes' command 'ps -au$USER'	  # list all user processes
 zstyle ':completion:*:*:kill:*:processes' list-colors "=(#b) #([0-9]#)*=29=34" # nicer kill
@@ -1347,14 +1346,14 @@ add-abbrev "tf"		"tail -fn10"
 add-abbrev "e"		'$EDITOR '
 add-abbrev "pp"		'$PAGER '
 
-add-abbrev "gb"		"git branch "
-add-abbrev "branch"	"git branch "
+add-abbrev "gb"		"git branch -a"
+add-abbrev "branch"	"git branch -a"
 add-abbrev "gc"		"git commit -m"
 add-abbrev "commit"	"git commit -m"
 add-abbrev "gk"		"git checkout "
 add-abbrev "pull"	"git pull "
-add-abbrev "fetch"	"git fetch "
-add-abbrev "gf"		"git fetch "
+add-abbrev "fetch"	"git fetch -a "
+add-abbrev "gf"		"git fetch -a "
 add-abbrev "push"	"git push "
 add-abbrev "gp"		"git push "
 
