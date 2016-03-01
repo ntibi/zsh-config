@@ -710,7 +710,7 @@ function back()					# list all backuped files
 
 function ft()					# find $1 in all files or files containing $3 from $2 or .
 {
-	command find -O3 ${2:=.} -type f -name "*${3:=}*" -exec grep --color=always -EInH -e "$1" {} +; # E extended regex, I (ignore binary) n (line number) H (print fn each line)
+	command find -O3 ${2:=.} -type f -name "*${3:=}*" -exec grep --color=always -EInH -e "$1" {} +; # grep: E extended regex, I (ignore binary) n (line number) H (print fn each line)
 }
 
 function installed()
@@ -961,6 +961,19 @@ function popup()
 	tput cnorm;
 }
 
+function get_cup()
+{
+	stty -echo;
+	echo -n $'\e[6n';
+	read -d R x;
+	stty echo;
+	echo ${x#??};
+}
+
+function set_cup()
+{
+	tput cup ${1//;/ };
+}
 
 ### LESS USEFUL USER FUNCTIONS ###
 
@@ -1065,13 +1078,13 @@ zstyle ':completion::complete:*' use-cache on # completion caching
 zstyle ':completion:*' cache-path ~/.zcache # cache path
 
 
-compdef _gnu_generic gdb emacs htop curl tr pv objdump # parse gnu getopts --help
+compdef _gnu_generic gdb emacs emacsclient htop curl tr pv objdump # parse gnu getopts --help
 compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 
 
 ### HOMEMADE FUNCTIONS COMPLETION ###
 
-_remove-abbrev() { local expl; _description tag expl abbreviation; compadd "$expl[@]" ${(k)abbrev} }
+_remove-abbrev() { local expl; _wanted arguments expl 'abbreviation' compadd -k abbrev }
 compdef _remove-abbrev remove-abbrev
 
 _ff() { _alternative "args:type:(( 'h:search in hidden files' 'e:search for empty files' 'r:search for files with the reading right' 'w:search for files with the writing right' 'x:search for files with the execution right' 'b:search for block files' 'c:search for character files' 'd:search for directories' 'f:search for regular files' 'l:search for symlinks' 'p:search for fifo files' 'nh:exclude hidden files' 'ne:exclude empty files' 'nr:exclude files with the reading right' 'nw:exclude files with the writing right' 'nx:exclude files with the execution right' 'nb:exclude block files' 'nc:exclude character files' 'nd:exclude directories' 'nf:exclude regular files' 'nl:exclude symlinks symlinks' 'np:exclude fifo files' 'ns:exclude socket files'))" "*:root:_files" }
