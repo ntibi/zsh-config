@@ -1246,10 +1246,16 @@ key[down]=$terminfo[kcud1]
 key[left]=$terminfo[kcub1]
 key[right]=$terminfo[kcuf1]
 
-key[C-up]="^[[1;5A"
+# key[C-up]=$(echotc ku)
+# key[C-down]=$(echotc kd)
+# key[C-left]=$(echotc kl)
+# key[C-right]=$(echotc kr)
+
+key[C-up]="^[[1;5A"				# cygwin
 key[C-down]="^[[1;5B"
 key[C-left]="^[[1;5D"
 key[C-right]="^[[1;5C"
+
 # key[C-up]="^[[A"				# when on old terms
 # key[C-down]="^[[B"
 # key[C-left]="^[[D"
