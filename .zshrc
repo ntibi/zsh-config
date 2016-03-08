@@ -54,6 +54,9 @@
 #
 # Split the main file
 # Optimize all the callbacks
+# improve cd hashed dirs completion (_cd_hashed_dir)
+# improve remove-abbrev completion (with abbrevated command in completion help)
+# find out how vi-match-bracket works
 #
 
 
@@ -967,7 +970,7 @@ function get_cup()
 	echo -n $'\e[6n';
 	read -d R x;
 	stty echo;
-	echo ${x#??};
+	echo "${x#??}";
 }
 
 function set_cup()
@@ -1083,6 +1086,14 @@ compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 
 
 ### HOMEMADE FUNCTIONS COMPLETION ###
+
+_cd_hashed_dir()
+{
+	_cd;
+	local expl;
+	_wanted arguments expl "hashed directory" compadd -l $(hash -d | cut -d\= -f1)
+}
+compdef _cd_hashed_dir cd
 
 _remove-abbrev() { local expl; _wanted arguments expl 'abbreviation' compadd -k abbrev }
 compdef _remove-abbrev remove-abbrev
@@ -1233,6 +1244,10 @@ function show-kill-ring()
 	zle -M "$kr";
 }; zle -N show-kill-ring
 
+function transpose-chars-inplace()
+{
+	BUFFER="${LBUFFER[1,-2]}${RBUFFER[1]}${LBUFFER[-1]}${RBUFFER:1}"
+}; zle -N transpose-chars-inplace
 
 ### ZSH FUNCTIONS BINDS ###
 
@@ -1298,8 +1313,8 @@ bindkey "^I" magic-abbrev-expand
 bindkey $key[left] backward-char
 bindkey $key[right] forward-char
 
-bindkey $key[M-right] move-text-right
-bindkey $key[M-left] move-text-left
+bindkey $key[M-right] vi-match-bracket
+bindkey $key[M-left] vi-match-bracket
 
 bindkey "^X^E" edit-command-line # edit line with $EDITOR
 
@@ -1327,6 +1342,7 @@ bindkey "^[y" yank-pop			# rotate yank array
 bindkey $key[S-tab] reverse-menu-complete # shift tab for backward completion
 
 bindkey "^[=" save-line
+bindkey "^T" transpose-chars-inplace
 
 bindkey $key[C-up] up-line-or-search-prefix # ctrl + arrow = smart completion
 bindkey $key[C-down] down-line-or-search-prefix
