@@ -1080,20 +1080,14 @@ zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 zstyle ':completion::complete:*' use-cache on # completion caching
 zstyle ':completion:*' cache-path ~/.zcache # cache path
 
+compdef '_files -g "out"' '-redirect-,2>,-default-' # suggest out file for redirections
+compdef '_files -g "out"' '-redirect-,>,-default-'
 
 compdef _gnu_generic gdb emacs emacsclient htop curl tr pv objdump # parse gnu getopts --help
 compdef _setxkbmap setxkbmap	# activate setxkbmap autocompletion
 
 
 ### HOMEMADE FUNCTIONS COMPLETION ###
-
-_cd_hashed_dir()
-{
-	_cd;
-	local expl;
-	_wanted arguments expl "hashed directory" compadd -l $(hash -d | cut -d\= -f1)
-}
-compdef _cd_hashed_dir cd
 
 _remove-abbrev() { local expl; _wanted arguments expl 'abbreviation' compadd -k abbrev }
 compdef _remove-abbrev remove-abbrev
@@ -1392,7 +1386,7 @@ add-abbrev "gf"		"git fetch -a "
 add-abbrev "push"	"git push "
 add-abbrev "gp"		"git push "
 
-add-abbrev "py"		"python "
+add-abbrev "pyt"	"python "
 add-abbrev "res"	"ressource"
 
 add-abbrev "s2e"	"1>&2"
