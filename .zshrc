@@ -77,7 +77,7 @@ TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-25
 typeset -Ug PATH				# do not accept doubles
 typeset -Ag abbrev				# global associative array to define abbrevations
 
-WORDCHARS="*?_-.[]~=/&;!#$%^(){}<>|"
+WORDCHARS="*?_-.[]~=/&;!#$%^(){}<>|" # for the word-movement
 
 PERIOD=5			  # period used to hook periodic function (in sec)
 
@@ -1110,7 +1110,6 @@ compdef _kbd kbd
 # C-v or 'cat -v' to get the keycode
 bindkey -s "^[j" "^A^Kjoin_others_shells\n" # join_others_shells user function
 bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
-bindkey -s "^[e" "^Uerror\n"			  # run error user function
 bindkey -s "^[s" "^Asudo ^E"	# insert sudo
 bindkey -s "\el" "^Uls\n"		# run ls
 
@@ -1219,7 +1218,7 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 
 function self-insert-hook() # hook after each non-binded key pressed
 {
-	# region_highlight+=("10 30 bold")
+	
 }; zle -N self-insert-hook
 
 function self-insert()			# call pre hook, insert key, and cal post hook
@@ -1242,6 +1241,13 @@ function transpose-chars-inplace()
 {
 	BUFFER="${LBUFFER[1,-2]}${RBUFFER[1]}${LBUFFER[-1]}${RBUFFER:1}"
 }; zle -N transpose-chars-inplace
+
+function remove-pipe()
+{
+	SPLIT=(${(@s:|:)LBUFFER})
+	LBUFFER=${(j:|:)${SPLIT[1,-2]}}
+}; zle -N remove-pipe
+
 
 ### ZSH FUNCTIONS BINDS ###
 
@@ -1316,7 +1322,7 @@ bindkey $key[right] forward-char
 bindkey $key[M-right] vi-match-bracket
 bindkey $key[M-left] vi-match-bracket
 
-bindkey "^X^E" edit-command-line # edit line with $EDITOR
+bindkey "^[e" edit-command-line # edit line with $EDITOR
 
 bindkey "^Z" ctrlz			# ctrl z zsh
 
@@ -1357,6 +1363,8 @@ bindkey $key[C-enter] clear-and-accept
 
 bindkey $key[F1] run-help
 bindkey $key[F5] clear-screen
+
+bindkey "^\\" remove-pipe
 
 
 ### USEFUL ALIASES ###
