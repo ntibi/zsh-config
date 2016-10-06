@@ -978,6 +978,21 @@ function set_cup()
 	tput cup ${1//;/ };
 }
 
+function format()
+{
+	clang-format -i -style="{
+BasedOnStyle: llvm,
+TabWidth: 4,
+IndentWidth: 4,
+AllowShortFunctionsOnASingleLine: None,
+KeepEmptyLinesAtTheStartOfBlocks: false,
+Language: Cpp,
+BreakBeforeBraces: Stroustrup,
+UseTab: ForIndentation,
+MaxEmptyLinesToKeep: 1,
+}" "$@"
+}
+
 ### LESS USEFUL USER FUNCTIONS ###
 
 function race()					# race between tokens given in parameters
