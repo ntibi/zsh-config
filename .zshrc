@@ -987,7 +987,7 @@ IndentWidth: 4,
 AllowShortFunctionsOnASingleLine: None,
 KeepEmptyLinesAtTheStartOfBlocks: false,
 Language: Cpp,
-BreakBeforeBraces: Stroustrup,
+BreakBeforeBraces: Allman,
 UseTab: ForIndentation,
 MaxEmptyLinesToKeep: 1,
 }" "$@"
