@@ -1428,7 +1428,7 @@ case "$OS" in
 	(*darwin*)					# Mac os
 		alias update="brew update && brew upgrade";
 		add-abbrev "install" "brew install ";
-		alias ls="ls -G";;
+		alias ls="ls --color=auto";;
 	(*cygwin*)					# cygwin
 		alias ls="ls --color=auto";
 		add-abbrev "install" "apt-cyg install ";;
