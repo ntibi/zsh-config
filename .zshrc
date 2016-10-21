@@ -987,10 +987,15 @@ IndentWidth: 4,
 AllowShortFunctionsOnASingleLine: None,
 KeepEmptyLinesAtTheStartOfBlocks: false,
 Language: Cpp,
-BreakBeforeBraces: Stroustrup,
+BreakBeforeBraces: Allman,
 UseTab: ForIndentation,
 MaxEmptyLinesToKeep: 1,
 }" "$@"
+}
+
+function go()
+{
+	emacs -q -nw --batch --eval "(browse-url-of-file \"https://duckduckgo.com/"$@"\")"
 }
 
 ### LESS USEFUL USER FUNCTIONS ###
@@ -1071,7 +1076,9 @@ zmodload zsh/complist			# load compeltion list
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # case insensitive completion
 zstyle ':completion:*:(rm|emacs|kill|remove-abbrev|unalias):*' ignore-line yes # remove suggestion if already in selection
 zstyle ':completion:*' ignore-parents parent pwd		  # avoid stupid ./../currend_dir
+
 zstyle ':completion:*:processes' command 'ps -au$USER'	  # list all user processes
+
 zstyle ':completion:*:*:kill:*:processes' list-colors "=(#b) #([0-9]#)*=29=34" # nicer kill
 
 zstyle ":completion:*" menu select # select menu completion
@@ -1094,6 +1101,9 @@ zstyle ":completion:*:descriptions" format "%B%d%b" # completion group in bold
 
 zstyle ':completion::complete:*' use-cache on # completion caching
 zstyle ':completion:*' cache-path ~/.zcache # cache path
+
+zstyle ':completion:history-words:*' menu yes select # for M-/ completion
+zstyle ':completion:history-words:*' remove-all-dups yes
 
 compdef '_files -g "out"' '-redirect-,2>,-default-' # suggest out file for redirections
 compdef '_files -g "out"' '-redirect-,>,-default-'
@@ -1380,6 +1390,17 @@ bindkey $key[F1] run-help
 bindkey $key[F5] clear-screen
 
 bindkey "^\\" remove-pipe
+
+autoload copy-earlier-word  # copy earlier word (like M-. but to scroll through previous agruments)
+zle -N copy-earlier-word
+bindkey "^[," copy-earlier-word
+
+bindkey "^[." insert-last-word
+
+bindkey "^[?" _history-complete-older
+bindkey "^[/" _history-complete-newer
+
+bindkey -M menuselect "^[?" _history-complete-older
 
 
 ### USEFUL ALIASES ###
