@@ -1444,16 +1444,26 @@ add-abbrev "rr"		'$(echo *(om[1]))'
 
 case "$OS" in
 	(*darwin*)					# Mac os
-		alias update="brew update && brew upgrade";
+		add-abbrev "update" "brew update && brew upgrade";
 		add-abbrev "install" "brew install ";
-		alias ls="ls --color=auto";;
-	(*cygwin*)					# cygwin
+		add-abbrev "search" "brew search ";
+		
 		alias ls="ls --color=auto";
-		add-abbrev "install" "apt-cyg install ";;
+		;
+	(*cygwin*)					# cygwin
+		add-abbrev "update" "setup.exe";
+		add-abbrev "install" "apt-cyg install ";
+		add-abbrev "search" "apt-cyg searchall ";
+		
+		alias ls="ls --color=auto";
+		;
 	(*linux*|*)					# Linux
-		alias update="sudo apt-get update && sudo apt-get upgrade";
+		add-abbrev "update" "sudo apt-get update && sudo apt-get upgrade";
 		add-abbrev "install" "apt-get install ";
-		alias ls="ls --color=auto";;
+		add-abbrev "search" "apt-cache search ";
+		
+		alias ls="ls --color=auto";
+		;
 esac
 
 
