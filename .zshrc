@@ -432,9 +432,11 @@ function pc()			  		# percent of the home taken by this dir/file
 	echo "$(($(du -sx $subdir | cut -f1) * 100 / $(du -sx $dir | cut -f1)))" "%"
 }
 
-function tmp()					# starts a new shubshell in /tmp
+function tmp()					#
 {
-	env STARTUP_CMD="cd /tmp" zsh;
+	# env STARTUP_CMD="cd /tmp" zsh;
+	cd "$(mktemp -d)"
+	pwd
 }
 
 function -() 					# if 0 params, acts like 'cd -', else, act like the regular '-'
@@ -1077,6 +1079,8 @@ zstyle ':completion:*' ignore-parents parent pwd		  # avoid stupid ./../currend_
 zstyle ':completion:*:processes' command 'ps -au$USER'	  # list all user processes
 
 zstyle ':completion:*:*:kill:*:processes' list-colors "=(#b) #([0-9]#)*=29=34" # nicer kill
+
+zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin/sbin /bin
 
 zstyle ":completion:*" menu select # select menu completion
 
