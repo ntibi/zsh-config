@@ -1453,21 +1453,21 @@ case "$OS" in
 		add-abbrev "search" "brew search ";
 		
 		alias ls="ls --color=auto";
-		;
+		;;
 	(*cygwin*)					# cygwin
 		add-abbrev "update" "setup.exe";
 		add-abbrev "install" "apt-cyg install ";
 		add-abbrev "search" "apt-cyg searchall ";
 		
 		alias ls="ls --color=auto";
-		;
+		;;
 	(*linux*|*)					# Linux
 		add-abbrev "update" "sudo apt-get update && sudo apt-get upgrade";
 		add-abbrev "install" "apt-get install ";
 		add-abbrev "search" "apt-cache search ";
 		
 		alias ls="ls --color=auto";
-		;
+		;;
 esac
 
 
