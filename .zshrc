@@ -141,6 +141,7 @@ setopt clobber					# i aint no pussy
 setopt extended_glob			# used in matching im some functions
 setopt multi_os					# no more tee !
 setopt cd_able_vars				# hash -d mdr=~/my/long/path/; cd mdr
+setopt interactive_comments			# allow comments after command in interactive session
 
 [ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
