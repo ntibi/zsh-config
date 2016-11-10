@@ -1261,7 +1261,7 @@ function show-kill-ring()
 	for k in $killring; do
 		kr+=", $k"
 	done
-	zle -M "$kr";
+	zle -M -- "$kr";
 }; zle -N show-kill-ring
 
 function transpose-chars-inplace()
@@ -1269,12 +1269,25 @@ function transpose-chars-inplace()
 	BUFFER="${LBUFFER[1,-2]}${RBUFFER[1]}${LBUFFER[-1]}${RBUFFER:1}"
 }; zle -N transpose-chars-inplace
 
-function remove-pipe()
+function remove-pipe()			# delete chars backwards beyond the next pipe
 {
 	SPLIT=(${(@s:|:)LBUFFER})
 	LBUFFER=${(j:|:)${SPLIT[1,-2]}}
 }; zle -N remove-pipe
 
+function operation-at-point()	# simplify the operation at point
+{
+	LB="${LBUFFER/*[^0-9\-\+\*\/\^\(\)]/}"
+	NLB="$LBUFFER[0,$#LBUFFER-$#LB]"
+	RB="${RBUFFER/[^0-9\-\+\*\/\^\(\)]*/}"
+	NRB="$RBUFFER[$#RB+1,$#RBUFFER]"
+	N="$LB$RB"
+	if [[ -n $N ]]; then
+		NN=$(echo "$N" | bc -q 2>/dev/null)
+		N=${NN:-$N}
+	fi
+	BUFFER="$NLB$N$NRB"
+}; zle -N operation-at-point
 
 ### ZSH FUNCTIONS BINDS ###
 
@@ -1392,6 +1405,7 @@ bindkey $key[F1] run-help
 bindkey $key[F5] clear-screen
 
 bindkey "^\\" remove-pipe
+bindkey "^[o" operation-at-point
 
 autoload copy-earlier-word  # copy earlier word (like M-. but to scroll through previous agruments)
 zle -N copy-earlier-word
