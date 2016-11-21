@@ -52,7 +52,6 @@
 #
 # Todo:
 #
-# Split the main file
 # Optimize all the callbacks
 # improve cd hashed dirs completion (_cd_hashed_dir)
 # improve remove-abbrev completion (with abbrevated command in completion help)
