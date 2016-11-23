@@ -10,7 +10,7 @@ git pull
 if [ ! -e "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ];
 then
 	echo "linking $HOME/.zshrc with ./.zshrc"
-	ln -s "$(pwd)/zshrc" "$HOME/.zshrc"
+	ln -s "$(pwd)/.zshrc" "$HOME/.zshrc"
 else
 	if [ -L "$HOME/.zshrc" ];
 	then
@@ -28,7 +28,7 @@ else
 		echo "old $HOME/.zshrc content is now in $HOME/.oldzshrc"
 		cat "$HOME/.zshrc" >> "$HOME/.oldzshrc"
 		rm "$HOME/.zshrc"
-		ln -s "$(pwd)./zshrc" "$HOME/.zshrc"
+		ln -s "$(pwd)./.zshrc" "$HOME/.zshrc"
 	fi
 fi
 
