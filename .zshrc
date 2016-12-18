@@ -98,6 +98,8 @@ HISTSIZE=65536
 
 CLICOLOR=1
 
+LOCAL_CONF_FILE="~/.myzshrc"	# use like this: ${~LOCAL_CONF_FILE}
+
 case "$OS" in
 	(*darwin*)					# Mac os
 		LS_COLORS='exfxcxdxbxexexabagacad';;
@@ -996,6 +998,20 @@ function go()
 {
 	emacs -q -nw --batch --eval "(browse-url-of-file \"https://duckduckgo.com/"$@"\")"
 }
+
+function addd()					# add a directory hash to the config file
+{
+	# $1: dir name (default value $(basename $PWD))
+	# $2: hash key (default value .)
+	# $3: if set, append a '/' to the aliased dir (this will prevent the complete aliasing)
+	
+	hdir="${1:=${PWD:t}}"
+	dir="${${2:=$PWD}:a}${3:+/}"
+	echo "hash -d $hdir=$dir" >> ${~LOCAL_CONF_FILE:=~/.myzshrc}
+	hash -d $hdir=$dir
+	echo "$C_YELLOW$dir$DEF_C is now aliased as $C_CYAN$hdir$DEF_C (in ${LOCAL_CONF_FILE:=~/.myzshrc})"
+}
+
 
 ### LESS USEFUL USER FUNCTIONS ###
 
