@@ -999,6 +999,7 @@ function go()
 	emacs -q -nw --batch --eval "(browse-url-of-file \"https://duckduckgo.com/"$@"\")"
 }
 
+# example> addd ec ~/emacs-config/
 function addd()					# add a directory hash to the config file
 {
 	# $1: dir name (default value $(basename $PWD))
