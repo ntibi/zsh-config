@@ -851,7 +851,6 @@ function show-associative-array() # nicely list associative array
 	done	
 }
 
-
 function add-abbrev()			# add a dynamic abbreviation
 {
 	if [ $# -eq 2 ]; then
@@ -1013,6 +1012,12 @@ function addd()					# add a directory hash to the config file
 	echo "$C_YELLOW$dir$DEF_C is now aliased as $C_CYAN$hdir$DEF_C (in ${LOCAL_CONF_FILE:=~/.myzshrc})"
 }
 
+function sizeof()
+{
+	echo "#include <stdint.h>\nint main(){return (sizeof($1));}" | gcc -x c -o/tmp/sizeof - 2>&- || return
+	/tmp/sizeof
+	echo $?
+}
 
 ### LESS USEFUL USER FUNCTIONS ###
 
