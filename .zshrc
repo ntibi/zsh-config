@@ -1019,6 +1019,20 @@ function sizeof()
 	echo $?
 }
 
+function sizeof32()
+{
+	echo "#include <stdint.h>\nint main(){return (sizeof($1));}" | gcc -m32 -x c -o/tmp/sizeof - 2>&- || return
+	/tmp/sizeof
+	echo $?
+}
+
+function sizeof64()
+{
+	echo "#include <stdint.h>\nint main(){return (sizeof($1));}" | gcc -m64 -x c -o/tmp/sizeof - 2>&- || return
+	/tmp/sizeof
+	echo $?
+}
+
 ### LESS USEFUL USER FUNCTIONS ###
 
 function race()					# race between tokens given in parameters
