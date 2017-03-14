@@ -26,9 +26,9 @@ else
 			ln -s $REPO_ZSHRC $DEST
 		fi
 	else
-		echo "linking $DEST with .zshrc"
-		echo "old $DEST content is now in $HOME/.oldzshrc"
+		echo "linking $DEST with $REPO_ZSHRC"
 		cat $DEST >> "$HOME/.oldzshrc"
+		echo "old $DEST content is now in $HOME/.oldzshrc"
 		rm $DEST
 		ln -s $REPO_ZSHRC $DEST
 	fi
