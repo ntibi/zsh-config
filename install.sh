@@ -2,7 +2,7 @@
 
 
 REPO_BASE="$(dirname "$PWD/$0")"
-REPO_ZSHRC="$(realpath $REPO_BASE/zshrc)"
+REPO_ZSHRC="$(readlink -f $REPO_BASE/zshrc)"
 
 DEST="$HOME/.zshrc"
 
