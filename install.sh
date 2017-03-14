@@ -4,35 +4,35 @@
 REPO_BASE="$(dirname "$PWD/$0")"
 REPO_ZSHRC="$(realpath $REPO_BASE/zshrc)"
 
-SAVED_PWD="$PWD"
+DEST="$HOME/.zshrc"
 
 echo "checking for updates..."
 git --git-dir $REPO_BASE/.git pull
 
-if [ ! -e "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ];
+if [ ! -e $DEST ] && [ ! -L $DEST ];
 then
-	echo "linking $HOME/.zshrc with ./.zshrc"
-	ln -s $REPO_ZSHRC "$HOME/.zshrc"
+	echo "linking $DEST with $REPO_ZSHRC"
+	ln -s $REPO_ZSHRC $DEST
 else
-	if [ -L "$HOME/.zshrc" ];
+	if [ -L $DEST ];
 	then
-		if [ $(readlink "$HOME/.zshrc") = $(echo $REPO_ZSHRC) ];
+		if [ $(readlink $DEST) = $(echo $REPO_ZSHRC) ];
 		then
 			echo "new .zshrc already installed"
 		else
-			echo "removing old $HOME/.zshrc pointing at $(readlink $HOME/.zshrc)"
-			unlink "$HOME/.zshrc"
-			echo "linking $HOME/.zshrc with $REPO_ZSHRC"
-			ln -s $REPO_ZSHRC "$HOME/.zshrc"
+			echo "removing old $DEST pointing at $(readlink $DEST)"
+			unlink $DEST
+			echo "linking $DEST with $REPO_ZSHRC"
+			ln -s $REPO_ZSHRC $DEST
 		fi
 	else
-		echo "linking $HOME/.zshrc with .zshrc"
-		echo "old $HOME/.zshrc content is now in $HOME/.oldzshrc"
-		cat "$HOME/.zshrc" >> "$HOME/.oldzshrc"
-		rm "$HOME/.zshrc"
-		ln -s $REPO_ZSHRC "$HOME/.zshrc"
+		echo "linking $DEST with .zshrc"
+		echo "old $DEST content is now in $HOME/.oldzshrc"
+		cat $DEST >> "$HOME/.oldzshrc"
+		rm $DEST
+		ln -s $REPO_ZSHRC $DEST
 	fi
 fi
 
-echo "type 'source $HOME/.zshrc' to apply update"
+echo "type 'source $DEST' to apply update"
 echo "Done"
