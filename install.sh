@@ -2,7 +2,7 @@
 
 
 REPO_BASE="$(dirname "$PWD/$0")"
-REPO_ZSHRC="$(realpath $REPO_BASE/.zshrc)"
+REPO_ZSHRC="$(realpath $REPO_BASE/zshrc)"
 
 SAVED_PWD="$PWD"
 
