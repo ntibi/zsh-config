@@ -1496,6 +1496,9 @@ add-abbrev "LIN"	'\${LINES}'
 add-abbrev "wd"		'$(pwd)'
 add-abbrev "rr"		'$(echo *(om[1]))'
 
+add-abbrev "bel"	'&& echo -e "\a"'
+
+
 case "$OS" in
 	(*darwin*)					# Mac os
 		add-abbrev "update" "brew update && brew upgrade";
