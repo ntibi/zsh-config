@@ -1564,6 +1564,9 @@ alias dzsh="zsh --norcs --xtrace" # debugzsh
 
 alias trunc='sed "s/^\(.\{0,$COLUMNS\}\).*$/\1/g"' # truncate too long lines
 
+alias-abbrev t "tmux "
+alias-abbrev ta "tmux a -t "
+
 
 ### USEFUL SNIPPETS ###
 
