@@ -887,12 +887,6 @@ function show-aliases()			# list all aliases
 	show-associative-array ${(kv)aliases};
 }
 
-function alias-abbrev() # alias AND abbrev
-{
-	add-abbrev $1 $2
-	alias $1=$2
-}
-
 function mkback()				# create a backup file of . or the specified dir/file
 {
 	local toback;
@@ -1540,7 +1534,7 @@ alias mkdir="mkdir -pv"			# create all the needed parent directories + inform us
 
 alias grep="grep --color=auto"
 alias egrep="egrep --color=auto"
-installed tree && alias tree="tree -C"		  # -C colorzzz
+alias tree="tree -C"		  # -C colorzzz
 installed colordiff && alias diff="colordiff" # diff with nicer colors
 installed rsync && alias cpr="rsync -a --stats --progress" || alias cpr="cp -R" # faster
 alias less="less -RS"			# -R Raw control chars, -S to truncate the long lines instead of folding them
@@ -1564,8 +1558,9 @@ alias dzsh="zsh --norcs --xtrace" # debugzsh
 
 alias trunc='sed "s/^\(.\{0,$COLUMNS\}\).*$/\1/g"' # truncate too long lines
 
-alias-abbrev t "tmux "
-alias-abbrev ta "tmux a -t "
+alias t="tmux" ; add-abbrev t "tmux "
+alias ta="tmux a -t" ; add-abbrev ta "tmux a -t "
+alias tns="tmux new-session -s" ; add-abbrev tns "tmux new-session -s "
 
 
 ### USEFUL SNIPPETS ###
