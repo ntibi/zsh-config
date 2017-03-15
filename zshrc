@@ -887,6 +887,12 @@ function show-aliases()			# list all aliases
 	show-associative-array ${(kv)aliases};
 }
 
+function alias-abbrev() # alias AND abbrev
+{
+	add-abbrev $1 $2
+	alias $1=$2
+}
+
 function mkback()				# create a backup file of . or the specified dir/file
 {
 	local toback;
