@@ -1063,7 +1063,7 @@ function hack()					# hollywood hacker cat
 
 function window()				# prints weather info
 {
-	curl -s "http://www.wunderground.com/q/zmw:00000.37.07156" | grep "og:title" | cut -d\" -f4 | sed 's/&deg;/ degrees/';
+	curl wttr.in/paris
 }
 
 function useless_fractal()
