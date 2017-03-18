@@ -1428,8 +1428,8 @@ bindkey $key[C-down] down-line-or-search-prefix
 bindkey $key[up] up-line-or-history # up/down scroll through history
 bindkey $key[down] down-line-or-history
 
-bindkey $key[S-right] select-right # emacs like shift selection
-bindkey $key[S-left] select-left
+#bindkey $key[S-right] select-right # emacs like shift selection
+#bindkey $key[S-left] select-left
 
 bindkey $key[C-enter] clear-and-accept
 
