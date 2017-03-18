@@ -72,6 +72,7 @@ fi
 
 _TERM="$TERM"
 TERM="xterm-256color" && [[ $(tput colors) == 256 ]] || echo "can't use xterm-256color :/" # check if xterm-256 color is available, or if we are in a dumb shell
+[ -n "$TMUX" ] && export TERM=screen-256color
 
 typeset -Ug PATH				# do not accept doubles
 typeset -Ag abbrev				# global associative array to define abbrevations
