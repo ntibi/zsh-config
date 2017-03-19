@@ -217,6 +217,7 @@ function clock()				# displays the time in the top right corner
 
 SEP_C="%F{242}"					# separator color
 ID_C="%F{33}"					# id color
+HN_C="%F{33}"					# hostname color
 PWD_C="%F{201}"					# pwd color
 GB_C="%F{208}"					# git branch color
 NBF_C="%F{46}"					# files number color
@@ -260,7 +261,7 @@ function setprompt()			# set a special predefined prompt or update the prompt ac
 	if [ ! -z $_PS1[$_user] ] && [ ! -z $_PS1[$_machine] ]; then
 		PS1+='${SEP_C}@'
 	fi
-	[ ! -z $_PS1[$_machine] ]		&& 	PS1+='$ID_C%m'												# @machine
+	[ ! -z $_PS1[$_machine] ]		&& 	PS1+='$HN_C%m'												# @machine
 	if [ ! -z $_PS1[$_wd] ] || ( [ ! -z $GIT_BRANCH ] && [ ! -z $_PS1[$_git_branch] ]) || [ ! -z $_PS1[$_dir_infos] ]; then 					# print separators if there is infos inside
 		PS1+='${SEP_C}['
 	fi
