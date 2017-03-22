@@ -252,7 +252,7 @@ function setprompt()			# set a special predefined prompt or update the prompt ac
 		("superlite") _PS1=("" "" "" "" "" "" "" "" "" "" "X" "");;
 		("lite") _PS1=("X" "X" "X" "" "" "" "" "" "" "" "X" "X");;
 		("nogit") _PS1=("X" "X" "X" "X" "" "X" "X" "" "X" "X" "X" "X");;
-		("classic") _PS1=("X" "X" "X" "X" "" "" "" "" "" "" "X" "X");;
+		("classic") _PS1=("X" "X" "X" "X" "X" "" "X" "X" "X" "X" "X" "X");;
 		("complete") _PS1=("X" "X" "X" "X" "X" "X" "X" "X" "X" "X" "X" "X");;
 	esac
 	PS1=''																								# simple quotes for post evaluation
@@ -757,7 +757,7 @@ function loadconf()				# load a visual config
 		(static)				# nicer, cooler, but without clock update nor title update
 			UPDATE_TERM_TITLE="";
 			UPDATE_CLOCK="";
-			setprompt complete;
+			setprompt classic;
 			;;
 		(complete|*)			# nicer, cooler
 			UPDATE_TERM_TITLE="X";
