@@ -1031,6 +1031,20 @@ function sizeof64()
 	echo $?
 }
 
+function rgb() # if truecolor is set, sets the foreground color
+{
+	[[ -z "$1$2$3" ]] &&
+	printf $DEF_C ||
+	printf "\033[38;2;%d;%d;%dm" $1 $2 $3
+}
+
+function rgbb() # if truecolor is set, sets the background color
+{
+	[[ -z "$1$2$3" ]] &&
+	printf $DEF_C ||
+	printf "\033[48;2;%d;%d;%dm" $1 $2 $3
+}
+
 ### LESS USEFUL USER FUNCTIONS ###
 
 function race()					# race between tokens given in parameters
