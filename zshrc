@@ -1237,7 +1237,11 @@ function save-line()			# save the current line at its state in ~/.saved_commands
 
 function ctrlz()
 {
-	suspend;
+	if [[ $#BUFFER -ne 0 ]]; then
+		zle push-input
+	fi
+	BUFFER=fg
+	zle accept-line
 }; zle -N ctrlz
 
 function clear-and-accept()		# clear the screen and accepts the line
