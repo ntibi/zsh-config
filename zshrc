@@ -177,17 +177,17 @@ function set_git_branch()
 
 function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 {
-	if [ $REPO -eq 1 ];		# if in git repo, get git infos
+	if [ "$REPO" -eq 1 ];		# if in git repo, get git infos
 	then
 		local STATUS
 		STATUS=$(git status 2> /dev/null)
-		if [[ $STATUS =~ "Changes not staged" ]];
+		if [[ "$STATUS" =~ "Changes not staged" ]];
 		then GET_GIT="%F{196}+"	# if git diff, wip
 		else
-			if [[ $STATUS =~ "Changes to be committed" ]];
+			if [[ "$STATUS" =~ "Changes to be committed" ]];
 			then GET_GIT="%F{214}+" # changes added
 			else
-				if [[ $STATUS =~ "is ahead" ]];
+				if [[ "$STATUS" =~ "is ahead" ]];
 				then GET_GIT="%F{46}+" # changes commited
 				else GET_GIT="%F{46}=" # changes pushed
 				fi
