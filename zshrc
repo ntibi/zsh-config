@@ -953,6 +953,8 @@ function popup()
 	done
 	shift $(( $OPTIND - 1 ));
 	msg="$*";
+    [[ $x == -1 ]] && x=$(( COLUMNS / 2 - $#msg / 2 ));
+	[[ $y == -1 ]] && y=$(( LINES / 2 ));
 	tput civis;
 	tput sc;
 	tput cup $y $x;
