@@ -1047,6 +1047,29 @@ function rgbb() # if truecolor is set, sets the background color
 	printf "\033[48;2;%d;%d;%dm" $1 $2 $3
 }
 
+function foreachd() # foreachd ~/.config/*-config -- ./install.sh
+{
+    dirs=()
+    cmd=()
+    found=""
+
+    for i in $@; do
+        if [[ "$i" == "-" || "$i" == "--" ]]; then
+            found="1";
+        elif [[ "$found" -eq 0 ]]; then
+            dirs+=$i
+        else
+            cmd+=$i
+        fi
+    done
+    for d in $dirs; do
+        print "\e[4m$d\e[0m:"
+        pushd $d >/dev/null
+        eval $cmd
+        popd >/dev/null
+    done
+}
+
 ### LESS USEFUL USER FUNCTIONS ###
 
 function race()					# race between tokens given in parameters
