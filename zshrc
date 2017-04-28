@@ -1259,11 +1259,13 @@ function save-line()			# save the current line at its state in ~/.saved_commands
 
 function ctrlz()
 {
-	if [[ $#BUFFER -ne 0 ]]; then
-		zle push-input
-	fi
-	BUFFER=fg
-	zle accept-line
+    if [[ $#jobstates -ne 0 ]]; then
+        if [[ $#BUFFER -ne 0 ]]; then
+            zle push-input
+        fi
+        BUFFER=fg
+        zle accept-line
+    fi
 }; zle -N ctrlz
 
 function clear-and-accept()		# clear the screen and accepts the line
@@ -1525,6 +1527,7 @@ add-abbrev "gv"		"| grep -Ev "
 add-abbrev "ce"		"| cat -e"
 add-abbrev "cutf"	"| cut -d\  -f"
 add-abbrev "T"		"| tee "
+add-abbrev "TS"		"| sudo tee "
 add-abbrev "tf"		"tail -fn10"
 
 add-abbrev "e"		'$EDITOR '
@@ -1557,6 +1560,8 @@ add-abbrev "wd"		'$(pwd)'
 add-abbrev "rr"		'$(echo *(om[1]))'
 
 add-abbrev "bel"	'&& tput bel'
+
+add-abbrev "awk"    "awk '{}'"
 
 
 case "$OS" in
