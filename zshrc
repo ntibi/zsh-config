@@ -1636,6 +1636,9 @@ add-abbrev "awkf"   "awk -F: '{}'";     abbrev-autopipe "awkf"; abbrev-cur "awkf
 
 add-abbrev "showf"  'echo \$functions['
 
+add-abbrev "f."    'find . -name ""';         abbrev-cur "f." -1
+add-abbrev "f/"    'find / -name ""';         abbrev-cur "f/" -1
+
 
 case "$OS" in
 	(*darwin*)					# Mac os
