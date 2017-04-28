@@ -1332,7 +1332,7 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 	local AUTOPIPE=0; # use $abbrev_autopipe to automatically prepend the abbrev with a pipe
 	tmp=${LBUFFER%%(#m)[._a-zA-Z0-9\[\]/\-]#};
 	REPL=${abbrev[$MATCH]};
-	if [ ! -z "$MATCH" ]; then
+	if [ ! -z "$REPL" ]; then
         CURMOV="${abbrev_curmov[$MATCH]}"
         AUTOPIPE="${abbrev_autopipe[$MATCH]}"
         if [[ $AUTOPIPE -eq 0 ]]; then
