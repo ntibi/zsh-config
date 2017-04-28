@@ -1179,6 +1179,8 @@ autoload -U compinit
 compinit						# enable completion
 zmodload zsh/complist			# load compeltion list
 
+zmodload zsh/regex
+
 
 ### SETTING UP ZSH COMPLETION STUFF ###
 
@@ -1341,13 +1343,13 @@ function get-word-at-point()
 	echo "${LBUFFER/* /}${RBUFFER/ */}";
 }; zle -N get-word-at-point
 
-function magic-abbrev-expand()	# expand the last word in the complete corresponding abbreviation if any
+function magic-abbrev-expand() # expand the last word in the complete corresponding abbreviation if any
 {
 	local MATCH;
 	local REPL;
 	local tmp;
-	local CURMOV=0; # use $abbrev_curmov to move the cursor after abbrev expand
-	local AUTOPIPE=0; # use $abbrev_autopipe to automatically prepend the abbrev with a pipe
+	local CURMOV=0;                                                 # use $abbrev_curmov to move the cursor after abbrev expand
+	local AUTOPIPE=0;                                               # use $abbrev_autopipe to automatically prepend the abbrev with a pipe
 	tmp=${LBUFFER%%(#m)[._a-zA-Z0-9\[\]/\-]#};
 	REPL=${abbrev[$MATCH]};
 	if [ ! -z "$REPL" ]; then
@@ -1356,10 +1358,10 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
         if [[ $AUTOPIPE -eq 0 ]]; then
     		LBUFFER="$tmp${(e)REPL}";
         else
-            if [[ $#tmp -eq 0 ]]; then
-                [[ $CURMOV -ne 0 ]] && CURMOV+=-1; # because of the appened space
-                LBUFFER="${(e)REPL} ";
-            else
+            if [[ $#tmp -eq 0 || $tmp -regex-match "\| *$" ]]; then # BUFFER is ">abbrev" or ">cmd | abbrev" >>> don't add a pipe
+                [[ $CURMOV -ne 0 ]] && CURMOV+=-1;                  # because of the appened space
+                LBUFFER="$tmp${(e)REPL} ";
+            else                                                    # BUFFER is ">abbrev" >>> add a pipe
                 LBUFFER="$tmp| ${(e)REPL}";
             fi
         fi
