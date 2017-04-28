@@ -141,7 +141,7 @@ setopt multi_os					# no more tee !
 setopt cd_able_vars				# hash -d mdr=~/my/long/path/; cd mdr
 setopt interactive_comments			# allow comments after command in interactive session
 
-[ ! -z "$EMACS" ] && unsetopt zle # allow zsh to work under emacs
+[[ ! -z "$EMACS" ]] && unsetopt zle # allow zsh to work under emacs
 unsetopt beep					# no disturbing sounds
 
 
@@ -168,7 +168,7 @@ function update_pwd_save()		# update the $PWD_FILE
 
 function set_git_branch()
 {
-	if [ $REPO -eq 1 ]; then		# if in git repo, get git infos
+	if [[ $REPO -eq 1 ]]; then		# if in git repo, get git infos
 		GIT_BRANCH="$(git branch | grep \* | cut -d\  -f2-)";
 	else
 		GIT_BRANCH="";
@@ -177,7 +177,7 @@ function set_git_branch()
 
 function set_git_char()			# set the $GET_GIT_CHAR variable for the prompt
 {
-	if [ "$REPO" -eq 1 ];		# if in git repo, get git infos
+	if [[ "$REPO" -eq 1 ]];		# if in git repo, get git infos
 	then
 		local STATUS
 		STATUS=$(git status 2> /dev/null)
@@ -203,7 +203,7 @@ PRE_CLOCK="$(tput setaf 226;tput smul;tput bold;tput civis)" # caching termcaps 
 POST_CLOCK="$(tput cnorm;tput sgr0;)"
 function clock()				# displays the time in the top right corner
 {
-	if [ ! -z $UPDATE_CLOCK ]; then
+	if [[ ! -z $UPDATE_CLOCK ]]; then
 		tput sc;
 		tput cup 0 $(( $(tput cols) - 6));
 		echo "$PRE_CLOCK$(date +%R)$POST_CLOCK";
@@ -345,13 +345,13 @@ function periodic()				# every $PERIOD secs - triggered by promt print
 
 function preexec()				# pre execution hook
 {
-	[ -z $UPDATE_TERM_TITLE ] || printf "\e]2;%s : %s\a" "${PWD/~/~}" "$1" # set 'pwd + cmd' set term title
+	[[ -z $UPDATE_TERM_TITLE ]] || printf "\e]2;%s : %s\a" "${PWD/~/~}" "$1" # set 'pwd + cmd' set term title
 }
 
 function precmd()				# pre promt hook
 {
-	[ -z $UPDATE_CLOCK ] || clock
-	[ -z $UPDATE_TERM_TITLE ] || printf "\e]2;%s\a" "${PWD/~/~}" # set pwd as term title
+	[[ -z $UPDATE_CLOCK ]] || clock
+	[[ -z $UPDATE_TERM_TITLE ]] || printf "\e]2;%s\a" "${PWD/~/~}" # set pwd as term title
 	
 	set_git_char
 }
@@ -504,12 +504,12 @@ function colorize() 			# cmd | colorize <exp1> (f/b)?<color1> <exp2> (f/b)?<colo
 	i=0
 	params=()
 	col=""
-	if [ $# -eq 0 ]; then
+	if [[ $# -eq 0 ]]; then
 		echo "Usage: colorize <exp1> <color1> <exp2> <color2> ..." 1>&2
 		return ;
 	fi
 	for c in "$@"; do
-		if [ "$((i % 2))" -eq 1 ]; then
+		if [[ "$((i % 2))" -eq 1 ]]; then
 			case "$c[1]" in
 				(b*)
 					background="1";
@@ -529,7 +529,7 @@ function colorize() 			# cmd | colorize <exp1> (f/b)?<color1> <exp2> (f/b)?<colo
 				("white") 	col=7;;
 				(*) 		col=$c;;
 			esac
-			if [ $#background -ne 0 ]; then
+			if [[ $#background -ne 0 ]]; then
 				col="$(tput setab $col)";
 			else
 				col="$(tput setaf $col)";
@@ -541,7 +541,7 @@ function colorize() 			# cmd | colorize <exp1> (f/b)?<color1> <exp2> (f/b)?<colo
 		fi
 		i+=1;
 	done
-	if [ "$c" = "$last" ]; then
+	if [[ "$c" = "$last" ]]; then
 		echo "Usage: cmd | colorize <exp1> <color1> <exp2> <color2> ..."
 		return
 	fi
@@ -603,10 +603,10 @@ function rm()					# safe rm with timestamped backup
 		rm_params="";
 		backup="$RM_BACKUP_DIR/$(date +%s)";
 		for i in "$@"; do
-			if [ ${i:0:1} = "-" ]; then # if $i is an args list, save them
+			if [[ ${i:0:1} = "-" ]]; then # if $i is an args list, save them
 				rm_params+="$i";
-			elif [ -f "$i" ] || [ -d "$i" ] || [ -L "$i" ] || [ -p "$i" ]; then # $i exist ?
-				[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
+			elif [[ -f "$i" ]] || [[ -d "$i" ]] || [[ -L "$i" ]] || [[ -p "$i" ]]; then # $i exist ?
+				[[ ! ${i:0:1} = "/" ]] && i="$PWD/$i"; # if path is not absolute, make it absolute
 				i=${i:A};		# simplify the path
 				idir="$(dirname $i)";
 				command mkdir -p "$backup/$idir";
@@ -630,10 +630,10 @@ function save()					# backup the files
 		backup="$RM_BACKUP_DIR/$(date +%s)";
 		command mkdir -p "$backup";
 		for i in "$@"; do
-			if [ ${i:0:1} = "-" ]; then # if $i is an args list, save them
+			if [[ ${i:0:1} = "-" ]]; then # if $i is an args list, save them
 				rm_params+="$i";
-			elif [ -f "$i" ] || [ -d "$i" ] || [ -L "$i" ] || [ -p "$i" ]; then # $i exist ?
-				[ ! ${i:0:1} = "/" ] && i="$PWD/$i"; # if path is not absolute, make it absolute
+			elif [[ -f "$i" ]] || [[ -d "$i" ]] || [[ -L "$i" ]] || [[ -p "$i" ]]; then # $i exist ?
+				[[ ! ${i:0:1} = "/" ]] && i="$PWD/$i"; # if path is not absolute, make it absolute
 				i=${i:A};						# simplify the path
 				idir="$(dirname $i)";
 				command mkdir -p "$backup/$idir";
@@ -661,22 +661,22 @@ function back()					# list all backuped files
 	local -i i;
 	local key;
 
-	[ -d $RM_BACKUP_DIR ] || return
+	[[ -d $RM_BACKUP_DIR ]] || return
 	back=( $(command ls -t1 $RM_BACKUP_DIR/) );
 	i=1;
-	while [ $i -le $#back ] && [ -z "$to_restore" ]; do
+	while [[ $i -le $#back ]] && [[ -z "$to_restore" ]]; do
 		b=$back[i];
 		files=( $(find $RM_BACKUP_DIR/$b -type f) )
-		if [ ! $#files -eq 0 ]; then
+		if [[ ! $#files -eq 0 ]]; then
 			peek=""
-			for f in $files; do peek+="$(basename $f), "; if [ $#peek -ge $COLUMNS ]; then break; fi; done
+			for f in $files; do peek+="$(basename $f), "; if [[ $#peek -ge $COLUMNS ]]; then break; fi; done
 			peek=${peek:0:(-2)}; # remove the last ', '
-			[ $#peek -gt $COLUMNS ] && peek="$(echo $peek | head -c $(( COLUMNS - 3 )) )..." # truncate and add '...' at the end if the peek is too large
+			[[ $#peek -gt $COLUMNS ]] && peek="$(echo $peek | head -c $(( COLUMNS - 3 )) )..." # truncate and add '...' at the end if the peek is too large
 			echo "$C_RED#$i$DEF_C: $C_GREEN$(ts $b)$DEF_C: $C_BLUE$(echo $files | wc -w)$DEF_C file(s) ($C_CYAN$(du -sh $RM_BACKUP_DIR/$b | cut -f1)$DEF_C)"
 			echo "$peek";
 			echo;
 		fi
-		if [ $(( i % $peeks_nbr == 0 || i == $#back )) -eq 1 ]; then
+		if [[ $(( i % $peeks_nbr == 0 || i == $#back )) -eq 1 ]]; then
 			key="";
 			echo -n "> $C_GREEN";
 			read -sk1 key;
@@ -698,9 +698,9 @@ function back()					# list all backuped files
 			i=$(( i + 1 ));
 		fi
 	done
-	if [ ! -z "$back[to_restore]" ]; then
+	if [[ ! -z "$back[to_restore]" ]]; then
 		files=( $(find $RM_BACKUP_DIR/$back[to_restore] -type f) )
-		if [ ! -z "$files" ]; then
+		if [[ ! -z "$files" ]]; then
 			for f in $files; do echo $f; done | command sed -r -e "s|$RM_BACKUP_DIR/$back[to_restore]||g" -e "s|/home/$USER|~|g"
 			read -q "?Restore ? (Y/n): " && cp --backup=t -R $RM_BACKUP_DIR/$back[to_restore]/*(:A) / # create file.~1~ if file already exists
 			echo;
@@ -731,11 +731,11 @@ function xtrace()				# debug cmd line with xtrace
 
 function title()				# set the title of the term, or toggle the title updating if no args
 {
-	if [ "$#" -ne "0" ]; then
+	if [[ "$#" -ne "0" ]]; then
 		print -Pn "\e]2;$@\a"
 		UPDATE_TERM_TITLE=""
 	else
-		if [ -z "$UPDATE_TERM_TITLE" ]; then
+		if [[ -z "$UPDATE_TERM_TITLE" ]]; then
 			UPDATE_TERM_TITLE="X"
 		else
 			print -Pn "\e]2;\a"
@@ -839,7 +839,7 @@ function show-associative-array() # nicely list associative array
 
 	aarray=( $@ );
 	for k in "${(@k)aarray}"; do
-		[ $#k -gt $pad ] && pad=$#k;
+		[[ $#k -gt $pad ]] && pad=$#k;
 	done
 	(( pad+=2 ));
 	for k in "${(@k)aarray}"; do
@@ -863,13 +863,13 @@ function show-abbrevs()			# list all the defined abbreviations
 
 function remove-abbrev()
 {
-	[ $# -lt 1 ] && return 1;
+	[[ $# -lt 1 ]] && return 1;
 	local -a to_remove;
 	typeset -Ag new_abbrev;
 
 	to_remove=( $@ )
 	for k in "${(@k)abbrev}"; do
-		if [ -z $to_remove[(r)$k] ]; then # if current key is not in to_remove array
+		if [[ -z $to_remove[(r)$k] ]]; then # if current key is not in to_remove array
 			new_abbrev[$k]="$abbrev[$k]";
 		else
 			unhash -f $k 2>/dev/null;		# unalias
@@ -888,7 +888,7 @@ function mkback()				# create a backup file of . or the specified dir/file
 	local toback;
 	local backfile;
 
-	if [ -e "$1" ] && [ "$1" != "." ] ; then
+	if [[ -e "$1" ]] && [[ "$1" != "." ]] ; then
 		toback="$1";
 		backfile="$(basename ${1:A})";
 	else
