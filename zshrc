@@ -859,6 +859,15 @@ function add-abbrev()			# add a dynamic abbreviation
 	fi
 }
 
+function abbrev-autopipe() # turn autopipe on for this abbrev
+{
+	if [ $# -eq 1 ]; then
+		abbrev_autopipe+=("$1" 1);
+	else
+		echo "Usage: abbrev-autopipe 'abbrev'" >&2;
+	fi
+}
+
 function abbrev-cur() # set a cursor offset for this abbrev
 {
 	if [ $# -eq 2 ]; then
@@ -1326,9 +1335,17 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 	if [ ! -z "$MATCH" ]; then
         CURMOV="${abbrev_curmov[$MATCH]}"
         AUTOPIPE="${abbrev_autopipe[$MATCH]}"
-		LBUFFER="$tmp${(e)REPL}";
+        if [[ $AUTOPIPE -eq 0 ]]; then
+    		LBUFFER="$tmp${(e)REPL}";
+        else
+            if [[ $#tmp -eq 0 ]]; then
+                [[ $CURMOV -ne 0 ]] && CURMOV+=-1; # because of the appened space
+                LBUFFER="${(e)REPL} ";
+            else
+                LBUFFER="$tmp| ${(e)REPL}";
+            fi
+        fi
         [[ $CURMOV -ne 0 ]] && CURSOR=$(( CURSOR + CURMOV ))
-        # TODO: GERER lE AUTOPIPE
 	else
 		case "$KEYS" in
 			("	") zle expand-or-complete;;
@@ -1537,25 +1554,30 @@ bindkey -M menuselect "^[?" _history-complete-older
 
 ### USEFUL ALIASES ###
 
-add-abbrev "ll"		"| less"
-add-abbrev "tt"		"| tail -n"
-add-abbrev "hh"		"| head -n"
-add-abbrev "lc"		"| wc -l"
-add-abbrev "gg"		"| grep -E "
-add-abbrev "gv"		"| grep -Ev "
-add-abbrev "ce"		"| cat -e"
-add-abbrev "cutf"	"| cut -d\  -f"
+add-abbrev "ll"		"less";             abbrev-autopipe "ll"
+add-abbrev "tf"		"tail -f";          abbrev-autopipe "tf"
+add-abbrev "tt"		"tail";             abbrev-autopipe "tt"
+add-abbrev "hh"		"head";             abbrev-autopipe "hh"
+add-abbrev "lc"		"wc -l";            abbrev-autopipe "lc"
+add-abbrev "gg"		"grep";             abbrev-autopipe "gg"
+add-abbrev "ge"		"grep -E";          abbrev-autopipe "ge"
+add-abbrev "gv"		"grep -v";          abbrev-autopipe "gv"
+add-abbrev "gev"	"grep -Ev";         abbrev-autopipe "gev"
+add-abbrev "ce"		"cat -e";           abbrev-autopipe "ce"
+add-abbrev "cutf"	"cut -d\  -f";      abbrev-autopipe "cutf"
+
 add-abbrev "T"		"| tee "
 add-abbrev "TS"		"| sudo tee "
-add-abbrev "tf"		"tail -fn10"
 
 add-abbrev "e"		'$EDITOR '
-add-abbrev "pp"		'$PAGER '
+add-abbrev "v"		'$EDITOR '
+
+add-abbrev "pp"		'$PAGER';           abbrev-autopipe "pp"
 
 add-abbrev "gb"		"git branch -a"
 add-abbrev "branch"	"git branch -a"
-add-abbrev "gc"		'git commit -m""'; abbrev-cur "gc" -1
-add-abbrev "commit"	'git commit -m""'; abbrev-cur "commit" -1
+add-abbrev "gc"		'git commit -m""';  abbrev-cur "gc" -1
+add-abbrev "commit"	'git commit -m""';  abbrev-cur "commit" -1
 add-abbrev "gk"		"git checkout "
 add-abbrev "pull"	"git pull "
 add-abbrev "fetch"	"git fetch -a "
@@ -1564,6 +1586,7 @@ add-abbrev "push"	"git push "
 add-abbrev "gp"		"git push "
 
 add-abbrev "py"     "python "
+add-abbrev "pyc"    "python -c''";      abbrev-cur "pyc" -1
 add-abbrev "res"	"ressource"
 
 add-abbrev "s2e"	"1>&2"
@@ -1580,8 +1603,8 @@ add-abbrev "rr"		'$(echo *(om[1]))'
 
 add-abbrev "bel"	'&& tput bel'
 
-add-abbrev "awk"    "awk '{}'"
-abbrev-cur "awk"    -2
+add-abbrev "awk"    "awk '{}'";         abbrev-autopipe "awk"; abbrev-cur "awk" -2
+add-abbrev "awkf"   "awk -F: '{}'";     abbrev-autopipe "awkf"; abbrev-cur "awkf" -2
 
 
 case "$OS" in
