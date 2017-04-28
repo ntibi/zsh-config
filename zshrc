@@ -1101,6 +1101,12 @@ function foreachd() # foreachd ~/.config/*-config -- ./install.sh
     done
 }
 
+function fatfiles() # get the n biggest files (default 10)
+{
+    du -a . | sort -nr | head -n ${1:-10} | awk 'BEGIN{ split("K M G", v) } { n=$1; s=1; while( n > 1024 ){ n /= 1024; ++s; } size = (v[s] == "G") ? sprintf("%.1f%c", n, v[s]) : sprintf("%0.f%c", n, v[s]); printf("%-7s %s\n", size, $2) }'
+}
+
+
 ### LESS USEFUL USER FUNCTIONS ###
 
 function race()					# race between tokens given in parameters
@@ -1680,7 +1686,6 @@ alias qmacs="emacs -q"			# faster with no config files loaded
 alias q="emacs -q"
 
 alias size="du -sh"								# get the size of smthing
-function fatfiles() {du -a . | sort -nr | head -n10 | awk 'BEGIN{ split("K M G", v) } { n=$1; s=1; while( n > 1024 ){ n /= 1024; ++s; } size = (v[s] == "G") ? sprintf("%.1f%c", n, v[s]) : sprintf("%0.f%c", n, v[s]); printf("%-7s %s\n", size, $2) }'} # get the 10 biggest files
 alias df="df -Tha --total"		# disk usage infos
 alias fps="ps | head -n1  && ps aux | grep -v grep | grep -i -e 'USER.*PID.*%CPU.*%MEM.*VSZ.*RSS TTY.*STAT.*START.*TIME COMMAND.*' -e " # fps <processname> to get ps infos only for the matching processes
 alias tt="tail --retry -fn0"	# real time tail a log
