@@ -720,9 +720,7 @@ function ft()					# find $1 in all files or files containing $3 from $2 or .
 
 function installed()
 {
-	if [ $# -eq 1 ]; then
-		[ "$(type $1)" = "$1 not found" ] || return 0 &&  return 1
-	fi
+    hash "$1" 2>/dev/null
 }
 
 function xtrace()				# debug cmd line with xtrace
@@ -1209,7 +1207,6 @@ compdef _kbd kbd
 # C-v or 'cat -v' to get the keycode
 bindkey -s "^[j" "^A^Kjoin_others_shells\n" # join_others_shells user function
 bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
-bindkey -s "^[s" "^Asudo ^E"	# insert sudo
 bindkey -s "\el" "^Uls\n"		# run ls
 
 bindkey -s ";;" "~"
@@ -1365,6 +1362,26 @@ function operation-at-point()	# simplify the operation at point
 	BUFFER="$NLB$N$NRB"
 }; zle -N operation-at-point
 
+function sudo-line() # add sudo to the current command or the last command
+{
+    [[ -z $BUFFER ]] && zle up-history
+    if [[ $BUFFER[1,5] != "sudo " ]]; then
+        BUFFER="sudo $BUFFER"
+        CURSOR=$(( CURSOR + 5 ))
+    fi
+}; zle -N sudo-line
+
+function su-c-line() # same function as sudo-line but with su when sudo is not available
+{
+    [[ -z $BUFFER ]] && zle up-history
+    if [[ $BUFFER[1,6] != "su -c " ]]; then
+        zle quote-line
+        BUFFER="su -c $BUFFER"
+        CURSOR=$(( CURSOR + 7 ))
+    fi
+}; zle -N su-c-line
+
+
 ### ZSH FUNCTIONS BINDS ###
 
 bindkey -e				  # load emacs style key binding
@@ -1491,6 +1508,8 @@ bindkey "^[." insert-last-word
 
 bindkey "^[?" _history-complete-older
 bindkey "^[/" _history-complete-newer
+
+installed sudo && bindkey "^[s" sudo-line || bindkey "^[s" su-c-line
 
 bindkey -M menuselect "^[?" _history-complete-older
 
