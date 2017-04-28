@@ -1431,6 +1431,12 @@ function su-c-line() # same function as sudo-line but with su when sudo is not a
     fi
 }; zle -N su-c-line
 
+function desc-word-at-point()
+{
+    local DESC="$(where "${LBUFFER/* /}${RBUFFER/ */}")"
+    zle -M ${DESC:-nope}
+}; zle -N desc-word-at-point
+
 
 ### ZSH FUNCTIONS BINDS ###
 
@@ -1558,6 +1564,8 @@ bindkey "^[." insert-last-word
 
 bindkey "^[?" _history-complete-older
 bindkey "^[/" _history-complete-newer
+
+bindkey $key[F1] desc-word-at-point
 
 installed sudo && bindkey "^[s" sudo-line || bindkey "^[s" su-c-line
 
