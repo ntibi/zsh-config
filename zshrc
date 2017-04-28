@@ -835,7 +835,7 @@ function b2h()					# binary to hexa
 	echo $(( [#16]2#$1 ));
 }
 
-function show-associative-array() # nicely list associative array
+function show-associative-array() # nicely list associative array with: show-associative-array ${(kv)array}
 {
 	local -A aarray;
 	local -i pad;
@@ -846,7 +846,7 @@ function show-associative-array() # nicely list associative array
 	done
 	(( pad+=2 ));
 	for k in "${(@k)aarray}"; do
-		printf "$C_BLUE%-${pad}s$C_GREY->$DEF_C  \"$C_GREEN%s$DEF_C\"\n" "$k" "$aarray[$k]";
+		printf "$C_YELLOW%-${pad}s$C_GREY->$DEF_C  \"$C_CYAN%s$DEF_C\"\n" "$k" "$aarray[$k]";
 	done	
 }
 
@@ -878,8 +878,20 @@ function abbrev-cur() # set a cursor offset for this abbrev
 }
 
 function show-abbrevs()			# list all the defined abbreviations
-{
-	show-associative-array ${(kv)abbrev};
+{ # abbrev -> autopipe? "result" cursormove?
+	local -i pad;
+
+	for k in "${(@k)abbrev}"; do
+		[[ $#k -gt $pad ]] && pad=$#k;
+	done
+	(( pad+=1 ));
+	for k in "${(@k)abbrev}"; do
+		printf  "$C_YELLOW%-${pad}s$C_GREY->$DEF_C  $C_GREEN%s$DEF_C\"$C_CYAN%s$DEF_C\" $C_GREEN%s$DEF_C\n"\
+                "$k"\
+                "$([[ $abbrev_autopipe[$k] -eq 1 ]] && echo -n " " || echo -n "|")"\
+                "$abbrev[$k]"\
+                $abbrev_curmov[$k];
+	done
 }
 
 function remove-abbrev()
