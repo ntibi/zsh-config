@@ -71,7 +71,10 @@ fi
 ### USEFUL VARS ###
 
 typeset -Ug PATH				# do not accept doubles
+
 typeset -Ag abbrev				# global associative array to define abbrevations
+typeset -Ag abbrev_curmov		# cursor movement after abbrev
+typeset -Ag abbrev_autopipe		# autopipe for abbrev
 
 WORDCHARS="*?_-.[]~=/&;!#$%^(){}<>|" # for the word-movement
 
@@ -856,6 +859,15 @@ function add-abbrev()			# add a dynamic abbreviation
 	fi
 }
 
+function abbrev-cur() # set a cursor offset for this abbrev
+{
+	if [ $# -eq 2 ]; then
+		abbrev_curmov+=("$1" "$2");
+	else
+		echo "Usage: abbrev-cur 'abbrev' 'n'" >&2;
+	fi
+}
+
 function show-abbrevs()			# list all the defined abbreviations
 {
 	show-associative-array ${(kv)abbrev};
@@ -1305,11 +1317,18 @@ function get-word-at-point()
 function magic-abbrev-expand()	# expand the last word in the complete corresponding abbreviation if any
 {
 	local MATCH;
+	local REPL;
 	local tmp;
+	local CURMOV=0; # use $abbrev_curmov to move the cursor after abbrev expand
+	local AUTOPIPE=0; # use $abbrev_autopipe to automatically prepend the abbrev with a pipe
 	tmp=${LBUFFER%%(#m)[._a-zA-Z0-9\[\]/\-]#};
-	MATCH=${abbrev[$MATCH]};
+	REPL=${abbrev[$MATCH]};
 	if [ ! -z "$MATCH" ]; then
-		LBUFFER="$tmp${(e)MATCH}";
+        CURMOV="${abbrev_curmov[$MATCH]}"
+        AUTOPIPE="${abbrev_autopipe[$MATCH]}"
+		LBUFFER="$tmp${(e)REPL}";
+        [[ $CURMOV -ne 0 ]] && CURSOR=$(( CURSOR + CURMOV ))
+        # TODO: GERER lE AUTOPIPE
 	else
 		case "$KEYS" in
 			("	") zle expand-or-complete;;
@@ -1535,8 +1554,8 @@ add-abbrev "pp"		'$PAGER '
 
 add-abbrev "gb"		"git branch -a"
 add-abbrev "branch"	"git branch -a"
-add-abbrev "gc"		"git commit -m"
-add-abbrev "commit"	"git commit -m"
+add-abbrev "gc"		'git commit -m""'; abbrev-cur "gc" -1
+add-abbrev "commit"	'git commit -m""'; abbrev-cur "commit" -1
 add-abbrev "gk"		"git checkout "
 add-abbrev "pull"	"git pull "
 add-abbrev "fetch"	"git fetch -a "
@@ -1544,7 +1563,7 @@ add-abbrev "gf"		"git fetch -a "
 add-abbrev "push"	"git push "
 add-abbrev "gp"		"git push "
 
-add-abbrev "pyt"	"python "
+add-abbrev "py"     "python "
 add-abbrev "res"	"ressource"
 
 add-abbrev "s2e"	"1>&2"
@@ -1562,6 +1581,7 @@ add-abbrev "rr"		'$(echo *(om[1]))'
 add-abbrev "bel"	'&& tput bel'
 
 add-abbrev "awk"    "awk '{}'"
+abbrev-cur "awk"    -2
 
 
 case "$OS" in
