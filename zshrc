@@ -1618,6 +1618,8 @@ add-abbrev "bel"	'&& tput bel'
 add-abbrev "awk"    "awk '{}'";         abbrev-autopipe "awk"; abbrev-cur "awk" -2
 add-abbrev "awkf"   "awk -F: '{}'";     abbrev-autopipe "awkf"; abbrev-cur "awkf" -2
 
+add-abbrev "showf"  'echo \$functions['
+
 
 case "$OS" in
 	(*darwin*)					# Mac os
