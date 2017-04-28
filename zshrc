@@ -88,8 +88,8 @@ OS="$(uname | tr "A-Z" "a-z")"	# get the os name
 UPDATE_TERM_TITLE="" # set to update the term title according to the path and the currently executed line
 UPDATE_CLOCK=""		 # set to update the top-right clock every second
 
-EDITOR="emacs"
-VISUAL="emacs"
+EDITOR="vi"
+VISUAL="vi"
 PAGER="less"
 
 HISTFILE=~/.zshrc_history
