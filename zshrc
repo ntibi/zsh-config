@@ -1129,7 +1129,7 @@ function hack()					# hollywood hacker cat
 	tput setaf 2; cat $@ | pv -qL 25
 }
 
-function window()				# prints weather info
+function weather()				# prints weather info
 {
 	curl wttr.in/paris
 }
