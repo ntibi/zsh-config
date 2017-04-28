@@ -1307,7 +1307,7 @@ function magic-abbrev-expand()	# expand the last word in the complete correspond
 {
 	local MATCH;
 	local tmp;
-	tmp=${LBUFFER%%(#m)[_a-zA-Z0-9\[\]/\-]#};
+	tmp=${LBUFFER%%(#m)[._a-zA-Z0-9\[\]/\-]#};
 	MATCH=${abbrev[$MATCH]};
 	if [ ! -z "$MATCH" ]; then
 		LBUFFER="$tmp${(e)MATCH}";
