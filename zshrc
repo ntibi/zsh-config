@@ -59,11 +59,6 @@
 #
 
 
-if [ ! $(echo "$0" | grep -s "zsh") ]; then
-	echo "error: Not in zsh" 1>&2
-	return;
-fi
-
 [ -e ~/.myzshrc ] && source ~/.myzshrc # load user file if any
 [ -e ~/.preszhrc ] && source ~/.preszhrc
 
