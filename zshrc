@@ -40,9 +40,6 @@
 # USEFUL ALIASES
 #	yes
 #
-# USEFUL SNIPPETS
-#   useful snippets of unused code
-#
 # MANDATORY FUNCTIONS CALLS
 #	functions calls setting datas for the first time
 #
@@ -1637,6 +1634,8 @@ add-abbrev "f/"    'find / -name ""'      ; abbrev-cur "f/" -1
 
 add-abbrev "ssht"   'ssh -t  tmux attach' ; abbrev-cur "ssht" -12
 
+add-abbrev "t" "tmux "
+
 
 case "$OS" in
 	(*darwin*)					# Mac os
@@ -1698,15 +1697,8 @@ alias trunc='sed "s/^\(.\{0,$COLUMNS\}\).*$/\1/g"' # truncate too long lines
 
 alias dmake="CFLAGS+=-g3 make"
 
-alias t="tmux" ; add-abbrev t "tmux "
-alias ta="tmux a -t" ; add-abbrev ta "tmux a -t "
-alias tns="tmux new-session -s" ; add-abbrev tns "tmux new-session -s "
-
-
-### USEFUL SNIPPETS ###
-
-# buffer=("${(f)$(< filename)}")
-# split file in array by lines
+alias t="tmux" 
+alias ta="tmux attach-session || tmux new-session"
 
 
 ### MANDATORY FUNCTIONS CALLS ###
