@@ -1578,17 +1578,17 @@ bindkey -M menuselect "^[?" _history-complete-older
 
 ### USEFUL ALIASES ###
 
-add-abbrev "ll"		"less";             abbrev-autopipe "ll"
-add-abbrev "tf"		"tail -f";          abbrev-autopipe "tf"
-add-abbrev "tt"		"tail";             abbrev-autopipe "tt"
-add-abbrev "hh"		"head";             abbrev-autopipe "hh"
-add-abbrev "lc"		"wc -l";            abbrev-autopipe "lc"
-add-abbrev "gg"		"grep \"\"";        abbrev-autopipe "gg"; abbrev-cur "gg" -1
-add-abbrev "ge"		"grep -E \"\"";     abbrev-autopipe "ge"; abbrev-cur "ge" -1
-add-abbrev "gv"		"grep -v \"\"";     abbrev-autopipe "gv"; abbrev-cur "gv" -1
-add-abbrev "gev"	"grep -Ev \"\"";    abbrev-autopipe "gev"; abbrev-cur "gev" -1
-add-abbrev "ce"		"cat -e";           abbrev-autopipe "ce"
-add-abbrev "cutf"	"cut -d\  -f";      abbrev-autopipe "cutf"
+add-abbrev "ll"		"less"                ; abbrev-autopipe "ll"
+add-abbrev "tf"		"tail -f"             ; abbrev-autopipe "tf"
+add-abbrev "tt"		"tail"                ; abbrev-autopipe "tt"
+add-abbrev "hh"		"head"                ; abbrev-autopipe "hh"
+add-abbrev "lc"		"wc -l"               ; abbrev-autopipe "lc"
+add-abbrev "gg"		"grep \"\""           ; abbrev-autopipe "gg"   ; abbrev-cur "gg" -1
+add-abbrev "ge"		"grep -E \"\""        ; abbrev-autopipe "ge"   ; abbrev-cur "ge" -1
+add-abbrev "gv"		"grep -v \"\""        ; abbrev-autopipe "gv"   ; abbrev-cur "gv" -1
+add-abbrev "gev"	"grep -Ev \"\""       ; abbrev-autopipe "gev"  ; abbrev-cur "gev" -1
+add-abbrev "ce"		"cat -e"              ; abbrev-autopipe "ce"
+add-abbrev "cutf"	"cut -d\  -f"         ; abbrev-autopipe "cutf"
 
 add-abbrev "T"		"| tee "
 add-abbrev "TS"		"| sudo tee "
@@ -1596,12 +1596,12 @@ add-abbrev "TS"		"| sudo tee "
 add-abbrev "e"		'$EDITOR '
 add-abbrev "v"		'$EDITOR '
 
-add-abbrev "pp"		'$PAGER';           abbrev-autopipe "pp"
+add-abbrev "pp"		'$PAGER'              ; abbrev-autopipe "pp"
 
 add-abbrev "gb"		"git branch -a"
 add-abbrev "branch"	"git branch -a"
-add-abbrev "gc"		'git commit -m""';  abbrev-cur "gc" -1
-add-abbrev "commit"	'git commit -m""';  abbrev-cur "commit" -1
+add-abbrev "gc"		'git commit -m""'     ; abbrev-cur "gc" -1
+add-abbrev "commit"	'git commit -m""'     ; abbrev-cur "commit" -1
 add-abbrev "gk"		"git checkout "
 add-abbrev "pull"	"git pull "
 add-abbrev "fetch"	"git fetch -a "
@@ -1610,7 +1610,7 @@ add-abbrev "push"	"git push "
 add-abbrev "gp"		"git push "
 
 add-abbrev "py"     "python "
-add-abbrev "pyc"    "python -c''";      abbrev-cur "pyc" -1
+add-abbrev "pyc"    "python -c''"         ; abbrev-cur "pyc" -1
 add-abbrev "res"	"ressource"
 
 add-abbrev "s2e"	"1>&2"
@@ -1627,13 +1627,15 @@ add-abbrev "rr"		'$(echo *(om[1]))'
 
 add-abbrev "bel"	'&& tput bel'
 
-add-abbrev "awk"    "awk '{}'";         abbrev-autopipe "awk"; abbrev-cur "awk" -2
-add-abbrev "awkf"   "awk -F: '{}'";     abbrev-autopipe "awkf"; abbrev-cur "awkf" -2
+add-abbrev "awk"    "awk '{}'"            ; abbrev-autopipe "awk"  ; abbrev-cur "awk" -2
+add-abbrev "awkf"   "awk -F: '{}'"        ; abbrev-autopipe "awkf" ; abbrev-cur "awkf" -2
 
 add-abbrev "showf"  'echo \$functions['
 
-add-abbrev "f."    'find . -name ""';         abbrev-cur "f." -1
-add-abbrev "f/"    'find / -name ""';         abbrev-cur "f/" -1
+add-abbrev "f."    'find . -name ""'      ; abbrev-cur "f." -1
+add-abbrev "f/"    'find / -name ""'      ; abbrev-cur "f/" -1
+
+add-abbrev "ssht"   'ssh -t  tmux attach' ; abbrev-cur "ssht" -12
 
 
 case "$OS" in
