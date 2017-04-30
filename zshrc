@@ -1587,10 +1587,10 @@ add-abbrev "tf"		"tail -f";          abbrev-autopipe "tf"
 add-abbrev "tt"		"tail";             abbrev-autopipe "tt"
 add-abbrev "hh"		"head";             abbrev-autopipe "hh"
 add-abbrev "lc"		"wc -l";            abbrev-autopipe "lc"
-add-abbrev "gg"		"grep";             abbrev-autopipe "gg"
-add-abbrev "ge"		"grep -E";          abbrev-autopipe "ge"
-add-abbrev "gv"		"grep -v";          abbrev-autopipe "gv"
-add-abbrev "gev"	"grep -Ev";         abbrev-autopipe "gev"
+add-abbrev "gg"		"grep \"\"";        abbrev-autopipe "gg"; abbrev-cur "gg" -1
+add-abbrev "ge"		"grep -E \"\"";     abbrev-autopipe "ge"; abbrev-cur "ge" -1
+add-abbrev "gv"		"grep -v \"\"";     abbrev-autopipe "gv"; abbrev-cur "gv" -1
+add-abbrev "gev"	"grep -Ev \"\"";    abbrev-autopipe "gev"; abbrev-cur "gev" -1
 add-abbrev "ce"		"cat -e";           abbrev-autopipe "ce"
 add-abbrev "cutf"	"cut -d\  -f";      abbrev-autopipe "cutf"
 
