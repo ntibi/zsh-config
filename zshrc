@@ -1087,7 +1087,7 @@ function foreachd() # foreachd ~/.config/*-config -- ./install.sh
         fi
     done
     for d in $dirs; do
-        print "\e[4m$d\e[0m:"
+        print "\e[4m${d:t}\e[0m:"
         pushd $d >/dev/null
         eval $cmd
         popd >/dev/null
