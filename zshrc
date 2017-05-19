@@ -93,11 +93,13 @@ CLICOLOR=1
 LOCAL_CONF_FILE="~/.myzshrc"	# use like this: ${~LOCAL_CONF_FILE}
 
 case "$OS" in
-	(*darwin*)					# Mac os
+	(*darwin*)					# mac os
+		LS_COLORS='exfxcxdxbxexexabagacad';;
+    (*bsd*)                     # bsd
 		LS_COLORS='exfxcxdxbxexexabagacad';;
 	(*cygwin*)					# cygwin
 		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
-	(*linux*|*)					# Linux
+	(*linux*|*)					# linux
 		LS_COLORS='fi=1;34:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
 esac
 
@@ -1652,6 +1654,13 @@ case "$OS" in
 		
 		alias ls="ls --color=auto";
 		;;
+    (*bsd*)
+		add-abbrev "update" "pkg upgrade";
+		add-abbrev "install" "pkg install ";
+		add-abbrev "search" "pkg search ";
+
+        alias ls="ls -G";
+        ;;
 	(*linux*|*)					# Linux
 		add-abbrev "update" "sudo apt-get update && sudo apt-get upgrade";
 		add-abbrev "install" "apt-get install ";
