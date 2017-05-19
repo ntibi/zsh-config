@@ -1525,6 +1525,9 @@ alias x="command emacs"
 alias e="emacs"
 alias qmacs="emacs -q"			# faster with no config files loaded
 alias q="emacs -q"
+alias vi="vim"
+alias v="vim"
+alias vq="vim -u NONE"
 
 alias size="du -sh"								# get the size of smthing
 alias df="df -Tha --total"		# disk usage infos
