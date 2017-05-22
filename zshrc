@@ -93,11 +93,13 @@ CLICOLOR=1
 LOCAL_CONF_FILE="~/.myzshrc"	# use like this: ${~LOCAL_CONF_FILE}
 
 case "$OS" in
-	(*darwin*)					# Mac os
+	(*darwin*)					# mac os
+		LS_COLORS='exfxcxdxbxexexabagacad';;
+    (*bsd*)                     # bsd
 		LS_COLORS='exfxcxdxbxexexabagacad';;
 	(*cygwin*)					# cygwin
 		LS_COLORS='fi=1;32:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
-	(*linux*|*)					# Linux
+	(*linux*|*)					# linux
 		LS_COLORS='fi=1;34:di=1;34:ln=35:so=32:pi=0;33:ex=32:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=1;34:ow=1;34:';;
 esac
 
@@ -441,47 +443,6 @@ function -() 					# if 0 params, acts like 'cd -', else, act like the regular '-
 }
 
 
-# faster find allowing easier parameters in disorder
-function ff()
-{
-	local p
-	local name=""
-	local type=""
-	local additional=""
-	local hidden=" -not -regex .*/\..*" # hide hidden files by default
-	local root="."
-	for p in "$@"; do
-		if $(echo $p | grep -Eq "^n?[herwxbcdflps]$"); # is it a type ?
-		then
-			if $(echo $p | grep -q "n"); then # handle command negation
-				neg=" -not"
-				p=${p/n/}		# remove the 'n' from p, to get the real type
-			else
-				neg=""
-			fi
-			case $p in
-				(h) [ -z $neg ] && hidden="" || hidden=" -not -regex .*/\..*";;
-				(e) additional+="$neg -empty";;
-				(r) additional+="$neg -readable";;
-				(w) additional+="$neg -writable";;
-				(x) additional+="$neg -executable";;
-				(*) type+=$([ -z "$type" ] && echo "$neg -type $p" || echo " -or $neg -type $p");;
-			esac
-		else if [ -d $p ];		# is it a path ?
-			 then
-				 root=$p
-			 else				# then its a name !
-				 name+="$([ -z "$name" ] && echo " -name $p" || echo " -or -name $p")";
-			 fi
-		fi
-	done
-	if [ -t ]; then				# disable colors if piped
-		find -O3 $(echo $root $name $additional $hidden $([ ! -z "$type" ] && echo "(") $type $([ ! -z "$type" ] && echo ")") | sed 's/ +/ /g') 2>/dev/null | grep --color=always "^\|[^/]*$" # re split all to spearate parameters and colorize filename
-	else
-		find -O3 $(echo $root $name $additional $hidden $([ ! -z "$type" ] && echo "(") $type $([ ! -z "$type" ] && echo ")") | sed 's/ +/ /g') 2>/dev/null
-	fi
-}
-
 function colorcode()  			# get the code to set the corresponding fg color
 {
 	for c in "$@"; do
@@ -579,135 +540,6 @@ function ts()					# timestamps operations (`ts` to get current, `ts <timestamp>`
 		echo "${delta}s";
 	fi
 }
-
-function rrm()					# real rm
-{
-	if [ "$1" != "$HOME" -a "$1" != "/" ]; then
-		command rm $@;
-	fi
-}
-
-RM_BACKUP_DIR="$HOME/.backup"
-function rm()					# safe rm with timestamped backup
-{
-	if [ $# -gt 0 ]; then
-		local backup;
-		local idir;
-		local rm_params;
-		local i;
-		idir="";
-		rm_params="";
-		backup="$RM_BACKUP_DIR/$(date +%s)";
-		for i in "$@"; do
-			if [[ ${i:0:1} = "-" ]]; then # if $i is an args list, save them
-				rm_params+="$i";
-			elif [[ -f "$i" ]] || [[ -d "$i" ]] || [[ -L "$i" ]] || [[ -p "$i" ]]; then # $i exist ?
-				[[ ! ${i:0:1} = "/" ]] && i="$PWD/$i"; # if path is not absolute, make it absolute
-				i=${i:A};		# simplify the path
-				idir="$(dirname $i)";
-				command mkdir -p "$backup/$idir";
-				mv "$i" "$backup$i";
-			else				# $i is not a param list nor a file/dir
-				echo "'$i' not found" 1>&2;
-			fi
-		done
-	fi
-}
-
-function save()					# backup the files
-{
-	if [ $# -gt 0 ]; then
-		local backup;
-		local idir;
-		local rm_params;
-		local i;
-		idir="";
-		rm_params="";
-		backup="$RM_BACKUP_DIR/$(date +%s)";
-		command mkdir -p "$backup";
-		for i in "$@"; do
-			if [[ ${i:0:1} = "-" ]]; then # if $i is an args list, save them
-				rm_params+="$i";
-			elif [[ -f "$i" ]] || [[ -d "$i" ]] || [[ -L "$i" ]] || [[ -p "$i" ]]; then # $i exist ?
-				[[ ! ${i:0:1} = "/" ]] && i="$PWD/$i"; # if path is not absolute, make it absolute
-				i=${i:A};						# simplify the path
-				idir="$(dirname $i)";
-				command mkdir -p "$backup/$idir";
-				if [ -d "$i" ]; then
-					cp -R "$i" "$backup$i";
-				else
-					cp "$i" "$backup$i";
-				fi
-			else				# $i is not a param list nor a file/dir
-				echo "'$i' not found" 1>&2;
-			fi
-		done
-	fi
-}
-
-CLEAR_LINE="$(tput sgr0; tput el1; tput cub 2)"
-function back()					# list all backuped files
-{
-	local files;
-	local peek;
-	local backs;
-	local to_restore="";
-	local peeks_nbr=$(( (LINES) / 3 ));
-	local b;
-	local -i i;
-	local key;
-
-	[[ -d $RM_BACKUP_DIR ]] || return
-	back=( $(command ls -t1 $RM_BACKUP_DIR/) );
-	i=1;
-	while [[ $i -le $#back ]] && [[ -z "$to_restore" ]]; do
-		b=$back[i];
-		files=( $(find $RM_BACKUP_DIR/$b -type f) )
-		if [[ ! $#files -eq 0 ]]; then
-			peek=""
-			for f in $files; do peek+="$(basename $f), "; if [[ $#peek -ge $COLUMNS ]]; then break; fi; done
-			peek=${peek:0:(-2)}; # remove the last ', '
-			[[ $#peek -gt $COLUMNS ]] && peek="$(echo $peek | head -c $(( COLUMNS - 3 )) )..." # truncate and add '...' at the end if the peek is too large
-			echo "$C_RED#$i$DEF_C: $C_GREEN$(ts $b)$DEF_C: $C_BLUE$(echo $files | wc -w)$DEF_C file(s) ($C_CYAN$(du -sh $RM_BACKUP_DIR/$b | cut -f1)$DEF_C)"
-			echo "$peek";
-			echo;
-		fi
-		if [[ $(( i % $peeks_nbr == 0 || i == $#back )) -eq 1 ]]; then
-			key="";
-			echo -n "> $C_GREEN";
-			read -sk1 key;
-			case "$(echo -n $key | cat -e)" in
-				("^[")
-					echo -n "$CLEAR_LINE";
-					read -sk2 key; # handle 3 characters arrow key press as next
-					i=$(( i + 1 ));;
-				("$"|" ")			# hangle enter and space as next
-					echo -n "$CLEAR_LINE";
-					i=$(( i + 1 ));;
-				(*)				# handle everything else as a first character of backup number
-					echo -n $key; # print the silently read key on the prompt
-					read to_restore;
-					to_restore="$key$to_restore";;
-			esac
-			echo -n "$DEF_C"
-		else
-			i=$(( i + 1 ));
-		fi
-	done
-	if [[ ! -z "$back[to_restore]" ]]; then
-		files=( $(find $RM_BACKUP_DIR/$back[to_restore] -type f) )
-		if [[ ! -z "$files" ]]; then
-			for f in $files; do echo $f; done | command sed -r -e "s|$RM_BACKUP_DIR/$back[to_restore]||g" -e "s|/home/$USER|~|g"
-			read -q "?Restore ? (Y/n): " && cp --backup=t -R $RM_BACKUP_DIR/$back[to_restore]/*(:A) / # create file.~1~ if file already exists
-			echo;
-		else
-			echo "No such back"
-		fi
-	else
-		echo "No such back"
-	fi
-}
-
 
 function ft()					# find $1 in all files or files containing $3 from $2 or .
 {
@@ -1652,6 +1484,13 @@ case "$OS" in
 		
 		alias ls="ls --color=auto";
 		;;
+    (*bsd*)
+		add-abbrev "update" "pkg upgrade";
+		add-abbrev "install" "pkg install ";
+		add-abbrev "search" "pkg search ";
+
+        alias ls="ls -G";
+        ;;
 	(*linux*|*)					# Linux
 		add-abbrev "update" "sudo apt-get update && sudo apt-get upgrade";
 		add-abbrev "install" "apt-get install ";
@@ -1686,6 +1525,9 @@ alias x="command emacs"
 alias e="emacs"
 alias qmacs="emacs -q"			# faster with no config files loaded
 alias q="emacs -q"
+alias vi="vim"
+alias v="vim"
+alias vq="vim -u NONE"
 
 alias size="du -sh"								# get the size of smthing
 alias df="df -Tha --total"		# disk usage infos
