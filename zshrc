@@ -1695,7 +1695,7 @@ alias dzsh="zsh --norcs --xtrace" # debugzsh
 
 alias trunc='sed "s/^\(.\{0,$COLUMNS\}\).*$/\1/g"' # truncate too long lines
 
-alias dmake="CFLAGS+=-g3 make"
+alias dmake='CFLAGS+="-g3 -DDEBUG" make'
 
 alias t="tmux" 
 alias ta="tmux attach-session || tmux new-session"
