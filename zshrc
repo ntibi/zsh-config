@@ -1521,10 +1521,11 @@ alias ressource="source ~/.zshrc"
 alias emacs="emacs -nw"			# default emacs is in console
 alias xemacs="command emacs"	# x one is not
 alias emax="command emacs"
-alias x="command emacs"
 alias e="emacs"
-alias qmacs="emacs -q"			# faster with no config files loaded
+alias qmacs="emacs -q"
 alias q="emacs -q"
+
+installed nvim && alias vim="nvim" # prefer neovim
 alias vi="vim"
 alias v="vim"
 alias vq="vim -u NONE"
