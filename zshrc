@@ -67,6 +67,7 @@ typeset -Ug PATH				# do not accept doubles
 typeset -Ag abbrev				# global associative array to define abbrevations
 typeset -Ag abbrev_curmov		# cursor movement after abbrev
 typeset -Ag abbrev_autopipe		# autopipe for abbrev
+typeset -Ag abbrev_beginning	# abbrev can not be used anywhere, only in beginning of line
 
 WORDCHARS="*?_-.[]~=/&;!#$%^(){}<>|" # for the word-movement
 
@@ -703,6 +704,15 @@ function abbrev-cur() # set a cursor offset for this abbrev
 	fi
 }
 
+function abbrev-beginning() # turn beginning on for this abbrev
+{
+	if [ $# -eq 1 ]; then
+		abbrev_beginning+=("$1" 1);
+	else
+		echo "Usage: abbrev-beginning 'abbrev'" >&2;
+	fi
+}
+
 function show-abbrevs()			# list all the defined abbreviations
 { # abbrev -> autopipe? "result" cursormove?
 	local -i pad;
@@ -1202,33 +1212,35 @@ function get-word-at-point()
 
 function magic-abbrev-expand() # expand the last word in the complete corresponding abbreviation if any
 {
-	local MATCH;
-	local REPL;
-	local tmp;
-	local CURMOV=0;                                                 # use $abbrev_curmov to move the cursor after abbrev expand
-	local AUTOPIPE=0;                                               # use $abbrev_autopipe to automatically prepend the abbrev with a pipe
-	tmp=${LBUFFER%%(#m)[._a-zA-Z0-9\[\]/\-]#};
-	REPL=${abbrev[$MATCH]};
-	if [ ! -z "$REPL" ]; then
-        CURMOV="${abbrev_curmov[$MATCH]}"
-        AUTOPIPE="${abbrev_autopipe[$MATCH]}"
-        if [[ $AUTOPIPE -eq 0 ]]; then
-    		LBUFFER="$tmp${(e)REPL}";
-        else
-            if [[ $#tmp -eq 0 || $tmp -regex-match "\| *$" ]]; then # BUFFER is ">abbrev" or ">cmd | abbrev" >>> don't add a pipe
-                [[ $CURMOV -ne 0 ]] && CURMOV+=-1;                  # because of the appened space
-                LBUFFER="$tmp${(e)REPL} ";
-            else                                                    # BUFFER is ">abbrev" >>> add a pipe
-                LBUFFER="$tmp| ${(e)REPL}";
+    local MATCH;
+    local REPL;
+    local tmp;
+    local CURMOV=0;                                                 # use $abbrev_curmov to move the cursor after abbrev expand
+    local AUTOPIPE=0;                                               # use $abbrev_autopipe to automatically prepend the abbrev with a pipe
+    tmp=${LBUFFER%%(#m)[._a-zA-Z0-9\[\]/\-]#};
+    REPL=${abbrev[$MATCH]};
+    if [ ! -z "$REPL" ]; then
+        if [[ ! ${abbrev_beginning[$MATCH]} || $MATCH == ${LBUFFER[1, $#MATCH]} ]]; then # check if abbrev must start the line
+            CURMOV="${abbrev_curmov[$MATCH]}"
+            AUTOPIPE="${abbrev_autopipe[$MATCH]}"
+            if [[ $AUTOPIPE -eq 0 ]]; then
+                LBUFFER="$tmp${(e)REPL}";
+            else
+                if [[ $#tmp -eq 0 || $tmp -regex-match "\| *$" ]]; then # BUFFER is ">abbrev" or ">cmd | abbrev" >>> don't add a pipe
+                    [[ $CURMOV -ne 0 ]] && CURMOV+=-1;                  # because of the appened space
+                    LBUFFER="$tmp${(e)REPL} ";
+                else                                                    # BUFFER is ">abbrev" >>> add a pipe
+                    LBUFFER="$tmp| ${(e)REPL}";
+                fi
             fi
         fi
         [[ $CURMOV -ne 0 ]] && CURSOR=$(( CURSOR + CURMOV ))
-	else
-		case "$KEYS" in
-			("	") zle expand-or-complete;;
-			(*) zle .self-insert;;
-		esac
-	fi
+    else
+        case "$KEYS" in
+            ("	") zle expand-or-complete;;
+            (*) zle .self-insert;;
+        esac
+    fi
 }; zle -N magic-abbrev-expand
 
 function self-insert-hook() # hook after each non-binded key pressed
@@ -1498,9 +1510,9 @@ add-abbrev "f/"    'find / -name ""'      ; abbrev-cur "f/" -1
 
 add-abbrev "ssht"   'ssh -t  tmux attach' ; abbrev-cur "ssht" -12
 
-add-abbrev "t" "tmux "
+add-abbrev "t" "tmux "                    ; abbrev-beginning "tmux"
 
-add-abbrev "ci"    "ci ''"            ; abbrev-autopipe "ci"  ; abbrev-cur "ci" -1
+add-abbrev "ci"    "ci ''"                ; abbrev-autopipe "ci"  ; abbrev-cur "ci" -1
 
 
 case "$OS" in
