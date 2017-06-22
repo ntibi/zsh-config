@@ -675,6 +675,7 @@ function show-associative-array() # nicely list associative array with: show-ass
 	done	
 }
 
+# TODO: add a flag to specify if the abbrev must be at the beginning of the line
 function add-abbrev()			# add a dynamic abbreviation
 {
 	if [ $# -eq 2 ]; then
@@ -929,6 +930,37 @@ function foreachd() # foreachd ~/.config/*-config -- ./install.sh
 function fatfiles() # get the n biggest files (default 10)
 {
     du -a . | sort -nr | head -n ${1:-10} | awk 'BEGIN{ split("K M G", v) } { n=$1; s=1; while( n > 1024 ){ n /= 1024; ++s; } size = (v[s] == "G") ? sprintf("%.1f%c", n, v[s]) : sprintf("%0.f%c", n, v[s]); printf("%-7s %s\n", size, $2) }'
+}
+
+function ci() # ci 'printf("Hello %s !\n", av[1]);' ntibi
+{
+    local fn
+    local final
+
+    [[ -d /tmp/ci ]] || mkdir -p /tmp/ci
+    fn=$(mktemp /tmp/ci/XXXXXX.c)
+    out=$(mktemp /tmp/ci/out.XXXXXX)
+    cat > $fn << EOF
+#include <unistd.h>
+#include <stdio.h>
+#include <strings.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <fcntl.h>
+#include <stddef.h>
+int main(int ac, char **av, char *env)
+{
+EOF
+# -R pour l'escaping
+    print -R $1 >> $fn
+    cat >> $fn << EOF
+    return 0;
+}
+EOF
+    gcc $fn -o $out
+    shift
+    $out $*
 }
 
 
@@ -1467,6 +1499,8 @@ add-abbrev "f/"    'find / -name ""'      ; abbrev-cur "f/" -1
 add-abbrev "ssht"   'ssh -t  tmux attach' ; abbrev-cur "ssht" -12
 
 add-abbrev "t" "tmux "
+
+add-abbrev "ci"    "ci ''"            ; abbrev-autopipe "ci"  ; abbrev-cur "ci" -1
 
 
 case "$OS" in
