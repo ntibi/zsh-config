@@ -855,7 +855,7 @@ AllowShortFunctionsOnASingleLine: None,
 KeepEmptyLinesAtTheStartOfBlocks: false,
 Language: Cpp,
 BreakBeforeBraces: Allman,
-UseTab: ForIndentation,
+UseTab: Never,
 MaxEmptyLinesToKeep: 1,
 }" "$@"
 }
