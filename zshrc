@@ -344,15 +344,29 @@ function periodic()				# every $PERIOD secs - triggered by promt print
 
 function preexec()				# pre execution hook
 {
-	[[ -z $UPDATE_TERM_TITLE ]] || printf "\e]2;%s : %s\a" "${PWD/~/~}" "$1" # set 'pwd + cmd' set term title
+    if [[ -n $UPDATE_TERM_TITLE ]]; then
+        case $TERM in
+            screen*) # do not print cwd in tmux/screen
+                set_title ${1// */};; # and only the binary name, not the args
+            *)
+                set_title "${PWD/~/~} : $1";; # set 'pwd + cmd' set term title
+        esac
+    fi
 }
 
 function precmd()				# pre promt hook
 {
-	[[ -z $UPDATE_CLOCK ]] || clock
-	[[ -z $UPDATE_TERM_TITLE ]] || printf "\e]2;%s\a" "${PWD/~/~}" # set pwd as term title
-	
-	set_git_char
+    [[ -z $UPDATE_CLOCK ]] || clock
+    if [[ -n $UPDATE_TERM_TITLE ]]; then
+        case $TERM in
+            screen*) # do not print cwd in tmux/screen
+                set_title zsh;;
+            *)
+                set_title "${PWD/~/~}";; # set pwd as term title
+        esac
+    fi
+
+    set_git_char
 }
 
 
@@ -561,16 +575,26 @@ function xtrace()				# debug cmd line with xtrace
 function title()				# set the title of the term, or toggle the title updating if no args
 {
 	if [[ "$#" -ne "0" ]]; then
-		print -Pn "\e]2;$@\a"
-		UPDATE_TERM_TITLE=""
+        set_title $@
+		UPDATE_TERM_TITLE="" # forced title is persistent
 	else
 		if [[ -z "$UPDATE_TERM_TITLE" ]]; then
 			UPDATE_TERM_TITLE="X"
 		else
-			print -Pn "\e]2;\a"
+            set_title $@
 			UPDATE_TERM_TITLE=""
 		fi
 	fi
+}
+
+function set_title() # sets the term title (handles tmux/screen)
+{
+    case $TERM in
+        screen*)
+            print -Pn "\ek$@\e\\";;
+        *)
+            print -Pn "\e]2;$@\a";;
+    esac
 }
 
 function loadconf()				# load a visual config
