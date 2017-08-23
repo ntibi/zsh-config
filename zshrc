@@ -1613,6 +1613,8 @@ alias dmake='CFLAGS+="-g3 -DDEBUG" make'
 alias t="tmux" 
 alias ta="tmux attach-session || tmux new-session"
 
+alias TODO="grep --exclude-dir='.git' -InHo 'TODO.*' -r . | grep TODO"
+
 
 ### MANDATORY FUNCTIONS CALLS ###
 
