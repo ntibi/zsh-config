@@ -997,6 +997,30 @@ EOF
     $out $*
 }
 
+function n() # next numbered directory
+{
+    local NEW;
+
+    NEW=$(echo $PWD | sed 's/^\(.*\)\([0-9]\+\)\(.*\)$/echo \1$((\2+1))\3/ge');
+    if [[ NEW != PWD ]]; then
+        if [[ -d $NEW ]]; then
+            cd $NEW;
+        fi
+    fi
+}
+
+function p() # previous numbered directory
+{
+    local NEW;
+
+    NEW=$(echo $PWD | sed 's/^\(.*\)\([0-9]\+\)\(.*\)$/echo \1$((\2-1))\3/ge');
+    if [[ NEW != PWD ]]; then
+        if [[ -d $NEW ]]; then
+            cd $NEW;
+        fi
+    fi
+}
+
 
 ### LESS USEFUL USER FUNCTIONS ###
 
