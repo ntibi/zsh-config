@@ -997,11 +997,11 @@ EOF
     $out $*
 }
 
-function n() # next numbered directory
+function n() # goto the #n next numbered directory (defaults at 1)
 {
     local NEW;
 
-    NEW=$(echo $PWD | sed 's/^\(.*\)\([0-9]\+\)\(.*\)$/echo \1$((\2+1))\3/ge');
+    NEW=$(echo $PWD | sed "s/^\(.*\)\([0-9]\+\)\(.*\)$/echo \1\$((\2+${1:=1}))\3/ge");
     if [[ NEW != PWD ]]; then
         if [[ -d $NEW ]]; then
             cd $NEW;
@@ -1009,11 +1009,11 @@ function n() # next numbered directory
     fi
 }
 
-function p() # previous numbered directory
+function p() # goto the #n previous numbered directory (defaults at 1)
 {
     local NEW;
 
-    NEW=$(echo $PWD | sed 's/^\(.*\)\([0-9]\+\)\(.*\)$/echo \1$((\2-1))\3/ge');
+    NEW=$(echo $PWD | sed "s/^\(.*\)\([0-9]\+\)\(.*\)$/echo \1\$((\2-${1:=1}))\3/ge");
     if [[ NEW != PWD ]]; then
         if [[ -d $NEW ]]; then
             cd $NEW;
