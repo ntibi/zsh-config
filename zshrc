@@ -561,6 +561,16 @@ function ft()					# find $1 in all files or files containing $3 from $2 or .
 	command find -O3 ${2:=.} -type f -name "*${3:=}*" -exec grep --color=always -EInH -e "$1" {} +; # grep: E extended regex, I (ignore binary) n (line number) H (print fn each line)
 }
 
+function ff() # find all files containing $1 in $2 or .
+{
+	command find -O3 ${2:=.} -type f -name "*${1:=}*";
+}
+
+function fe() # edit all files containing $1 in $2 or .
+{
+    command find -O3 ${2:=.} -type f -name "*${1:=}*" -exec $EDITOR {} \+;
+}
+
 function installed()
 {
     hash "$1" 2>/dev/null
