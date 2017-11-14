@@ -1569,7 +1569,7 @@ case "$OS" in
 		add-abbrev "install" "brew install ";
 		add-abbrev "search" "brew search ";
 		
-		alias ls="ls --color=auto";
+		alias ls="ls -G";
 		;;
 	(*cygwin*)					# cygwin
 		add-abbrev "update" "setup.exe";
