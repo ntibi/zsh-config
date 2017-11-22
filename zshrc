@@ -1666,6 +1666,10 @@ rehash							# hash commands in path
 
 
 [ -e ~/.postzshrc ] && source ~/.postzshrc # load user file if any
+if [ -e ~/.fzf.zsh ]; then
+    source ~/.fzf.zsh # load fzf
+    bindkey '^F' fzf-file-widget
+fi
 
 # join_others_shells				# ask to join others shells
 
