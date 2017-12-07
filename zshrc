@@ -1539,6 +1539,10 @@ add-abbrev "fetch"	"git fetch -a "
 add-abbrev "gf"		"git fetch -a "
 add-abbrev "push"	"git push "
 add-abbrev "gp"		"git push "
+add-abbrev "gd"		"git diff "
+add-abbrev "gds"	"git diff --staged "
+
+add-abbrev "gdf"    '$(git diff --name-only | tr \\n \ )'
 
 add-abbrev "py"     "python "
 add-abbrev "pyc"    "python -c''"         ; abbrev-cur "pyc" -1
@@ -1670,8 +1674,8 @@ if [ -e ~/.fzf.zsh ]; then
     source ~/.fzf.zsh # load fzf
     bindkey '^F' fzf-file-widget
 fi
+bindkey "^T" transpose-chars-inplace # override fzf binding
 
 # join_others_shells				# ask to join others shells
 
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
-
