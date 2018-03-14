@@ -1419,7 +1419,7 @@ key[enter]=$terminfo[cr]
 key[M-enter]="^[^J"
 case "$OS" in
 	(*cygwin*) 	key[C-enter]="^^";;
-	(*) 		key[C-enter]="^J";;
+	(*) 		key[C-enter]="^M";;
 esac
 
 key[F1]=$terminfo[kf1]
