@@ -1677,6 +1677,9 @@ if [ -e ~/.fzf.zsh ]; then
 fi
 bindkey "^T" transpose-chars-inplace # override fzf binding
 
+installed coderay && export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || (coderay {} || cat {}) 2> /dev/null | head -$LINES'\''' || export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || cat {} 2> /dev/null | head -$LINES'\'''
+installed highlight && export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || (highlight -O ansi -l {} || cat {}) 2> /dev/null | head -$LINES'\''' || export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || cat {} 2> /dev/null | head -$LINES'\'''
+
 # join_others_shells				# ask to join others shells
 
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
