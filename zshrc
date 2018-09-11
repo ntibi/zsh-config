@@ -81,8 +81,8 @@ OS="$(uname | tr "A-Z" "a-z")"	# get the os name
 UPDATE_TERM_TITLE="" # set to update the term title according to the path and the currently executed line
 UPDATE_CLOCK=""		 # set to update the top-right clock every second
 
-EDITOR="vi"
-VISUAL="vi"
+EDITOR="vim"
+VISUAL="vim"
 PAGER="less"
 
 HISTFILE=~/.zshrc_history
@@ -319,7 +319,7 @@ function setps4()				# toggle PS4 (xtrace prompt) between verbose and default
 		(*)
 			PS4="%b%N:%I %_
 %B";
-	esac 
+	esac
 }
 
 
@@ -806,82 +806,82 @@ function mkback()				# create a backup file of . or the specified dir/file
 BLOG_FILE="$HOME/.blog"
 function blog()					# blog or blog "text" to log it in a file; blog -v to view the logs
 {
-	if [ "$1" = "-v" ]; then
-		[ -f "$BLOG_FILE" ] && less -S "$BLOG_FILE";
-	else
-		trap "" INT
-		date "+%D %T" | tee -a "$BLOG_FILE"
-		if [ $# -eq 0 ]; then
-			cat >> "$BLOG_FILE"
-		else
-			echo "$@" >> "$BLOG_FILE"
-		fi
-		echo -e "\n" >> "$BLOG_FILE"
-		trap - INT
-	fi
+    if [ "$1" = "-v" ]; then
+        [ -f "$BLOG_FILE" ] && less -S "$BLOG_FILE";
+    else
+        trap "" INT
+        date "+%D %T" | tee -a "$BLOG_FILE"
+        if [ $# -eq 0 ]; then
+            cat >> "$BLOG_FILE"
+        else
+            echo "$@" >> "$BLOG_FILE"
+        fi
+        echo -e "\n" >> "$BLOG_FILE"
+        trap - INT
+    fi
 }
 
 function kbd()
 {
-	case $1 in
-		(caps-ctrl)
-			setxkbmap -option ctrl:nocaps;; # caps lock is a ctrl key
-		(caps-esc)
-			setxkbmap -option caps:escape;; # caps lock is an alt key
-		(caps-super)
-			setxkbmap -option caps:super;; # caps lock is a super key
-		(us)
-			setxkbmap us;;
-		(fr)
-			setxkbmap fr;;
-	esac
+    case $1 in
+        (caps-ctrl)
+            setxkbmap -option ctrl:nocaps;; # caps lock is a ctrl key
+        (caps-esc)
+            setxkbmap -option caps:escape;; # caps lock is an alt key
+        (caps-super)
+            setxkbmap -option caps:super;; # caps lock is a super key
+        (us)
+            setxkbmap us;;
+        (fr)
+            setxkbmap fr;;
+    esac
 }
 
 function popup()
 {
-	trap "tput cnorm; tput rc; return;" INT;
-	local -i x y;
-	local msg;
-	x=-1;
-	y=-1;
-	while getopts "x:y:" opt 2>/dev/null ; do
-		case $opt in
-			(x) x=$OPTARG;;
-			(y) y=$OPTARG;;
-			(*) echo "Invalid option" >&2;
-				return;;
-		esac
-	done
-	shift $(( $OPTIND - 1 ));
-	msg="$*";
+    trap "tput cnorm; tput rc; return;" INT;
+    local -i x y;
+    local msg;
+    x=-1;
+    y=-1;
+    while getopts "x:y:" opt 2>/dev/null ; do
+        case $opt in
+            (x) x=$OPTARG;;
+            (y) y=$OPTARG;;
+            (*) echo "Invalid option" >&2;
+                return;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ));
+    msg="$*";
     [[ $x == -1 ]] && x=$(( COLUMNS / 2 - $#msg / 2 ));
-	[[ $y == -1 ]] && y=$(( LINES / 2 ));
-	tput civis;
-	tput sc;
-	tput cup $y $x;
-	print "$msg";
-	read -sk1;
-	tput rc;
-	tput cnorm;
+    [[ $y == -1 ]] && y=$(( LINES / 2 ));
+    tput civis;
+    tput sc;
+    tput cup $y $x;
+    print "$msg";
+    read -sk1;
+    tput rc;
+    tput cnorm;
 }
 
 function get_cup()
 {
-	stty -echo;
-	echo -n $'\e[6n';
-	read -d R x;
-	stty echo;
-	echo "${x#??}";
+    stty -echo;
+    echo -n $'\e[6n';
+    read -d R x;
+    stty echo;
+    echo "${x#??}";
 }
 
 function set_cup()
 {
-	tput cup ${1//;/ };
+    tput cup ${1//;/ };
 }
 
 function format()
 {
-	clang-format -i -style="{
+    clang-format -i -style="{
 BasedOnStyle: llvm,
 TabWidth: 4,
 IndentWidth: 4,
@@ -894,58 +894,53 @@ MaxEmptyLinesToKeep: 1,
 }" "$@"
 }
 
-function go()
-{
-	emacs -q -nw --batch --eval "(browse-url-of-file \"https://duckduckgo.com/"$@"\")"
-}
-
 # example> addd ec ~/emacs-config/
 function addd()					# add a directory hash to the config file
 {
-	# $1: dir name (default value $(basename $PWD))
-	# $2: hash key (default value .)
-	# $3: if set, append a '/' to the aliased dir (this will prevent the complete aliasing)
-	
-	hdir="${1:=${PWD:t}}"
-	dir="${${2:=$PWD}:a}${3:+/}"
-	echo "hash -d $hdir=$dir" >> ${~LOCAL_CONF_FILE:=~/.myzshrc}
-	hash -d $hdir=$dir
-	echo "$C_YELLOW$dir$DEF_C is now aliased as $C_CYAN$hdir$DEF_C (in ${LOCAL_CONF_FILE:=~/.myzshrc})"
+    # $1: dir name (default value $(basename $PWD))
+    # $2: hash key (default value .)
+    # $3: if set, append a '/' to the aliased dir (this will prevent the complete aliasing)
+
+    hdir="${1:=${PWD:t}}"
+    dir="${${2:=$PWD}:a}${3:+/}"
+    echo "hash -d $hdir=$dir" >> ${~LOCAL_CONF_FILE:=~/.myzshrc}
+    hash -d $hdir=$dir
+    echo "$C_YELLOW$dir$DEF_C is now aliased as $C_CYAN$hdir$DEF_C (in ${LOCAL_CONF_FILE:=~/.myzshrc})"
 }
 
 function sizeof()
 {
-	echo "#include <stdint.h>\nint main(){return (sizeof($1));}" | gcc -x c -o/tmp/sizeof - 2>&- || return
-	/tmp/sizeof
-	echo $?
+    echo "#include <stdint.h>\nint main(){return (sizeof($1));}" | gcc -x c -o/tmp/sizeof - 2>&- || return
+    /tmp/sizeof
+    echo $?
 }
 
 function sizeof32()
 {
-	echo "#include <stdint.h>\nint main(){return (sizeof($1));}" | gcc -m32 -x c -o/tmp/sizeof - 2>&- || return
-	/tmp/sizeof
-	echo $?
+    echo "#include <stdint.h>\nint main(){return (sizeof($1));}" | gcc -m32 -x c -o/tmp/sizeof - 2>&- || return
+    /tmp/sizeof
+    echo $?
 }
 
 function sizeof64()
 {
-	echo "#include <stdint.h>\nint main(){return (sizeof($1));}" | gcc -m64 -x c -o/tmp/sizeof - 2>&- || return
-	/tmp/sizeof
-	echo $?
+    echo "#include <stdint.h>\nint main(){return (sizeof($1));}" | gcc -m64 -x c -o/tmp/sizeof - 2>&- || return
+    /tmp/sizeof
+    echo $?
 }
 
 function rgb() # if truecolor is set, sets the foreground color
 {
-	[[ -z "$1$2$3" ]] &&
-	printf $DEF_C ||
-	printf "\033[38;2;%d;%d;%dm" $1 $2 $3
+    [[ -z "$1$2$3" ]] &&
+    printf $DEF_C ||
+    printf "\033[38;2;%d;%d;%dm" $1 $2 $3
 }
 
 function rgbb() # if truecolor is set, sets the background color
 {
-	[[ -z "$1$2$3" ]] &&
-	printf $DEF_C ||
-	printf "\033[48;2;%d;%d;%dm" $1 $2 $3
+    [[ -z "$1$2$3" ]] &&
+    printf $DEF_C ||
+    printf "\033[48;2;%d;%d;%dm" $1 $2 $3
 }
 
 function foreachd() # foreachd ~/.config/*-config -- ./install.sh
@@ -1036,52 +1031,52 @@ function p() # goto the #n previous numbered directory (defaults at 1)
 
 function race()					# race between tokens given in parameters
 {
-	cat /dev/urandom | tr -dc "0-9A-Za-z" | command egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
+    cat /dev/urandom | tr -dc "0-9A-Za-z" | command egrep --line-buffered -ao "$(echo $@ | sed "s/[^A-Za-z0-9]/\|/g")" | nl
 }
 
 function work()					# work simulation
 {
-	clear;
-	text="$(cat $(find ~ -type f -name "*.cpp" 2>/dev/null | head -n25) | sed ':a;$!N;$!ba;s/\/\*[^​*]*\*\([^/*​][^*]*\*\|\*\)*\///g')"
-	arr=($(echo $text))
-	i=0
-	cat /dev/zero | head -c $COLUMNS | tr '\0' '='
-	while true
-	do
-		read -sk;
-		echo -n ${text[$i]};
-		i=$(( i + 1 ))
-	done
-	echo
+    clear;
+    text="$(cat $(find ~ -type f -name "*.cpp" 2>/dev/null | head -n25) | sed ':a;$!N;$!ba;s/\/\*[^​*]*\*\([^/*​][^*]*\*\|\*\)*\///g')"
+    arr=($(echo $text))
+    i=0
+    cat /dev/zero | head -c $COLUMNS | tr '\0' '='
+    while true
+    do
+        read -sk;
+        echo -n ${text[$i]};
+        i=$(( i + 1 ))
+    done
+    echo
 }
 
 function hack()					# hollywood hacker cat
 {
-	tput setaf 2; cat $@ | pv -qL 25
+    tput setaf 2; cat $@ | pv -qL 25
 }
 
 function weather()				# prints weather info
 {
-	curl wttr.in/paris
+    curl wttr.in/paris
 }
 
 function useless_fractal()
 {
-	local lines columns a b p q i pnew;
-	clear;
-	((columns=COLUMNS-1, lines=LINES-1, colour=0));
-	bi=$((3.0/lines));
-	ai=$((3.0/columns));
-	for ((b=-1.5; b<=1.5; b+=$bi)); do
-		for ((a=-2.0; a<=1; a+=$ai)); do
-			for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)); do
-				((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew));
-			done
-			echo -n "\\e[4$(( (i/4)%8 ))m ";
-			# echo -n "\\e[48;5;$(( ((i/4)%23) + 232 ))m ";
-		done
-		echo;
-	done
+    local lines columns a b p q i pnew;
+    clear;
+    ((columns=COLUMNS-1, lines=LINES-1, colour=0));
+    bi=$((3.0/lines));
+    ai=$((3.0/columns));
+    for ((b=-1.5; b<=1.5; b+=$bi)); do
+        for ((a=-2.0; a<=1; a+=$ai)); do
+            for ((p=0.0, q=0.0, i=0; p*p+q*q < 4 && i < 32; i++)); do
+                ((pnew=p*p-q*q+a, q=2*p*q+b, p=pnew));
+            done
+            echo -n "\\e[4$(( (i/4)%8 ))m ";
+            # echo -n "\\e[48;5;$(( ((i/4)%23) + 232 ))m ";
+        done
+        echo;
+    done
 }
 
 
@@ -1182,31 +1177,31 @@ bindkey -s ";;" "~"
 
 function get_terminfo_name()	# get the terminfo name according to the keycode
 {
-	for k in "${(@k)terminfo}"; do
-		[ "$terminfo[$k]" = "$@" ] && echo $k
-	done
+    for k in "${(@k)terminfo}"; do
+        [ "$terminfo[$k]" = "$@" ] && echo $k
+    done
 }
 
 function up-line-or-search-prefix () # smart up search (search in history anything matching before the cursor)
 {
-	local CURSOR_before_search=$CURSOR
-	zle up-line-or-search "$LBUFFER"
-	CURSOR=$CURSOR_before_search
+    local CURSOR_before_search=$CURSOR
+    zle up-line-or-search "$LBUFFER"
+    CURSOR=$CURSOR_before_search
 }; zle -N up-line-or-search-prefix
 
 function down-line-or-search-prefix () # same with down
 {
-	local CURSOR_before_search=$CURSOR
-	zle down-line-or-search "$LBUFFER"
-	CURSOR=$CURSOR_before_search
+    local CURSOR_before_search=$CURSOR
+    zle down-line-or-search "$LBUFFER"
+    CURSOR=$CURSOR_before_search
 }; zle -N down-line-or-search-prefix
 
 function open-delims() # open and close quoting chars and put the cursor at the beginning of the quoting
 {
-	if [ $# -eq 2 ]; then
-		BUFFER="$LBUFFER$1$2$RBUFFER"
-		CURSOR+=$#1;
-	fi
+    if [ $# -eq 2 ]; then
+        BUFFER="$LBUFFER$1$2$RBUFFER"
+        CURSOR+=$#1;
+    fi
 }; zle -N open-delims
 
 function sub-function() zle open-delims "\$(" ")"
@@ -1220,7 +1215,7 @@ zle -N double-quote
 
 function save-line()			# save the current line at its state in ~/.saved_commands
 {
-	echo $BUFFER >> ~/.saved_commands
+    echo $BUFFER >> ~/.saved_commands
 }; zle -N save-line
 
 function ctrlz()
@@ -1236,28 +1231,28 @@ function ctrlz()
 
 function clear-and-accept()		# clear the screen and accepts the line
 {
-	zle clear-screen;
-	[ $#BUFFER -ne 0 ] && zle accept-line;
+    zle clear-screen;
+    [ $#BUFFER -ne 0 ] && zle accept-line;
 }; zle -N clear-and-accept
 
 function move-text-right()		# shift text after cursor to the right
 {
-	BUFFER="${BUFFER:0:$CURSOR} ${BUFFER:$CURSOR}";
-	CURSOR+=1;
+    BUFFER="${BUFFER:0:$CURSOR} ${BUFFER:$CURSOR}";
+    CURSOR+=1;
 }; zle -N move-text-right
 
 function move-text-left()		# shift text after cursor to the left
 {
-	if [ $CURSOR -ne 0 ]; then
-		BUFFER="${BUFFER:0:$((CURSOR-1))}${BUFFER:$CURSOR}";
-		CURSOR+=-1;
-	fi
+    if [ $CURSOR -ne 0 ]; then
+        BUFFER="${BUFFER:0:$((CURSOR-1))}${BUFFER:$CURSOR}";
+        CURSOR+=-1;
+    fi
 }; zle -N move-text-left
 
 function shift-arrow()			# emacs-like shift selection
 {
-	((REGION_ACTIVE)) || zle set-mark-command;
-	zle $1;
+    ((REGION_ACTIVE)) || zle set-mark-command;
+    zle $1;
 }; zle -N shift-arrow
 
 function select-left() shift-arrow backward-char; zle -N select-left
@@ -1265,7 +1260,7 @@ function select-right() shift-arrow forward-char; zle -N select-right
 
 function get-word-at-point()
 {
-	echo "${LBUFFER/* /}${RBUFFER/ */}";
+    echo "${LBUFFER/* /}${RBUFFER/ */}";
 }; zle -N get-word-at-point
 
 function magic-abbrev-expand() # expand the last word in the complete corresponding abbreviation if any
@@ -1303,48 +1298,48 @@ function magic-abbrev-expand() # expand the last word in the complete correspond
 
 function self-insert-hook() # hook after each non-binded key pressed
 {
-	
+
 }; zle -N self-insert-hook
 
 function self-insert()			# call pre hook, insert key, and cal post hook
 {
-	zle .self-insert;
-	zle self-insert-hook;
+    zle .self-insert;
+    zle self-insert-hook;
 }; zle -N self-insert
 
 function show-kill-ring()
 {
-	local kr;
-	kr="=> $CUTBUFFER";
-	for k in $killring; do
-		kr+=", $k"
-	done
-	zle -M -- "$kr";
+    local kr;
+    kr="=> $CUTBUFFER";
+    for k in $killring; do
+        kr+=", $k"
+    done
+    zle -M -- "$kr";
 }; zle -N show-kill-ring
 
 function transpose-chars-inplace()
 {
-	BUFFER="${LBUFFER[1,-2]}${RBUFFER[1]}${LBUFFER[-1]}${RBUFFER:1}"
+    BUFFER="${LBUFFER[1,-2]}${RBUFFER[1]}${LBUFFER[-1]}${RBUFFER:1}"
 }; zle -N transpose-chars-inplace
 
 function remove-pipe()			# delete chars backwards beyond the next pipe
 {
-	SPLIT=(${(@s:|:)LBUFFER})
-	LBUFFER=${(j:|:)${SPLIT[1,-2]}}
+    SPLIT=(${(@s:|:)LBUFFER})
+    LBUFFER=${(j:|:)${SPLIT[1,-2]}}
 }; zle -N remove-pipe
 
 function operation-at-point()	# simplify the operation at point
 {
-	LB="${LBUFFER/*[^0-9\-\+\*\/\^\(\)]/}"
-	NLB="$LBUFFER[0,$#LBUFFER-$#LB]"
-	RB="${RBUFFER/[^0-9\-\+\*\/\^\(\)]*/}"
-	NRB="$RBUFFER[$#RB+1,$#RBUFFER]"
-	N="$LB$RB"
-	if [[ -n $N ]]; then
-		NN=$(echo "$N" | bc -q 2>/dev/null)
-		N=${NN:-$N}
-	fi
-	BUFFER="$NLB$N$NRB"
+    LB="${LBUFFER/*[^0-9\-\+\*\/\^\(\)]/}"
+    NLB="$LBUFFER[0,$#LBUFFER-$#LB]"
+    RB="${RBUFFER/[^0-9\-\+\*\/\^\(\)]*/}"
+    NRB="$RBUFFER[$#RB+1,$#RBUFFER]"
+    N="$LB$RB"
+    if [[ -n $N ]]; then
+        NN=$(echo "$N" | bc -q 2>/dev/null)
+        N=${NN:-$N}
+    fi
+    BUFFER="$NLB$N$NRB"
 }; zle -N operation-at-point
 
 function sudo-line() # add sudo to the current command or the last command
@@ -1372,6 +1367,11 @@ function desc-word-at-point()
     zle -M ${DESC:-nope}
 }; zle -N desc-word-at-point
 
+function get-symlink()
+{
+    WORD="${LBUFFER/* /}${RBUFFER/ */}";
+    BUFFER="${BUFFER//$WORD/$(readlink -f $WORD)}"
+}; zle -N get-symlink
 
 ### ZSH FUNCTIONS BINDS ###
 
@@ -1418,8 +1418,8 @@ key[C-space]="^@"
 key[enter]=$terminfo[cr]
 key[M-enter]="^[^J"
 case "$OS" in
-	(*cygwin*) 	key[C-enter]="^^";;
-	(*) 		key[C-enter]="^J";;
+    (*cygwin*) 	key[C-enter]="^^";;
+    (*) 		key[C-enter]="^J";;
 esac
 
 key[F1]=$terminfo[kf1]
@@ -1490,6 +1490,8 @@ bindkey $key[F5] clear-screen
 
 bindkey "^\\" remove-pipe
 bindkey "^[o" operation-at-point
+
+bindkey "^[t" get-symlink
 
 autoload copy-earlier-word  # copy earlier word (like M-. but to scroll through previous agruments)
 zle -N copy-earlier-word
@@ -1579,34 +1581,34 @@ add-abbrev "ci"    "ci ''"                ; abbrev-autopipe "ci"  ; abbrev-cur "
 
 
 case "$OS" in
-	(*darwin*)					# Mac os
-		add-abbrev "update" "brew update && brew upgrade";
-		add-abbrev "install" "brew install ";
-		add-abbrev "search" "brew search ";
-		
-		alias ls="ls -G";
-		;;
-	(*cygwin*)					# cygwin
-		add-abbrev "update" "setup.exe";
-		add-abbrev "install" "apt-cyg install ";
-		add-abbrev "search" "apt-cyg searchall ";
-		
-		alias ls="ls --color=auto";
-		;;
-    (*bsd*)
-		add-abbrev "update" "pkg upgrade";
-		add-abbrev "install" "pkg install ";
-		add-abbrev "search" "pkg search ";
+    (*darwin*)					# Mac os
+        add-abbrev "update" "brew update && brew upgrade";
+        add-abbrev "install" "brew install ";
+        add-abbrev "search" "brew search ";
 
         alias ls="ls -G";
         ;;
-	(*linux*|*)					# Linux
-		add-abbrev "update" "sudo apt-get update && sudo apt-get upgrade";
-		add-abbrev "install" "apt-get install ";
-		add-abbrev "search" "apt-cache search ";
-		
-		alias ls="ls --color=auto";
-		;;
+    (*cygwin*)					# cygwin
+        add-abbrev "update" "setup.exe";
+        add-abbrev "install" "apt-cyg install ";
+        add-abbrev "search" "apt-cyg searchall ";
+
+        alias ls="ls --color=auto";
+        ;;
+    (*bsd*)
+        add-abbrev "update" "pkg upgrade";
+        add-abbrev "install" "pkg install ";
+        add-abbrev "search" "pkg search ";
+
+        alias ls="ls -G";
+        ;;
+    (*linux*|*)					# Linux
+        add-abbrev "update" "sudo apt-get update && sudo apt-get upgrade";
+        add-abbrev "install" "apt-get install ";
+        add-abbrev "search" "apt-cache search ";
+
+        alias ls="ls --color=auto";
+        ;;
 esac
 
 
@@ -1649,13 +1651,13 @@ alias trunc='sed "s/^\(.\{0,$COLUMNS\}\).*$/\1/g"' # truncate too long lines
 
 alias dmake='CFLAGS+="-g3 -DDEBUG" make'
 
-alias t="tmux" 
+alias t="tmux"
 alias ta="tmux attach-session || tmux new-session"
 
 alias TODO="grep --exclude-dir='.git' -InHo 'TODO.*' -r ."
 
 
-### MANDATORY FUNCTIONS CALLS ###
+# ### MANDATORY FUNCTIONS CALLS ###
 
 check_git_repo
 set_git_branch
@@ -1681,5 +1683,7 @@ installed coderay && export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {})
 installed highlight && export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || (highlight -O ansi -l {} || cat {}) 2> /dev/null | head -$LINES'\''' || export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || cat {} 2> /dev/null | head -$LINES'\'''
 
 # join_others_shells				# ask to join others shells
+
+[ -e /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
