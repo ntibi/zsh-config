@@ -245,6 +245,22 @@ _shlvl=10			;_PS1_DOC+="print the current sh level (shell depth)"
 _user_level=11		;_PS1_DOC+="print the current user level (root or not)"
 _end_char=12		;_PS1_DOC+="print a nice '>' at the end"
 
+
+TODO_FILE=.todo
+
+function print_todo()
+{
+    [ -e $TODO_FILE ] && cat $TODO_FILE | sed "s/^/[${C_BLUE}TODO${DEF_C}]: /"
+}
+
+function todo() {
+if [ "$#" -ne 0 ]; then
+    echo $* >> $TODO_FILE
+else
+    $EDITOR $TODO_FILE
+fi
+}
+
 function setprompt()			# set a special predefined prompt or update the prompt according to the prompt vars
 {
 	case $1 in
@@ -332,6 +348,7 @@ function chpwd()				# chpwd hook
 	update_pwd_datas
 	update_pwd_save
 	setprompt					# update the prompt
+    print_todo
 }
 
 function periodic()				# every $PERIOD secs - triggered by promt print
@@ -1687,3 +1704,5 @@ installed highlight && export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {
 [ -e /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
+
+print_todo
