@@ -1694,9 +1694,13 @@ rehash							# hash commands in path
 
 
 [ -e ~/.postzshrc ] && source ~/.postzshrc # load user file if any
+
 if [ -e ~/.fzf.zsh ]; then
     source ~/.fzf.zsh # load fzf
     bindkey '^F' fzf-file-widget
+    function fzf-history-widget-np { FZF_DEFAULT_OPTS="" fzf-history-widget }
+    zle -N fzf-history-widget-np
+    bindkey '^R' fzf-history-widget-np
 fi
 bindkey "^T" transpose-chars-inplace # override fzf binding
 
