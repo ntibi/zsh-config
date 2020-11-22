@@ -1096,6 +1096,11 @@ function useless_fractal()
     done
 }
 
+function mem()
+{
+    ps aux | awk '{print $6/1024 " MB\t\t" $11}'  | sort -n
+}
+
 
 ### ZSH FUNCTIONS LOAD ###
 
