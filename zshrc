@@ -1571,7 +1571,6 @@ add-abbrev "gdf"    '$(git diff --name-only | tr \\n \ )'
 
 add-abbrev "py"     "python "
 add-abbrev "pyc"    "python -c''"         ; abbrev-cur "pyc" -1
-add-abbrev "res"	"ressource"
 
 add-abbrev "s2e"	"1>&2"
 add-abbrev "e2s"	"2>&1"
