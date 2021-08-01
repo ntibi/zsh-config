@@ -1698,3 +1698,5 @@ rehash							# hash commands in path
 
 
 print_todo
+
+if [ -f "$HOME/.zsh-better-npm-completion.plugin.zsh" ]; then . "${HOME}/.zsh-better-npm-completion.plugin.zsh"; fi
