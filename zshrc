@@ -73,8 +73,6 @@ WORDCHARS="*?_-.[]~=/&;!#$%^(){}<>|" # for the word-movement
 
 PERIOD=5			  # period used to hook periodic function (in sec)
 
-PWD_FILE=~/.pwd					# last pwd sav file
-
 
 OS="$(uname | tr "A-Z" "a-z")"	# get the os name
 
@@ -158,11 +156,6 @@ function update_pwd_datas()		# update the numbers of files and dirs in .
 	d=( *(/D) )
 	NB_FILES=$#f
 	NB_DIRS=$#d
-}
-
-function update_pwd_save()		# update the $PWD_FILE
-{
-	[[ $PWD != "$HOME" ]] && echo $PWD > $PWD_FILE
 }
 
 function set_git_branch()
@@ -346,7 +339,6 @@ function chpwd()				# chpwd hook
 	check_git_repo
 	set_git_branch
 	update_pwd_datas
-	update_pwd_save
 	setprompt					# update the prompt
     print_todo
 }
@@ -356,7 +348,6 @@ function periodic()				# every $PERIOD secs - triggered by promt print
 	check_git_repo
 	set_git_branch
 	update_pwd_datas
-	update_pwd_save
 }
 
 function preexec()				# pre execution hook
@@ -417,13 +408,6 @@ function error()				# give error nb to get the corresponding error string
 import os;
 print '{}: {}'.format($?, os.strerror($?))
 ";
-}
-
-function join_others_shells()	# ask for joining path specified in $PWD_FILE if not already in it
-{
-	if [[ -e $PWD_FILE ]] && [[ $(pwd) != $(cat $PWD_FILE) ]]; then
-		read -q "?Go to $C_YELLOW$(cat $PWD_FILE)$C_WHITE ? (Y/n):" && cd "$(cat $PWD_FILE)"
-	fi
 }
 
 function loop()					# loop parameter command every $LOOP_INT seconds (default 1)
@@ -1188,7 +1172,6 @@ compdef _kbd kbd
 ### SHELL COMMANDS BINDS ###
 
 # C-v or 'cat -v' to get the keycode
-bindkey -s "^[j" "^A^Kjoin_others_shells\n" # join_others_shells user function
 bindkey -s "^[r" "^Uressource\n"		  # source ~/.zshrc
 bindkey -s "\el" "^Uls\n"		# run ls
 
