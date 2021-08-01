@@ -1682,6 +1682,8 @@ installed highlight && export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {
 
 [ -e /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
+[ -e /usr/share/autojump/autojump.zsh ] && source /usr/share/autojump/autojump.zsh
+
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
 
 # ### MANDATORY FUNCTIONS CALLS ###
