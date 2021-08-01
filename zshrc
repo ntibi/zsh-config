@@ -1662,17 +1662,6 @@ alias ta="tmux attach-session || tmux new-session"
 alias TODO="rg 'TODO.*'"
 
 
-# ### MANDATORY FUNCTIONS CALLS ###
-
-check_git_repo
-set_git_branch
-update_pwd_datas
-update_pwd_save
-set_git_char
-loadconf static
-title
-rehash							# hash commands in path
-
 # call the clock update when the term size change
 # trap clock WINCH
 
@@ -1691,10 +1680,19 @@ bindkey "^T" transpose-chars-inplace # override fzf binding
 installed coderay && export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || (coderay {} || cat {}) 2> /dev/null | head -$LINES'\''' || export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || cat {} 2> /dev/null | head -$LINES'\'''
 installed highlight && export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || (highlight -O ansi -l {} || cat {}) 2> /dev/null | head -$LINES'\''' || export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || cat {} 2> /dev/null | head -$LINES'\'''
 
-# join_others_shells				# ask to join others shells
-
 [ -e /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
+
+# ### MANDATORY FUNCTIONS CALLS ###
+
+check_git_repo
+set_git_branch
+update_pwd_datas
+set_git_char
+loadconf static
+title
+rehash							# hash commands in path
+
 
 print_todo
