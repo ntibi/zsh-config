@@ -1549,6 +1549,7 @@ add-abbrev "stash"	"git stash "
 add-abbrev "gp"		"git push "
 add-abbrev "gd"		"git diff "
 add-abbrev "gds"	"git diff --staged "
+add-abbrev "rebase"	'git rebase '
 
 add-abbrev "gdf"    '$(git diff --name-only | tr \\n \ )'
 
