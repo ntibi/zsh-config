@@ -1684,6 +1684,8 @@ installed highlight && export FZF_DEFAULT_OPTS='--preview '\''[[ $(file --mime {
 
 [ -e /usr/share/autojump/autojump.zsh ] && source /usr/share/autojump/autojump.zsh
 
+[ -e "$HOME/.zsh-better-npm-completion.plugin.zsh" ] && source "${HOME}/.zsh-better-npm-completion.plugin.zsh"
+
 [ "$STARTUP_CMD" != "" ] && eval $STARTUP_CMD && unset STARTUP_CMD; # execute user defined commands after init
 
 # ### MANDATORY FUNCTIONS CALLS ###
@@ -1698,5 +1700,3 @@ rehash							# hash commands in path
 
 
 print_todo
-
-if [ -f "$HOME/.zsh-better-npm-completion.plugin.zsh" ]; then . "${HOME}/.zsh-better-npm-completion.plugin.zsh"; fi
