@@ -79,17 +79,19 @@ OS="$(uname | tr "A-Z" "a-z")"	# get the os name
 UPDATE_TERM_TITLE="" # set to update the term title according to the path and the currently executed line
 UPDATE_CLOCK=""		 # set to update the top-right clock every second
 
-EDITOR="vim"
-VISUAL="vim"
+EDITOR="nvim"
+VISUAL="nvim"
 PAGER="less"
 
 HISTFILE=~/.zshrc_history
-SAVEHIST=65536
-HISTSIZE=65536
+SAVEHIST=262144
+HISTSIZE=262144
 
 CLICOLOR=1
 
 LOCAL_CONF_FILE="~/.myzshrc"	# use like this: ${~LOCAL_CONF_FILE}
+
+# fpath+=('/usr/share/zsh/site-functions/')
 
 case "$OS" in
 	(*darwin*)					# mac os
@@ -1003,7 +1005,7 @@ EOF
     $out $*
 }
 
-function n() # goto the #n next numbered directory (defaults at 1)
+function next() # goto the #n next numbered directory (defaults at 1)
 {
     local NEW;
 
@@ -1015,7 +1017,7 @@ function n() # goto the #n next numbered directory (defaults at 1)
     fi
 }
 
-function p() # goto the #n previous numbered directory (defaults at 1)
+function prev() # goto the #n previous numbered directory (defaults at 1)
 {
     local NEW;
 
@@ -1333,6 +1335,12 @@ function remove-pipe()			# delete chars backwards beyond the next pipe
     LBUFFER=${(j:|:)${SPLIT[1,-2]}}
 }; zle -N remove-pipe
 
+function remove-slash()			# delete chars backwards beyond the next slash
+{
+    SPLIT=(${(@s:/:)LBUFFER})
+    LBUFFER=${(j:/:)${SPLIT[1,-2]}}/
+}; zle -N remove-slash
+
 function operation-at-point()	# simplify the operation at point
 {
     LB="${LBUFFER/*[^0-9\-\+\*\/\^\(\)]/}"
@@ -1493,6 +1501,8 @@ bindkey $key[C-enter] clear-and-accept
 bindkey $key[F1] run-help
 bindkey $key[F5] clear-screen
 
+bindkey -r ""
+bindkey "" remove-slash
 bindkey "^\\" remove-pipe
 bindkey "^[o" operation-at-point
 
