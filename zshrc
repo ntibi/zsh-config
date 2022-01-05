@@ -1678,8 +1678,8 @@ alias TODO="rg 'TODO.*'"
 
 [ -e ~/.postzshrc ] && source ~/.postzshrc # load user file if any
 
-if [ -e ~/.fzf.zsh ]; then
-    source ~/.fzf.zsh # load fzf
+if installed fzf; then
+    source /usr/share/fzf/key-bindings.zsh
     bindkey '^F' fzf-file-widget
     function fzf-history-widget-np { FZF_DEFAULT_OPTS="" fzf-history-widget }
     zle -N fzf-history-widget-np
