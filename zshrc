@@ -359,7 +359,7 @@ function preexec()				# pre execution hook
             screen*) # do not print cwd in tmux/screen
                 set_title ${1// */};; # and only the binary name, not the args
             *)
-                set_title "${PWD/~/~} : $1";; # set 'pwd + cmd' set term title
+                set_title "${PWD/~/~} : ${1// */}";; # set 'pwd + cmd' set term title
         esac
     fi
 }
