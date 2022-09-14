@@ -1594,39 +1594,7 @@ add-abbrev "t" "tmux "                    ; abbrev-beginning "tmux"
 
 add-abbrev "ci"    "ci ''"                ; abbrev-autopipe "ci"  ; abbrev-cur "ci" -1
 
-
-case "$OS" in
-    (*darwin*)					# Mac os
-        add-abbrev "update" "brew update && brew upgrade";
-        add-abbrev "install" "brew install ";
-        add-abbrev "search" "brew search ";
-
-        alias ls="ls -G";
-        ;;
-    (*cygwin*)					# cygwin
-        add-abbrev "update" "setup.exe";
-        add-abbrev "install" "apt-cyg install ";
-        add-abbrev "search" "apt-cyg searchall ";
-
-        alias ls="ls --color=auto";
-        ;;
-    (*bsd*)
-        add-abbrev "update" "pkg upgrade";
-        add-abbrev "install" "pkg install ";
-        add-abbrev "search" "pkg search ";
-
-        alias ls="ls -G";
-        ;;
-    (*linux*|*)					# Linux
-        add-abbrev "update" "sudo apt-get update && sudo apt-get upgrade";
-        add-abbrev "install" "apt-get install ";
-        add-abbrev "search" "apt-cache search ";
-
-        alias ls="ls --color=auto";
-        ;;
-esac
-
-
+alias ls="ls --color=auto";
 alias l="ls -lFh"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
 alias lt="ls -ltFh"				# l with modification date sort
