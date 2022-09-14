@@ -1639,6 +1639,9 @@ alias ta="tmux attach-session || tmux new-session"
 
 alias TODO="rg 'TODO.*'"
 
+alias nowrap="tput rmam"
+alias wrap="tput smam"
+
 
 # call the clock update when the term size change
 # trap clock WINCH
