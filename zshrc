@@ -1650,7 +1650,8 @@ alias wrap="tput smam"
 [ -e ~/.postzshrc ] && source ~/.postzshrc # load user file if any
 
 if installed fzf; then
-    source /usr/share/fzf/key-bindings.zsh
+    test -e /usr/share/fzf/key-bindings.zsh && source /usr/share/fzf/key-bindings.zsh
+    test -e /usr/share/doc/fzf/examples/key-bindings.zsh && source /usr/share/doc/fzf/examples/key-bindings.zsh
     bindkey '^F' fzf-file-widget
     function fzf-history-widget-np { FZF_DEFAULT_OPTS="" fzf-history-widget }
     zle -N fzf-history-widget-np
