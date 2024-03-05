@@ -1595,11 +1595,12 @@ add-abbrev "t" "tmux "                    ; abbrev-beginning "tmux"
 add-abbrev "ci"    "ci ''"                ; abbrev-autopipe "ci"  ; abbrev-cur "ci" -1
 
 alias ls="ls --color=auto";
-alias l="ls -lFh"				# list + classify + human readable
+alias l="ls -l -F -h"				# list + classify + human readable
 alias la="ls -lAFh"				# l with hidden files
 alias lt="ls -ltFh"				# l with modification date sort
 alias lt="ls -ltFh"				# l with modification date sort
 alias l1="ls -1"				# one result per line
+installed eza && alias ls="eza" # prefer eza
 
 alias mkdir="mkdir -pv"			# create all the needed parent directories + inform user about creations
 
