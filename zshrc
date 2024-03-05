@@ -1643,6 +1643,7 @@ alias TODO="rg 'TODO.*'"
 alias nowrap="tput rmam"
 alias wrap="tput smam"
 
+alias asciitable='column -t -s "|" -o " | "'
 
 # call the clock update when the term size change
 # trap clock WINCH
