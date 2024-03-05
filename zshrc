@@ -408,7 +408,7 @@ function error()				# give error nb to get the corresponding error string
 {
 	python -c "
 import os;
-print '{}: {}'.format($?, os.strerror($?))
+print ('{}: {}'.format($?, os.strerror($?)))
 ";
 }
 
